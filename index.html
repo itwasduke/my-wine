@@ -227,6 +227,22 @@ const wines = {
   powers:{vintage:'NAS',title:'Powers Irish Whiskey',origin:'Midleton Distillery, Cork, Ireland',grape:'Triple-distilled pot still & grain blend · 40% ABV',type:'spirit',profile:'One of Ireland\'s most storied whiskeys, founded in 1791 by John Power — and the first Irish whiskey ever to be bottled (1886). A high pot still ratio gives it more richness and character than typical Irish blends. Nose: crisp apple, pear, honey, vanilla, and cereal grain. Palate: honey, orchard fruits, toasted barley, caramel, spicy black pepper, and warming ginger. Finish: medium-length, warm, with lingering spice and honey sweetness.',pairings:['Hearty Irish stew','Roasted meats','Sharp cheddar','Creamy blue cheese','Dark chocolate','Apple desserts','Irish soda bread'],serve:'Wonderful neat, with a splash of water, or as the base of an Irish Coffee. Also great with ginger ale. Powers is an underrated classic that regularly outperforms whiskeys twice its price.'}
 };
 
+// 🥚 Easter egg — type "armel" anywhere on the page
+wines['armel'] = {
+  type:'peak', vintage:'😳', name:'For Armel', origin:'🍷 Special Reserve',
+  about:'Simulated Dick Pick',
+  tasting:'Simulated Dick Pick',
+  pairings:['Simulated Dick Pick'],
+  serving:'Simulated Dick Pick',
+  stats:[{l:'Rating',v:'🍆/10'},{l:'Varietal',v:'100% Cheeky'},{l:'Serve',v:'Immediately'}]
+};
+let _buf='';
+document.addEventListener('keypress',e=>{
+  _buf+=e.key.toLowerCase();
+  if(_buf.includes('armel')){_buf='';openModal('armel');}
+  if(_buf.length>10)_buf=_buf.slice(-10);
+});
+
 function openModal(id){
   const w=wines[id];if(!w)return;
   const ac=document.getElementById('modalAccent');
