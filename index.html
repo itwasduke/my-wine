@@ -192,6 +192,87 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   main { padding: 20px 20px 60px; }
   .modal { padding: 30px 24px; }
 }
+
+/* PIN modal */
+.pin-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,6,2,0.94);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.pin-overlay.active { display: flex; }
+.pin-modal {
+  background: linear-gradient(145deg, #1f1208, #160e05);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 2px;
+  max-width: 340px;
+  width: 100%;
+  padding: 40px 36px 36px;
+  position: relative;
+  text-align: center;
+}
+.pin-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.pin-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ash);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.pin-input {
+  display: block;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 2px;
+  color: var(--cream);
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  letter-spacing: 0.6em;
+  text-align: center;
+  padding: 14px 14px 14px 28px;
+  outline: none;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.pin-input:focus { border-color: rgba(201,168,76,0.5); }
+.pin-error {
+  font-size: 0.72rem;
+  color: #FC8181;
+  letter-spacing: 0.12em;
+  min-height: 20px;
+  margin-bottom: 16px;
+  font-family: 'Raleway', sans-serif;
+}
+.pin-submit {
+  width: 100%;
+  padding: 12px;
+  background: rgba(107,26,42,0.3);
+  border: 1px solid rgba(155,58,74,0.5);
+  border-radius: 2px;
+  color: var(--wine-light);
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pin-submit:hover { background: rgba(107,26,42,0.55); color: var(--cream); }
+.pin-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -225,6 +306,21 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   </div>
 </div>
 
+<!-- PIN Modal -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-modal">
+    <button class="modal-close" onclick="closePinModal()">×</button>
+    <div class="pin-title">Confirm</div>
+    <div class="pin-subtitle">Enter your 4-digit PIN to mark this bottle as consumed</div>
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric"
+      maxlength="4" placeholder="····" autocomplete="off"
+      oninput="this.value=this.value.replace(/\D/g,'')"
+      onkeydown="if(event.key==='Enter')submitPin()">
+    <div class="pin-error" id="pinError"></div>
+    <button class="pin-submit" id="pinSubmit" onclick="submitPin()">Confirm</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc }
@@ -242,8 +338,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// PIN stored as SHA-256 hash — the plain-text PIN is never in source.
+// To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
+const PIN_HASH = 'a8d248c5eda6fa32253b67ea3613fd9e74ce099bc701e807c6d8fbd714e6b040';
+
+async function hashPin(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // In-memory cache of all inventory documents (id -> data)
 let inventory = {};
+let pendingConsumeId = null;
 
 const SECTIONS = [
   { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },
@@ -327,14 +433,12 @@ window.openModal = function(id) {
     <div class="modal-section-label">Drinking Window</div>
     <div class="modal-text">${w.window}</div>
     ${showBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
-      <button class="consume-btn" onclick="markConsumed('${id}')">Mark as Consumed</button>` : ''}
+      <button class="consume-btn" onclick="showPinModal('${id}')">Mark as Consumed</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
 };
 
-window.markConsumed = async function(id) {
-  const btn = document.querySelector('.consume-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+async function markConsumed(id) {
   try {
     await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed' });
     inventory[id].status = 'consumed';
@@ -342,9 +446,45 @@ window.markConsumed = async function(id) {
     closeModalDirect();
     renderInventory();
   } catch (e) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Mark as Consumed'; }
     console.error('Failed to update Firestore:', e);
   }
+}
+
+window.showPinModal = function(id) {
+  pendingConsumeId = id;
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinSubmit').disabled = false;
+  document.getElementById('pinSubmit').textContent = 'Confirm';
+  document.getElementById('pinOverlay').classList.add('active');
+  setTimeout(() => document.getElementById('pinInput').focus(), 50);
+};
+
+window.submitPin = async function() {
+  const entered = document.getElementById('pinInput').value;
+  if (entered.length !== 4) {
+    document.getElementById('pinError').textContent = 'Please enter a 4-digit PIN.';
+    return;
+  }
+  const btn = document.getElementById('pinSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  const hash = await hashPin(entered);
+  if (hash === PIN_HASH) {
+    closePinModal();
+    await markConsumed(pendingConsumeId);
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+    btn.disabled = false;
+    btn.textContent = 'Confirm';
+  }
+};
+
+window.closePinModal = function() {
+  document.getElementById('pinOverlay').classList.remove('active');
+  pendingConsumeId = null;
 };
 
 window.closeModal = function(e) {
@@ -356,7 +496,12 @@ function closeModalDirect() {
 }
 window.closeModalDirect = closeModalDirect;
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('pinOverlay').classList.contains('active')) closePinModal();
+    else closeModalDirect();
+  }
+});
 
 loadInventory();
 </script>
