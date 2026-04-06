@@ -207,201 +207,10 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   <p class="last-updated">Last updated: April 6, 2026</p>
 </header>
 
-<main>
-
-  <!-- READY TO DRINK -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title ready">Ready to Drink</span>
-      <div class="section-line ready"></div>
-    </div>
-    <div class="grid">
-
-      <div class="card ready" onclick="openModal('brundesp')">
-        <div class="card-year">2019</div>
-        <div class="card-name">Château Brun Despagne</div>
-        <div class="card-region">Bordeaux, France</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('boomboom')">
-        <div class="card-year">2021</div>
-        <div class="card-name">Boom Boom Syrah</div>
-        <div class="card-region">Washington State</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('butter')">
-        <div class="card-year">NV</div>
-        <div class="card-name">Butter Chardonnay</div>
-        <div class="card-region">California</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('mondavi')">
-        <div class="card-year">2023</div>
-        <div class="card-name">Robert Mondavi Private Selection Bourbon Barrel-Aged Cabernet Sauvignon</div>
-        <div class="card-region">California</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('davinci')">
-        <div class="card-year">2016</div>
-        <div class="card-name">DaVinci Chianti</div>
-        <div class="card-region">Tuscany, Italy</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('cesari')">
-        <div class="card-year">2021</div>
-        <div class="card-name">Cesari Pinot Grigio</div>
-        <div class="card-region">Delle Venezie, Italy</div>
-      </div>
-
-      <div class="card ready" onclick="openModal('stnicolas')">
-        <div class="card-year">NV</div>
-        <div class="card-name">Chateau St. Nicholas</div>
-        <div class="card-region">France</div>
-      </div>
-
-
-
-    </div>
+<main id="main-content">
+  <div id="cellar-loading" style="text-align:center;padding:80px 20px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--ash);letter-spacing:0.15em;">
+    Loading cellar…
   </div>
-
-  <!-- DRINK SOON -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title soon">Drink Soon</span>
-      <div class="section-line soon"></div>
-    </div>
-    <div class="grid">
-
-      <div class="card soon" onclick="openModal('jadot')">
-        <div class="card-year">2011</div>
-        <div class="card-name">Louis Jadot Beaujolais-Villages</div>
-        <div class="card-region">Burgundy, France</div>
-      </div>
-
-      <div class="card soon" onclick="openModal('riojavega')">
-        <div class="card-year">2009</div>
-        <div class="card-name">Rioja Vega</div>
-        <div class="card-region">Rioja, Spain</div>
-      </div>
-
-      <div class="card soon" onclick="openModal('josh')">
-        <div class="card-year">NV</div>
-        <div class="card-name">Josh North Coast Reserve Cabernet Sauvignon</div>
-        <div class="card-region">California</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- PAST PEAK -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title cook">Past Peak — Cooking Only</span>
-      <div class="section-line cook"></div>
-    </div>
-    <div class="grid">
-
-      <div class="card cook" onclick="openModal('joshmerlot')">
-        <div class="card-year">2015</div>
-        <div class="card-name">Josh Merlot</div>
-        <div class="card-region">California</div>
-      </div>
-
-      <div class="card cook" onclick="openModal('concannon')">
-        <div class="card-year">2010</div>
-        <div class="card-name">Concannon Merlot</div>
-        <div class="card-region">California</div>
-      </div>
-
-      <div class="card cook" onclick="openModal('castlerock')">
-        <div class="card-year">2010</div>
-        <div class="card-name">Castle Rock Cabernet Sauvignon</div>
-        <div class="card-region">California</div>
-      </div>
-
-      <div class="card cook" onclick="openModal('littlepenguin')">
-        <div class="card-year">2008</div>
-        <div class="card-name">The Little Penguin Cabernet Sauvignon</div>
-        <div class="card-region">South Eastern Australia</div>
-      </div>
-
-      <div class="card cook" onclick="openModal('gabbiano')">
-        <div class="card-year">2007</div>
-        <div class="card-name">Gabbiano Chianti</div>
-        <div class="card-region">Tuscany, Italy</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- SPIRITS -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title spirits">Spirits</span>
-      <div class="section-line spirits"></div>
-    </div>
-    <div class="grid">
-
-      <div class="card spirits" onclick="openModal('glenfiddich')">
-        <div class="card-year">14 YEAR</div>
-        <div class="card-name">Glenfiddich Single Malt Scotch</div>
-        <div class="card-region">Bourbon Barrel Reserve · Speyside, Scotland</div>
-      </div>
-
-      <div class="card spirits" onclick="openModal('whistlepig')">
-        <div class="card-year">6 YEAR · 100 PROOF</div>
-        <div class="card-name">WhistlePig PiggyBack Bourbon</div>
-        <div class="card-region">Vermont, USA</div>
-      </div>
-
-      <div class="card spirits" onclick="openModal('powers')">
-        <div class="card-year">NAS</div>
-        <div class="card-name">Powers Irish Whiskey</div>
-        <div class="card-region">Gold Label · Ireland</div>
-      </div>
-
-      <div class="card spirits" onclick="openModal('hinomaru')">
-        <div class="card-year">3+ YEAR · 48% ABV</div>
-        <div class="card-name">Hinomaru Whisky Kome</div>
-        <div class="card-region">Ibaraki, Japan</div>
-        <span class="card-badge badge-japan">Japan Exclusive</span>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- CONSUMED -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title consumed">Consumed</span>
-      <div class="section-line consumed"></div>
-    </div>
-    <div class="grid">
-
-      <div class="card consumed" onclick="openModal('nessa')">
-        <div class="card-year">2024</div>
-        <div class="card-name">Nessa Albariño</div>
-        <div class="card-region">Rías Baixas, Spain</div>
-        <span class="card-badge badge-consumed">Consumed</span>
-      </div>
-
-      <div class="card consumed" onclick="openModal('mitravelas')">
-        <div class="card-year">2023</div>
-        <div class="card-name">Mitravelas "Red on Black" Agiorgitiko</div>
-        <div class="card-region">Nemea, Greece</div>
-        <span class="card-badge badge-consumed">Consumed</span>
-      </div>
-
-      <div class="card consumed" onclick="openModal('deepdark')">
-        <div class="card-year">NV</div>
-        <div class="card-name">Deep &amp; Dark Cabernet Sauvignon</div>
-        <div class="card-region">California</div>
-        <span class="card-badge badge-consumed">Consumed</span>
-      </div>
-
-    </div>
-  </div>
-
 </main>
 
 <footer>
@@ -416,208 +225,95 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   </div>
 </div>
 
-<script>
-const wines = {
-  nessa: {
-    year: '2024', name: 'Nessa Albariño', region: 'Rías Baixas, Spain',
-    status: 'consumed', statusLabel: 'Consumed',
-    grape: 'Albariño', abv: '12.5%', temp: '45–50°F',
-    decant: 'No decanting — serve straight from the fridge',
-    notes: 'Bright and vivacious with aromas of white peach, green apple, and citrus blossom. The palate delivers crisp acidity with a saline mineral finish — a hallmark of the Atlantic-influenced Galician coast. Refreshing and precise.',
-    window: 'Drink now through 2026'
-  },
-  mitravelas: {
-    year: '2023', name: 'Mitravelas "Red on Black" Agiorgitiko', region: 'Nemea, Greece',
-    status: 'consumed', statusLabel: 'Consumed',
-    grape: 'Agiorgitiko', abv: '13.5%', temp: '60–65°F',
-    decant: '20–30 minutes — softens tannins and opens up the fruit',
-    notes: 'Deep ruby with violet highlights. Dark cherry, blackberry, and a hint of dried herbs on the nose. Soft, velvety tannins with a warm spice finish. Greece\'s answer to Merlot in terms of approachability, but with its own distinct Mediterranean soul.',
-    window: 'Drink now through 2027'
-  },
-  brundesp: {
-    year: '2019', name: 'Château Brun Despagne', region: 'Bordeaux, France',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Merlot, Cabernet Sauvignon', abv: '13.5%', temp: '62–65°F',
-    decant: '45–60 minutes — opens up the structure and releases the bouquet',
-    notes: 'Classic right-bank Bordeaux character: cassis, plum, cedar, and a touch of graphite. The 2019 vintage was exceptional in Bordeaux — ripe, structured, and age-worthy. Tannins are integrating nicely and drinking beautifully now.',
-    window: 'Drink now through 2028'
-  },
-  davinci: {
-    year: '2016', name: 'DaVinci Chianti', region: 'Tuscany, Italy',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Sangiovese', abv: '12.5%', temp: '60–65°F',
-    decant: '20–30 minutes — helps integrate the acidity and soften any remaining tannins',
-    notes: 'Tart cherry, leather, and dried herbs with characteristic Sangiovese acidity. At eight years of age this is approachable and rustic in a charming way — the acidity has softened and secondary earthy notes have emerged. A textbook everyday Chianti.',
-    window: 'Drink now — approaching peak'
-  },
-  cesari: {
-    year: '2021', name: 'Cesari Pinot Grigio', region: 'Delle Venezie, Italy',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Pinot Grigio', abv: '12%', temp: '45–50°F',
-    decant: 'No decanting — serve cold, pour and enjoy',
-    notes: 'Light straw with green highlights. Crisp pear, white flower, and a subtle almond note on the finish. Clean and refreshing with bright acidity. A reliable, easygoing white for warm evenings.',
-    window: 'Drink now — best enjoyed young'
-  },
-  jadot: {
-    year: '2011', name: 'Louis Jadot Beaujolais-Villages', region: 'Burgundy, France',
-    status: 'soon', statusLabel: 'Drink Soon',
-    grape: 'Gamay', abv: '12.5%', temp: '55–58°F',
-    decant: 'No decanting — if drinking, open and assess immediately',
-    notes: 'Beaujolais-Villages is built for early drinking — carbonic maceration and Gamay are designed for freshness, not aging. At 15 years this bottle is well past its window. Expect faded fruit, possible oxidation, and flat aromatics. May still be drinkable but is a shadow of what it was.',
-    window: '⚠️ Open immediately or move to cooking use — well past peak'
-  },
-  stnicolas: {
-    year: 'NV', name: 'Chateau St. Nicholas', region: 'France',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Blend', abv: '—', temp: '62°F',
-    decant: '15–20 minutes optional — may help open up the fruit slightly',
-    notes: 'A French table wine showing reliable everyday character. Soft red fruit with a gentle tannic structure, made for relaxed drinking without overthinking.',
-    window: 'Drink now'
-  },
-  deepdark: {
-    year: 'NV', name: 'Deep & Dark Cabernet Sauvignon', region: 'California',
-    status: 'consumed', statusLabel: 'Consumed',
-    grape: 'Cabernet Sauvignon', abv: '13.5%', temp: '62–65°F',
-    decant: '20–30 minutes — opens up the dark fruit and softens the oak',
-    notes: 'Dark fruit, mocha, and a hint of vanilla oak. A crowd-pleasing California Cab with soft tannins and a generous, approachable style. The 3L format keeps oxygen exposure low — the last pour is as good as the first.',
-    window: 'Drink within 4–6 weeks of opening'
-  },
-  riojavega: {
-    year: '2009', name: 'Rioja Vega', region: 'Rioja, Spain',
-    status: 'soon', statusLabel: 'Drink Soon',
-    grape: 'Tempranillo', abv: '13.5%', temp: '63–65°F',
-    decant: '60 minutes — essential at this age to blow off any bottle stink and revive the fruit',
-    notes: 'At 15+ years, this Rioja has evolved into dried cherry, tobacco, leather, and earthy undergrowth. Classic Tempranillo tertiary development. Likely at or just past peak — decant for an hour and drink soon to catch it at its best.',
-    window: '⚠️ Drink within the next 6–12 months'
-  },
-  josh: {
-    year: 'NV', name: 'Josh North Coast Reserve Cabernet Sauvignon', region: 'California',
-    status: 'soon', statusLabel: 'Drink Soon',
-    grape: 'Cabernet Sauvignon', abv: '13.5%', temp: '63°F',
-    decant: '30–45 minutes — benefits from air to open up the dark fruit and integrate the oak',
-    notes: 'Rich blackcurrant, dark cherry, and toasty oak with plush tannins. The Reserve designation brings extra concentration versus the standard Josh Cab. Drinking well now with a short window ahead.',
-    window: 'Drink within the next 1–2 years'
-  },
-  joshmerlot: {
-    year: '2015', name: 'Josh Merlot', region: 'California',
-    status: 'cook', statusLabel: 'Cooking Only',
-    grape: 'Merlot', abv: '13.5%', temp: '—',
-    decant: 'N/A — cooking use only',
-    notes: 'Past its prime for drinking. The fruit has faded and oxidation notes have emerged. Excellent for braising, reduction sauces, and any cooked application where wine is an ingredient rather than the star.',
-    window: 'Cooking use only'
-  },
-  concannon: {
-    year: '2010', name: 'Concannon Merlot', region: 'California',
-    status: 'cook', statusLabel: 'Cooking Only',
-    grape: 'Merlot', abv: '13.5%', temp: '—',
-    decant: 'N/A — cooking use only',
-    notes: 'Well past its drinking window. Use in braises, pan sauces, and slow-cooked dishes. The natural acidity and remaining fruit character still add depth to cooked preparations.',
-    window: 'Cooking use only'
-  },
-  castlerock: {
-    year: '2010', name: 'Castle Rock Cabernet Sauvignon', region: 'California',
-    status: 'cook', statusLabel: 'Cooking Only',
-    grape: 'Cabernet Sauvignon', abv: '13.5%', temp: '—',
-    decant: 'N/A — cooking use only',
-    notes: 'Beyond its prime. The tannin structure of Cabernet makes it particularly useful in slow braises — adds body and complexity to beef dishes without the fresh fruit you\'d want in a drinking wine.',
-    window: 'Cooking use only'
-  },
-  littlepenguin: {
-    year: '2008', name: 'The Little Penguin Cabernet Sauvignon', region: 'South Eastern Australia',
-    status: 'cook', statusLabel: 'Cooking Only',
-    grape: 'Cabernet Sauvignon', abv: '13.5%', temp: '—',
-    decant: 'N/A — cooking use only',
-    notes: 'Well past peak. A budget Aussie Cab at 16+ years has run its course for drinking. Still useful in the kitchen — the structure holds up for cooking purposes.',
-    window: 'Cooking use only'
-  },
-  gabbiano: {
-    year: '2007', name: 'Gabbiano Chianti', region: 'Tuscany, Italy',
-    status: 'cook', statusLabel: 'Cooking Only',
-    grape: 'Sangiovese', abv: '12.5%', temp: '—',
-    decant: 'N/A — cooking use only',
-    notes: 'At 17+ years, this budget Chianti has lost its fruit vitality. The high natural acidity of Sangiovese makes it a useful cooking wine — excellent in tomato-based pasta sauces and Italian braises.',
-    window: 'Cooking use only'
-  },
-  glenfiddich: {
-    year: '14 Year', name: 'Glenfiddich Single Malt Scotch', region: 'Bourbon Barrel Reserve · Speyside, Scotland',
-    status: 'spirits', statusLabel: 'Spirits',
-    grape: 'Single Malt Scotch Whisky', abv: '43%', temp: 'Neat or with a drop of water',
-    decant: 'No decanting — add a few drops of water to open up the nose if desired',
-    notes: 'Aged in ex-bourbon barrels for a sweeter, American-influenced profile — vanilla, honey, and toasted oak lead, with Speyside\'s signature dried fruit and a hint of cinnamon spice. Approachable and elegant. The 14-year is the sweet spot in the Glenfiddich range.',
-    window: 'Open bottles best within 1–2 years'
-  },
-  whistlepig: {
-    year: '6 Year · 100 Proof', name: 'WhistlePig PiggyBack Bourbon', region: 'Vermont, USA',
-    status: 'spirits', statusLabel: 'Spirits',
-    grape: '100% Rye Mash Bourbon', abv: '50%', temp: 'Neat, on the rocks, or in cocktails',
-    decant: 'No decanting — let it breathe in the glass for 5 minutes at 100 proof',
-    notes: 'WhistlePig\'s entry-level expression but punches well above its weight. Big rye spice — black pepper, caraway, and fresh herbs — with caramel and vanilla from the barrel. At 100 proof it has presence without being harsh. Exceptional in a Manhattan.',
-    window: 'Open bottles best within 1–2 years'
-  },
-  powers: {
-    year: 'NAS', name: 'Powers Irish Whiskey', region: 'Gold Label · Ireland',
-    status: 'spirits', statusLabel: 'Spirits',
-    grape: 'Triple Distilled Irish Pot Still Whiskey', abv: '43.2%', temp: 'Neat, with water, or on the rocks',
-    decant: 'No decanting — pour and enjoy, optionally with a splash of still water',
-    notes: 'A classic Dublin-style pot still Irish whiskey. Creamy and approachable with green apple, vanilla, and a distinctive spicy pot still character on the finish. Powers is one of the most authentic expressions of traditional Irish whiskey — unpretentious and genuinely delicious.',
-    window: 'Open bottles best within 1–2 years'
-  },
-  hinomaru: {
-    year: '3+ Year · 48% ABV', name: 'Hinomaru Whisky Kome', region: 'Ibaraki, Japan',
-    status: 'spirits', statusLabel: 'Spirits',
-    grape: 'Japanese Rice Whisky', abv: '48% / 96 Proof', temp: 'Neat, with a single ice sphere, or mizuwari',
-    decant: 'No decanting — let it rest in the glass 5 minutes; the rice character opens beautifully with air',
-    notes: 'A genuinely rare and unique Japanese whisky made from rice (kome) — aged over 3 years in a combination of Sherry and Bourbon casks. Produced by Kiuchi Brewing & Distilling, the Ibaraki brewery better known for Hitachino Nest Beer. Expect delicate floral and rice character layered with vanilla from Bourbon casks and dried fruit from Sherry. At 48% it has excellent presence. A Japan-exclusive you won\'t easily find stateside.',
-    window: 'Open bottles best within 2 years · Japan exclusive'
-  },
-  boomboom: {
-    year: '2021', name: 'Boom Boom Syrah', region: 'Washington State',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Syrah', abv: '14.5%', temp: '62–65°F',
-    decant: '30–45 minutes — opens up the dark fruit and tames the bold tannins',
-    notes: 'Washington State Syrah from Charles Smith Wines — expect bold dark fruit, black olive, cracked pepper, and a meaty, savory quality that defines Pacific Northwest Syrah. Fuller-bodied than its fun label suggests, with smooth tannins and a lingering finish. Washington\'s Columbia Valley produces some of the best Syrah in North America.',
-    window: 'Drink now through 2026'
-  },
-  butter: {
-    year: 'NV', name: 'Butter Chardonnay', region: 'California',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Chardonnay', abv: '13.5%', temp: '48–52°F',
-    decant: 'No decanting — serve cold straight from the fridge',
-    notes: 'True to its name — rich, creamy, and unapologetically oaked. Buttered toast, vanilla, ripe apple, and tropical fruit with a smooth, full-bodied palate. Heavy malolactic fermentation gives it that signature velvety texture. A crowd-pleaser for fans of the classic California Chardonnay style.',
-    window: 'Drink now — best within 1–2 years'
-  },
-  mondavi: {
-    year: '2023', name: 'Robert Mondavi Private Selection Bourbon Barrel-Aged Cabernet Sauvignon', region: 'California',
-    status: 'ready', statusLabel: 'Ready to Drink',
-    grape: 'Cabernet Sauvignon', abv: '13.5%', temp: '62–65°F',
-    decant: '30 minutes — softens the oak influence and lets the fruit come forward',
-    notes: 'Finished in bourbon barrels, which add a distinctive layer of vanilla, caramel, and toasted oak on top of classic Cab blackcurrant and dark cherry. The bourbon influence is noticeable but well-integrated — it rounds out the tannins and adds sweetness to the finish without overwhelming the wine\'s core fruit character.',
-    window: 'Drink now through 2026'
-  },
-  consumed_placeholder: {
-    year: '—', name: 'Consumed Archive', region: 'Your finished bottles',
-    status: 'consumed', statusLabel: 'Consumed',
-    grape: '—', abv: '—', temp: '—',
-    decant: '—',
-    notes: 'This section tracks bottles you\'ve finished. Ask Claude to add any wine or spirit you\'ve consumed and it will appear here as a permanent record.',
-    window: 'Finished'
-  }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDSI59xpcHzwk6mwHA9ocQZePfjoGpholw",
+  authDomain: "my-wine-616a8.firebaseapp.com",
+  projectId: "my-wine-616a8",
+  storageBucket: "my-wine-616a8.firebasestorage.app",
+  messagingSenderId: "393703017848",
+  appId: "1:393703017848:web:eefd98ed3e0c49f811cc8d"
 };
 
-function openModal(id) {
-  const w = wines[id];
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// In-memory cache of all inventory documents (id -> data)
+let inventory = {};
+
+const SECTIONS = [
+  { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },
+  { status: 'soon',     label: 'Drink Soon',               cls: 'soon' },
+  { status: 'cook',     label: 'Past Peak — Cooking Only', cls: 'cook' },
+  { status: 'spirits',  label: 'Spirits',                  cls: 'spirits' },
+  { status: 'consumed', label: 'Consumed',                 cls: 'consumed' },
+];
+
+async function loadInventory() {
+  try {
+    const snapshot = await getDocs(collection(db, 'cellar'));
+    inventory = {};
+    snapshot.forEach(d => { inventory[d.id] = { id: d.id, ...d.data() }; });
+    renderInventory();
+  } catch (e) {
+    document.getElementById('cellar-loading').textContent =
+      'Could not load cellar. Check your connection and Firestore rules.';
+    console.error(e);
+  }
+}
+
+function renderInventory() {
+  const main = document.getElementById('main-content');
+
+  // Group by status
+  const byStatus = {};
+  Object.values(inventory).forEach(w => {
+    if (!byStatus[w.status]) byStatus[w.status] = [];
+    byStatus[w.status].push(w);
+  });
+
+  main.innerHTML = SECTIONS
+    .filter(sec => byStatus[sec.status]?.length)
+    .map(sec => `
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title ${sec.cls}">${sec.label}</span>
+          <div class="section-line ${sec.cls}"></div>
+        </div>
+        <div class="grid">
+          ${byStatus[sec.status].map(cardHTML).join('')}
+        </div>
+      </div>
+    `).join('');
+}
+
+function cardHTML(w) {
+  const badge = w.status === 'consumed'
+    ? `<span class="card-badge badge-consumed">Consumed</span>`
+    : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
+  return `
+    <div class="card ${w.status}" onclick="openModal('${w.id}')">
+      <div class="card-year">${w.year}</div>
+      <div class="card-name">${w.name}</div>
+      <div class="card-region">${w.region}</div>
+      ${badge}
+    </div>
+  `;
+}
+
+window.openModal = function(id) {
+  const w = inventory[id];
   if (!w) return;
-  const consumed = getConsumed();
-  const isConsumed = consumed.includes(id) || w.status === 'consumed';
-  const effectiveStatus = isConsumed ? 'consumed' : w.status;
-  const effectiveLabel = isConsumed ? 'Consumed' : w.statusLabel;
-  const statusClass = `status-${effectiveStatus}`;
-  const showBtn = !isConsumed && w.status !== 'cook' && w.status !== 'spirits';
+  const showBtn = w.status !== 'consumed' && w.status !== 'cook' && w.status !== 'spirits';
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-year">${w.year}</div>
     <div class="modal-name">${w.name}</div>
     <div class="modal-region">${w.region}</div>
-    <span class="modal-status ${statusClass}">${effectiveLabel}</span>
+    <span class="modal-status status-${w.status}">${w.statusLabel}</span>
     <div class="modal-divider"></div>
     <div class="modal-meta">
       <div class="meta-item"><span class="meta-label">Variety</span><span class="meta-value">${w.grape}</span></div>
@@ -630,58 +326,39 @@ function openModal(id) {
     <div class="modal-text">${w.decant}</div>
     <div class="modal-section-label">Drinking Window</div>
     <div class="modal-text">${w.window}</div>
-    ${showBtn ? `<div class="modal-divider" style="margin-top:24px"></div><button class="consume-btn" onclick="markConsumed('${id}')">Mark as Consumed</button>` : ''}
+    ${showBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
+      <button class="consume-btn" onclick="markConsumed('${id}')">Mark as Consumed</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
-}
+};
 
-function getConsumed() {
-  try { return JSON.parse(localStorage.getItem('cellar_consumed') || '[]'); } catch { return []; }
-}
+window.markConsumed = async function(id) {
+  const btn = document.querySelector('.consume-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed' });
+    inventory[id].status = 'consumed';
+    inventory[id].statusLabel = 'Consumed';
+    closeModalDirect();
+    renderInventory();
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Mark as Consumed'; }
+    console.error('Failed to update Firestore:', e);
+  }
+};
 
-function markConsumed(id) {
-  const consumed = getConsumed();
-  if (!consumed.includes(id)) consumed.push(id);
-  localStorage.setItem('cellar_consumed', JSON.stringify(consumed));
-  // Update card in DOM
-  const cards = document.querySelectorAll(`[onclick="openModal('${id}')"]`);
-  cards.forEach(card => {
-    card.className = card.className.replace(/\b(ready|soon|cook|spirits)\b/, 'consumed');
-    card.querySelector('.card-year').style.color = 'var(--consumed)';
-    if (!card.querySelector('.badge-consumed')) {
-      const badge = document.createElement('span');
-      badge.className = 'card-badge badge-consumed';
-      badge.textContent = 'Consumed';
-      card.appendChild(badge);
-    }
-  });
-  closeModalDirect();
-}
-
-// Apply saved consumed state on page load
-document.addEventListener('DOMContentLoaded', () => {
-  getConsumed().forEach(id => {
-    const cards = document.querySelectorAll(`[onclick="openModal('${id}')"]`);
-    cards.forEach(card => {
-      card.className = card.className.replace(/\b(ready|soon|cook|spirits)\b/, 'consumed');
-      card.querySelector('.card-year') && (card.querySelector('.card-year').style.color = 'var(--consumed)');
-      if (!card.querySelector('.badge-consumed')) {
-        const badge = document.createElement('span');
-        badge.className = 'card-badge badge-consumed';
-        badge.textContent = 'Consumed';
-        card.appendChild(badge);
-      }
-    });
-  });
-});
-
-function closeModal(e) {
+window.closeModal = function(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
-}
+};
+
 function closeModalDirect() {
   document.getElementById('modalOverlay').classList.remove('active');
 }
+window.closeModalDirect = closeModalDirect;
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+loadInventory();
 </script>
 </body>
 </html>
