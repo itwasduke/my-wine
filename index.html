@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Cellar</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1C1208">
+
+<!-- iOS home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Cellar">
+<link rel="apple-touch-icon" href="icon.svg">
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -323,7 +334,8 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc }
+import { initializeFirestore, persistentLocalCache,
+         collection, getDocs, doc, updateDoc }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -336,7 +348,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache()
+});
 
 // PIN stored as SHA-256 hash — the plain-text PIN is never in source.
 // To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
@@ -504,6 +518,11 @@ document.addEventListener('keydown', e => {
 });
 
 loadInventory();
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(console.error);
+}
 </script>
 </body>
 </html>
