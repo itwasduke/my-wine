@@ -465,7 +465,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.0.8</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.0.9</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -805,14 +805,14 @@ window.handleImageSelected = async function(event) {
     try {
       const { getVertexAI, getGenerativeModel } =
         await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.0-flash' });
+      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
       console.log('[Cellar] SDK: firebase-vertexai.js loaded');
     } catch (e1) {
       console.warn('[Cellar] firebase-vertexai.js failed:', e1?.message);
       try {
         const { getAI, getGenerativeModel, GoogleAIBackend } =
           await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-        geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.0-flash' });
+        geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
         console.log('[Cellar] SDK: firebase-ai.js (GoogleAIBackend) loaded');
       } catch (e2) {
         sdkLoadError = e2;
