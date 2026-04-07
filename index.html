@@ -284,6 +284,165 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 }
 .pin-submit:hover { background: rgba(107,26,42,0.55); color: var(--cream); }
 .pin-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── FAB ──────────────────────────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--wine-dark), var(--wine));
+  border: 1px solid rgba(155,58,74,0.5);
+  color: var(--cream);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 24px rgba(107,26,42,0.6), 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  z-index: 500;
+}
+.fab:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 32px rgba(107,26,42,0.8);
+  border-color: rgba(155,58,74,0.8);
+}
+
+/* ── Scan / Add Bottle modal ──────────────────────────────────────────────── */
+.scan-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,6,2,0.92);
+  z-index: 1500;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+.scan-overlay.active { display: flex; }
+.scan-modal {
+  background: linear-gradient(145deg, #1f1208, #160e05);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 2px;
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+  padding: 36px 36px 32px;
+  position: relative;
+}
+.scan-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.scan-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 2px;
+  margin-bottom: 20px;
+  background: rgba(0,0,0,0.3);
+}
+.scan-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ash);
+  margin-bottom: 24px;
+  min-height: 22px;
+}
+.scan-status.done  { color: var(--gold-light); }
+.scan-status.error { color: #FC8181; }
+.scan-spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(201,168,76,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Add-bottle form ──────────────────────────────────────────────────────── */
+.add-form { display: none; }
+.add-form.visible { display: block; }
+.form-row   { margin-bottom: 16px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin-bottom: 5px;
+}
+.form-input, .form-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 2px;
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  padding: 9px 11px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-textarea:focus { border-color: rgba(201,168,76,0.5); }
+.form-textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+.form-divider { height: 1px; background: linear-gradient(to right, rgba(201,168,76,0.15), transparent); margin: 20px 0; }
+.form-actions { display: flex; gap: 12px; margin-top: 24px; }
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(140,123,107,0.3);
+  border-radius: 2px;
+  color: var(--ash);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--ash); color: var(--cream); }
+.btn-add {
+  flex: 2;
+  padding: 12px;
+  background: rgba(107,26,42,0.28);
+  border: 1px solid rgba(155,58,74,0.45);
+  border-radius: 2px;
+  color: var(--wine-light);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add:hover:not(:disabled) { background: rgba(107,26,42,0.55); color: var(--cream); }
+.btn-add:disabled { opacity: 0.35; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .fab { bottom: 24px; right: 24px; }
+  .scan-modal { padding: 28px 20px 24px; }
+  .form-row-2 { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -309,6 +468,72 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory</p>
 </footer>
 
+<!-- Camera / photo file input (hidden) -->
+<input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handleImageSelected(event)">
+
+<!-- Floating add button -->
+<button class="fab" onclick="openAddBottle()" aria-label="Add a bottle">+</button>
+
+<!-- Scan / Add Bottle Modal -->
+<div class="scan-overlay" id="scanOverlay">
+  <div class="scan-modal">
+    <button class="modal-close" onclick="closeScanModal()">×</button>
+    <div class="scan-modal-title">Add to Cellar</div>
+    <img id="scanPreview" class="scan-preview" src="" alt="Label preview" style="display:none">
+    <div class="scan-status" id="scanStatus">
+      <div class="scan-spinner" id="scanSpinner"></div>
+      <span id="scanStatusText">Reading label with Gemini…</span>
+    </div>
+    <form class="add-form" id="addForm" onsubmit="return false">
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Vintage</label>
+          <input class="form-input" id="f-year" type="text" placeholder="2021 or NV">
+        </div>
+        <div>
+          <label class="form-label">ABV</label>
+          <input class="form-input" id="f-abv" type="text" placeholder="13.5%">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Wine / Spirit Name</label>
+        <input class="form-input" id="f-name" type="text" placeholder="Producer and wine name">
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Region</label>
+          <input class="form-input" id="f-region" type="text" placeholder="Region, Country">
+        </div>
+        <div>
+          <label class="form-label">Grape / Spirit Type</label>
+          <input class="form-input" id="f-grape" type="text" placeholder="Variety or blend">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Serving Temperature</label>
+        <input class="form-input" id="f-temp" type="text" placeholder="62–65°F">
+      </div>
+      <div class="form-divider"></div>
+      <div class="form-row">
+        <label class="form-label">Tasting Notes</label>
+        <textarea class="form-textarea" id="f-notes" placeholder="Tasting notes…"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Decanting</label>
+        <input class="form-input" id="f-decant" type="text" placeholder="45 minutes — opens up the structure">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Drinking Window</label>
+        <input class="form-input" id="f-window" type="text" placeholder="Drink now through 2028">
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" type="button" onclick="closeScanModal()">Cancel</button>
+        <button class="btn-add" type="button" id="addBtn" disabled onclick="confirmAddBottle()">Add to Cellar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal">
@@ -322,7 +547,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   <div class="pin-modal">
     <button class="modal-close" onclick="closePinModal()">×</button>
     <div class="pin-title">Confirm</div>
-    <div class="pin-subtitle">Enter your 4-digit PIN to mark this bottle as consumed</div>
+    <div class="pin-subtitle" id="pinSubtitle">Enter your 4-digit PIN to mark this bottle as consumed</div>
     <input class="pin-input" id="pinInput" type="password" inputmode="numeric"
       maxlength="4" placeholder="····" autocomplete="off"
       oninput="this.value=this.value.replace(/\D/g,'')"
@@ -335,8 +560,12 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { initializeFirestore, persistentLocalCache,
-         collection, getDocs, doc, updateDoc }
+         collection, getDocs, doc, updateDoc, addDoc }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+// Firebase AI Logic — requires Blaze plan + Vertex AI API enabled in Google Cloud Console.
+// If this 404s on your Firebase version, try firebase-ai.js and swap getVertexAI→getAI.
+import { getVertexAI, getGenerativeModel }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDSI59xpcHzwk6mwHA9ocQZePfjoGpholw",
@@ -348,9 +577,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = initializeFirestore(app, {
-  localCache: persistentLocalCache()
-});
+const db  = initializeFirestore(app, { localCache: persistentLocalCache() });
+const vertexAI    = getVertexAI(app);
+const geminiModel = getGenerativeModel(vertexAI, { model: 'gemini-2.0-flash' });
 
 // PIN stored as SHA-256 hash — the plain-text PIN is never in source.
 // To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
@@ -362,8 +591,10 @@ async function hashPin(pin) {
 }
 
 // In-memory cache of all inventory documents (id -> data)
-let inventory = {};
+let inventory        = {};
 let pendingConsumeId = null;
+let pendingAddData   = null;
+let pinAction        = null; // 'consume' | 'add'
 
 const SECTIONS = [
   { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },
@@ -372,6 +603,8 @@ const SECTIONS = [
   { status: 'spirits',  label: 'Spirits',                  cls: 'spirits' },
   { status: 'consumed', label: 'Consumed',                 cls: 'consumed' },
 ];
+
+// ── Inventory load / render ───────────────────────────────────────────────
 
 async function loadInventory() {
   try {
@@ -388,14 +621,11 @@ async function loadInventory() {
 
 function renderInventory() {
   const main = document.getElementById('main-content');
-
-  // Group by status
   const byStatus = {};
   Object.values(inventory).forEach(w => {
     if (!byStatus[w.status]) byStatus[w.status] = [];
     byStatus[w.status].push(w);
   });
-
   main.innerHTML = SECTIONS
     .filter(sec => byStatus[sec.status]?.length)
     .map(sec => `
@@ -424,6 +654,8 @@ function cardHTML(w) {
     </div>
   `;
 }
+
+// ── Detail modal ──────────────────────────────────────────────────────────
 
 window.openModal = function(id) {
   const w = inventory[id];
@@ -464,14 +696,30 @@ async function markConsumed(id) {
   }
 }
 
-window.showPinModal = function(id) {
-  pendingConsumeId = id;
+window.closeModal = function(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+};
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+window.closeModalDirect = closeModalDirect;
+
+// ── PIN ───────────────────────────────────────────────────────────────────
+
+function openPinModal(action, subtitle) {
+  pinAction = action;
+  document.getElementById('pinSubtitle').textContent = subtitle;
   document.getElementById('pinInput').value = '';
   document.getElementById('pinError').textContent = '';
   document.getElementById('pinSubmit').disabled = false;
   document.getElementById('pinSubmit').textContent = 'Confirm';
   document.getElementById('pinOverlay').classList.add('active');
   setTimeout(() => document.getElementById('pinInput').focus(), 50);
+}
+
+window.showPinModal = function(id) {
+  pendingConsumeId = id;
+  openPinModal('consume', 'Enter your 4-digit PIN to mark this bottle as consumed');
 };
 
 window.submitPin = async function() {
@@ -486,7 +734,8 @@ window.submitPin = async function() {
   const hash = await hashPin(entered);
   if (hash === PIN_HASH) {
     closePinModal();
-    await markConsumed(pendingConsumeId);
+    if (pinAction === 'consume') await markConsumed(pendingConsumeId);
+    else if (pinAction === 'add') await saveNewBottle(pendingAddData);
   } else {
     document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
     document.getElementById('pinInput').value = '';
@@ -499,20 +748,155 @@ window.submitPin = async function() {
 window.closePinModal = function() {
   document.getElementById('pinOverlay').classList.remove('active');
   pendingConsumeId = null;
+  pendingAddData   = null;
+  pinAction        = null;
 };
 
-window.closeModal = function(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+// ── Add Bottle ────────────────────────────────────────────────────────────
+
+window.openAddBottle = function() {
+  document.getElementById('cameraInput').value = '';
+  document.getElementById('cameraInput').click();
 };
 
-function closeModalDirect() {
-  document.getElementById('modalOverlay').classList.remove('active');
+window.handleImageSelected = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const preview    = document.getElementById('scanPreview');
+  const status     = document.getElementById('scanStatus');
+  const statusText = document.getElementById('scanStatusText');
+  const spinner    = document.getElementById('scanSpinner');
+  const form       = document.getElementById('addForm');
+  const addBtn     = document.getElementById('addBtn');
+
+  // Show preview and open modal in loading state
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  status.className = 'scan-status';
+  statusText.textContent = 'Reading label with Gemini…';
+  spinner.style.display = '';
+  form.classList.remove('visible');
+  addBtn.disabled = true;
+  document.getElementById('scanOverlay').classList.add('active');
+
+  try {
+    const { base64, mimeType } = await readFileAsBase64(file);
+    const data = await analyzeLabel(base64, mimeType);
+    populateAddForm(data);
+    spinner.style.display = 'none';
+    statusText.textContent = 'Label read — review and edit before saving';
+    status.classList.add('done');
+    form.classList.add('visible');
+    addBtn.disabled = false;
+  } catch (e) {
+    console.error('Gemini label read failed:', e);
+    spinner.style.display = 'none';
+    statusText.textContent = 'Could not read label — fill in details manually';
+    status.classList.add('error');
+    form.classList.add('visible');
+    addBtn.disabled = false;
+  }
+};
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve({ base64: reader.result.split(',')[1], mimeType: file.type || 'image/jpeg' });
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
-window.closeModalDirect = closeModalDirect;
+
+async function analyzeLabel(base64, mimeType) {
+  const prompt = `You are an expert sommelier analyzing a wine or spirits label photograph.
+Extract information from the label and respond with ONLY a valid JSON object — no markdown, no code fences, no explanation, just the raw JSON:
+{
+  "name": "full producer and wine or spirit name as on the label",
+  "year": "4-digit vintage year as a string, NV if non-vintage, or age statement for spirits (e.g. 12 Year)",
+  "region": "appellation, region, and country (e.g. Napa Valley, California or Rioja, Spain)",
+  "grape": "grape variety or blend for wine; mash bill or spirit type for spirits (e.g. Single Malt Scotch Whisky)",
+  "abv": "alcohol by volume with % symbol (e.g. 13.5%), or — if not visible",
+  "temp": "ideal serving temperature range in °F appropriate for this wine or spirit type",
+  "notes": "2–3 sentences of expert tasting notes appropriate for this wine or spirit's style, region, and vintage",
+  "decant": "specific decanting recommendation: duration and brief reason, or No decanting needed if not applicable",
+  "window": "drinking window or aging recommendation"
+}`;
+
+  const result = await geminiModel.generateContent([
+    prompt,
+    { inlineData: { mimeType, data: base64 } }
+  ]);
+  const text = result.response.text().trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/, '')
+    .trim();
+  return JSON.parse(text);
+}
+
+function populateAddForm(data) {
+  document.getElementById('f-name').value   = data.name   || '';
+  document.getElementById('f-year').value   = data.year   || '';
+  document.getElementById('f-region').value = data.region || '';
+  document.getElementById('f-grape').value  = data.grape  || '';
+  document.getElementById('f-abv').value    = data.abv    || '';
+  document.getElementById('f-temp').value   = data.temp   || '';
+  document.getElementById('f-notes').value  = data.notes  || '';
+  document.getElementById('f-decant').value = data.decant || '';
+  document.getElementById('f-window').value = data.window || '';
+}
+
+window.confirmAddBottle = function() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  pendingAddData = {
+    name,
+    year:        document.getElementById('f-year').value.trim()   || 'NV',
+    region:      document.getElementById('f-region').value.trim() || '—',
+    grape:       document.getElementById('f-grape').value.trim()  || '—',
+    abv:         document.getElementById('f-abv').value.trim()    || '—',
+    temp:        document.getElementById('f-temp').value.trim()   || '—',
+    notes:       document.getElementById('f-notes').value.trim()  || '—',
+    decant:      document.getElementById('f-decant').value.trim() || '—',
+    window:      document.getElementById('f-window').value.trim() || '—',
+    status:      'ready',
+    statusLabel: 'Ready to Drink',
+  };
+  openPinModal('add', 'Enter your 4-digit PIN to add this bottle to the cellar');
+};
+
+window.closeScanModal = function() {
+  document.getElementById('scanOverlay').classList.remove('active');
+  pendingAddData = null;
+  const preview = document.getElementById('scanPreview');
+  URL.revokeObjectURL(preview.src);
+  preview.src = '';
+  preview.style.display = 'none';
+};
+
+async function saveNewBottle(data) {
+  try {
+    const ref = await addDoc(collection(db, 'cellar'), data);
+    inventory[ref.id] = { id: ref.id, ...data };
+    closeScanModal();
+    renderInventory();
+  } catch (e) {
+    console.error('Failed to save to Firestore:', e);
+    // Re-show scan modal with error so user isn't left with a blank screen
+    document.getElementById('scanOverlay').classList.add('active');
+    const status = document.getElementById('scanStatus');
+    status.className = 'scan-status error';
+    document.getElementById('scanStatusText').textContent = 'Save failed — check Firestore rules';
+    document.getElementById('scanSpinner').style.display = 'none';
+  }
+}
+
+// ── Keyboard / escape ─────────────────────────────────────────────────────
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (document.getElementById('pinOverlay').classList.contains('active')) closePinModal();
+    if (document.getElementById('pinOverlay').classList.contains('active'))  closePinModal();
+    else if (document.getElementById('scanOverlay').classList.contains('active')) closeScanModal();
     else closeModalDirect();
   }
 });
