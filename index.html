@@ -7,7 +7,7 @@
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1C1208">
+<meta name="theme-color" content="#0F2010">
 
 <!-- iOS home screen -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,7 +25,7 @@
   --gold-light: #E8D5A3;
   --cream: #F5EFE0;
   --parchment: #EDE3CC;
-  --ink: #1C1208;
+  --ink: #0F2010;
   --ash: #8C7B6B;
   --spirit-amber: #B5651D;
   --spirit-gold: #DAA520;
@@ -42,7 +42,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(107,26,42,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 50%, rgba(26,74,42,0.25) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.08) 0%, transparent 50%);
 }
 header { text-align: center; padding: 60px 20px 40px; position: relative; }
@@ -127,7 +127,7 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 }
 .modal-overlay.active { display: flex; }
 .modal {
-  background: linear-gradient(145deg, #1f1208, #160e05);
+  background: linear-gradient(145deg, #162A18, #0D1F0F);
   border: 1px solid rgba(201,168,76,0.2);
   border-radius: 2px;
   max-width: 560px;
@@ -218,7 +218,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 }
 .pin-overlay.active { display: flex; }
 .pin-modal {
-  background: linear-gradient(145deg, #1f1208, #160e05);
+  background: linear-gradient(145deg, #162A18, #0D1F0F);
   border: 1px solid rgba(201,168,76,0.25);
   border-radius: 2px;
   max-width: 340px;
@@ -327,7 +327,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 }
 .scan-overlay.active { display: flex; }
 .scan-modal {
-  background: linear-gradient(145deg, #1f1208, #160e05);
+  background: linear-gradient(145deg, #162A18, #0D1F0F);
   border: 1px solid rgba(201,168,76,0.2);
   border-radius: 2px;
   max-width: 600px;
@@ -583,7 +583,7 @@ console.log('[Cellar] Firebase ready, db:', !!db);
 
 // PIN stored as SHA-256 hash — the plain-text PIN is never in source.
 // To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
-const PIN_HASH = 'a8d248c5eda6fa32253b67ea3613fd9e74ce099bc701e807c6d8fbd714e6b040';
+const PIN_HASH = '3f735c67d29014733cf56508d3c5dba2c87abb07313998e23b49b7c8cc0d7e4a';
 
 async function hashPin(pin) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
