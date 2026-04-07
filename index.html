@@ -741,9 +741,13 @@ window.submitPin = async function() {
   btn.textContent = 'Verifying…';
   const hash = await hashPin(entered);
   if (hash === PIN_HASH) {
+    // Capture before closePinModal() nulls them out
+    const action    = pinAction;
+    const consumeId = pendingConsumeId;
+    const addData   = pendingAddData;
     closePinModal();
-    if (pinAction === 'consume') await markConsumed(pendingConsumeId);
-    else if (pinAction === 'add') await saveNewBottle(pendingAddData);
+    if (action === 'consume') await markConsumed(consumeId);
+    else if (action === 'add') await saveNewBottle(addData);
   } else {
     document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
     document.getElementById('pinInput').value = '';
