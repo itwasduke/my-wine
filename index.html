@@ -668,7 +668,7 @@ function cardHTML(w) {
 window.openModal = function(id) {
   const w = inventory[id];
   if (!w) return;
-  const showBtn = w.status !== 'consumed' && w.status !== 'cook' && w.status !== 'spirits';
+  const showBtn = w.status !== 'consumed' && w.status !== 'cook';
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-year">${w.year}</div>
     <div class="modal-name">${w.name}</div>
