@@ -6,10 +6,8 @@ service cloud.firestore {
       // Public read — the inventory is a personal display, no sensitive data.
       allow read: if true;
 
-      // Create and update allowed — PIN enforcement happens in the app.
-      // Deletes are blocked; bottles are marked consumed, never removed.
-      allow create, update: if true;
-      allow delete: if false;
+      // All writes allowed — PIN enforcement happens in the app.
+      allow create, update, delete: if true;
     }
   }
 }

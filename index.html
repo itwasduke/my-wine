@@ -195,6 +195,27 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
   border-color: rgba(155,58,74,0.7);
   color: var(--cream);
 }
+.delete-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid rgba(140,123,107,0.2);
+  border-radius: 2px;
+  color: rgba(140,123,107,0.5);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.delete-btn:hover {
+  border-color: rgba(252,129,129,0.4);
+  color: #FC8181;
+  background: rgba(252,129,129,0.05);
+}
 
 footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,168,76,0.08); }
 .footer-text { font-size: 0.75rem; color: rgba(140,123,107,0.5); letter-spacing: 0.15em; }
@@ -514,7 +535,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.1.0</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.1.1</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -618,7 +639,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { initializeFirestore, persistentLocalCache,
-         collection, getDocs, doc, updateDoc, addDoc }
+         collection, getDocs, doc, updateDoc, addDoc, deleteDoc }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 // NOTE: Vertex AI SDK is loaded lazily inside openAddBottle() so that a missing
 // or broken CDN module cannot prevent the inventory from loading.
@@ -759,7 +780,8 @@ window.openModal = function(id) {
     <div class="modal-section-label">Drinking Window</div>
     <div class="modal-text">${w.window}</div>
     ${showBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
-      <button class="consume-btn" onclick="showPinModal('${id}')">Mark as Consumed</button>` : ''}
+      <button class="consume-btn" onclick="showPinModal('${id}')">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
+    <button class="delete-btn" onclick="showDeleteModal('${id}')">Remove from Cellar</button>
   `;
   document.getElementById('modalOverlay').classList.add('active');
 };
@@ -775,6 +797,17 @@ async function markConsumed(id) {
     renderInventory();
   } catch (e) {
     console.error('Failed to update Firestore:', e);
+  }
+}
+
+async function deleteBottle(id) {
+  try {
+    await deleteDoc(doc(db, 'cellar', id));
+    delete inventory[id];
+    closeModalDirect();
+    renderInventory();
+  } catch (e) {
+    console.error('Failed to delete from Firestore:', e);
   }
 }
 
@@ -804,6 +837,11 @@ window.showPinModal = function(id) {
   openPinModal('consume', 'Enter your 4-digit PIN to mark this bottle as consumed');
 };
 
+window.showDeleteModal = function(id) {
+  pendingConsumeId = id;
+  openPinModal('delete', 'Enter your 4-digit PIN to permanently remove this bottle');
+};
+
 window.submitPin = async function() {
   const entered = document.getElementById('pinInput').value;
   if (entered.length !== 4) {
@@ -821,6 +859,7 @@ window.submitPin = async function() {
     const addData   = pendingAddData;
     closePinModal();
     if (action === 'consume') await markConsumed(consumeId);
+    else if (action === 'delete') await deleteBottle(consumeId);
     else if (action === 'add') await saveNewBottle(addData);
   } else {
     document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
