@@ -465,7 +465,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.0.6</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.0.7</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -650,7 +650,7 @@ function renderInventory() {
 
 function cardHTML(w) {
   const badge = w.status === 'consumed'
-    ? `<span class="card-badge badge-consumed">Consumed</span>`
+    ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
     : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
   return `
     <div class="card ${w.status}" onclick="openModal('${w.id}')">
@@ -693,9 +693,11 @@ window.openModal = function(id) {
 
 async function markConsumed(id) {
   try {
-    await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed' });
+    const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed', consumedDate });
     inventory[id].status = 'consumed';
     inventory[id].statusLabel = 'Consumed';
+    inventory[id].consumedDate = consumedDate;
     closeModalDirect();
     renderInventory();
   } catch (e) {
