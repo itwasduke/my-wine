@@ -469,7 +469,9 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
-<input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handleImageSelected(event)">
+<!-- capture="environment" opens the rear camera directly on Android and iOS.
+     Browsers that don't support capture ignore the attribute and show the file picker instead. -->
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageSelected(event)">
 
 <!-- Floating add button -->
 <button class="fab" onclick="openAddBottle()" aria-label="Add a bottle">+</button>
