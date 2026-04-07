@@ -562,10 +562,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/fireba
 import { initializeFirestore, persistentLocalCache,
          collection, getDocs, doc, updateDoc, addDoc }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-// Firebase AI Logic — requires Blaze plan + Vertex AI API enabled in Google Cloud Console.
-// If this 404s on your Firebase version, try firebase-ai.js and swap getVertexAI→getAI.
-import { getVertexAI, getGenerativeModel }
-  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js";
+// NOTE: Vertex AI SDK is loaded lazily inside openAddBottle() so that a missing
+// or broken CDN module cannot prevent the inventory from loading.
 
 const firebaseConfig = {
   apiKey: "AIzaSyDSI59xpcHzwk6mwHA9ocQZePfjoGpholw",
@@ -576,10 +574,10 @@ const firebaseConfig = {
   appId: "1:393703017848:web:eefd98ed3e0c49f811cc8d"
 };
 
+console.log('[Cellar] Initializing Firebase…');
 const app = initializeApp(firebaseConfig);
 const db  = initializeFirestore(app, { localCache: persistentLocalCache() });
-const vertexAI    = getVertexAI(app);
-const geminiModel = getGenerativeModel(vertexAI, { model: 'gemini-2.0-flash' });
+console.log('[Cellar] Firebase ready, db:', !!db);
 
 // PIN stored as SHA-256 hash — the plain-text PIN is never in source.
 // To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
@@ -607,15 +605,23 @@ const SECTIONS = [
 // ── Inventory load / render ───────────────────────────────────────────────
 
 async function loadInventory() {
+  console.log('[Cellar] loadInventory() called');
+  const loadingEl = document.getElementById('cellar-loading');
   try {
+    console.log('[Cellar] Fetching cellar collection from Firestore…');
     const snapshot = await getDocs(collection(db, 'cellar'));
+    console.log('[Cellar] Snapshot received, docs:', snapshot.size);
     inventory = {};
     snapshot.forEach(d => { inventory[d.id] = { id: d.id, ...d.data() }; });
+    console.log('[Cellar] Inventory built, rendering…');
     renderInventory();
+    console.log('[Cellar] Render complete');
   } catch (e) {
-    document.getElementById('cellar-loading').textContent =
-      'Could not load cellar. Check your connection and Firestore rules.';
-    console.error(e);
+    console.error('[Cellar] loadInventory failed:', e);
+    const msg = e?.code
+      ? `Firestore error (${e.code}) — ${e.message}`
+      : `Could not load cellar: ${e?.message || e}`;
+    if (loadingEl) loadingEl.textContent = msg;
   }
 }
 
@@ -781,8 +787,28 @@ window.handleImageSelected = async function(event) {
   document.getElementById('scanOverlay').classList.add('active');
 
   try {
+    console.log('[Cellar] Reading image file…');
     const { base64, mimeType } = await readFileAsBase64(file);
-    const data = await analyzeLabel(base64, mimeType);
+
+    console.log('[Cellar] Loading Vertex AI SDK…');
+    // Dynamic import keeps a missing/renamed CDN module from crashing the whole app
+    let geminiModel;
+    try {
+      const { getVertexAI, getGenerativeModel } =
+        await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
+      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.0-flash' });
+      console.log('[Cellar] Vertex AI ready');
+    } catch (sdkErr) {
+      console.warn('[Cellar] firebase-vertexai.js failed, trying firebase-ai.js…', sdkErr);
+      const { getAI, getGenerativeModel } =
+        await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
+      geminiModel = getGenerativeModel(getAI(app), { model: 'gemini-2.0-flash' });
+      console.log('[Cellar] Firebase AI ready (firebase-ai.js)');
+    }
+
+    console.log('[Cellar] Calling Gemini…');
+    const data = await analyzeLabel(base64, mimeType, geminiModel);
+    console.log('[Cellar] Gemini response:', data);
     populateAddForm(data);
     spinner.style.display = 'none';
     statusText.textContent = 'Label read — review and edit before saving';
@@ -790,7 +816,7 @@ window.handleImageSelected = async function(event) {
     form.classList.add('visible');
     addBtn.disabled = false;
   } catch (e) {
-    console.error('Gemini label read failed:', e);
+    console.error('[Cellar] Gemini label read failed:', e);
     spinner.style.display = 'none';
     statusText.textContent = 'Could not read label — fill in details manually';
     status.classList.add('error');
@@ -808,7 +834,7 @@ function readFileAsBase64(file) {
   });
 }
 
-async function analyzeLabel(base64, mimeType) {
+async function analyzeLabel(base64, mimeType, geminiModel) {
   const prompt = `You are an expert sommelier analyzing a wine or spirits label photograph.
 Extract information from the label and respond with ONLY a valid JSON object — no markdown, no code fences, no explanation, just the raw JSON:
 {
@@ -901,6 +927,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
+console.log('[Cellar] Module parsed successfully, calling loadInventory()');
 loadInventory();
 
 // Register service worker

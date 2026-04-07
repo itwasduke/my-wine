@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'cellar-shell-v1';
+const SHELL_CACHE = 'cellar-shell-v2';
 const FONT_CACHE  = 'cellar-fonts-v1';
 
 // App shell — everything needed to render the page offline
@@ -20,7 +20,7 @@ self.addEventListener('install', e => {
 
 // ── Activate: delete stale caches ────────────────────────────────────────────
 self.addEventListener('activate', e => {
-  const keep = [SHELL_CACHE, FONT_CACHE];
+  const keep = [SHELL_CACHE, FONT_CACHE]; // anything not listed here is deleted on activate
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
