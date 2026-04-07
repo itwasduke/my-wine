@@ -53,9 +53,17 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // App shell — cache-first
+  // App shell — network-first for HTML so updates are always picked up immediately.
+  // Static assets (icon, manifest) stay cache-first.
   if (url.origin === self.location.origin) {
-    e.respondWith(cacheFirstThenNetwork(request, SHELL_CACHE));
+    const isHtml = request.mode === 'navigate' ||
+                   url.pathname === '/' ||
+                   url.pathname.endsWith('.html');
+    e.respondWith(
+      isHtml
+        ? networkFirstThenCache(request, SHELL_CACHE)
+        : cacheFirstThenNetwork(request, SHELL_CACHE)
+    );
     return;
   }
 });
