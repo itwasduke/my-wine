@@ -1,7 +1,8 @@
 export const state = {
   inventory: {},
   currentUser: null,
-  consumedLikedFilter: 'all'
+  consumedLikedFilter: 'all',
+  wineColorFilter: 'all'
 };
 
 export const SECTIONS = [

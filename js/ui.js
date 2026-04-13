@@ -39,7 +39,13 @@ export function renderInventory() {
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
   const sortBy = document.getElementById('sortSelect')?.value || 'newest';
 
-  // 1. Convert to array and filter by Search + Type Filter
+  // Toggle sub-filter visibility
+  const subFilterBar = document.getElementById('subFilterBar');
+  if (subFilterBar) {
+    subFilterBar.style.display = (filter === 'wine') ? 'flex' : 'none';
+  }
+
+  // 1. Convert to array and filter by Search + Type Filter + Color Filter
   let items = Object.values(state.inventory).filter(w => {
     // Type Filter
     const matchesFilter = 
@@ -48,6 +54,11 @@ export function renderInventory() {
       (filter === 'spirits' && (w.status === 'spirits' || w.status === 'consumed'));
     
     if (!matchesFilter) return false;
+
+    // Sub-Filter (Wine Color)
+    if (filter === 'wine' && state.wineColorFilter !== 'all') {
+      if (w.colorStyle !== state.wineColorFilter) return false;
+    }
 
     // Search Query
     if (searchQuery) {
@@ -215,6 +226,21 @@ export function initUIListeners() {
     bar.querySelectorAll('.filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.filter === filter)
     );
+    state.wineColorFilter = 'all'; // Reset sub-filter on main change
+    document.querySelectorAll('.sub-filter-btn').forEach(b => 
+      b.classList.toggle('active', b.dataset.color === 'all')
+    );
+    renderInventory();
+  });
+
+  // Sub-filter clicks (Wine Color)
+  document.getElementById('subFilterBar').addEventListener('click', e => {
+    const btn = e.target.closest('.sub-filter-btn');
+    if (!btn) return;
+    state.wineColorFilter = btn.dataset.color;
+    document.querySelectorAll('.sub-filter-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.color === state.wineColorFilter)
+    );
     renderInventory();
   });
 
@@ -294,6 +320,7 @@ export function initUIListeners() {
   });
 
   const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
+  const bulkColorBtn  = document.getElementById('bulkColorBtn');
   const bulkUpdateStatus = document.getElementById('bulkUpdateStatus');
 
   if (bulkUpdateBtn) {
@@ -305,6 +332,18 @@ export function initUIListeners() {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
       bulkUpdateBtn.disabled = false;
+    });
+  }
+
+  if (bulkColorBtn) {
+    bulkColorBtn.addEventListener('click', async () => {
+      bulkColorBtn.disabled = true;
+      if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
+      const { bulkTagWineColor } = await import('./db.js');
+      await bulkTagWineColor((msg) => {
+        if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
+      });
+      bulkColorBtn.disabled = false;
     });
   }
 

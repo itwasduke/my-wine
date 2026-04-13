@@ -560,6 +560,22 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 .filter-btn.active            { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 .filter-btn:hover:not(.active) { border-color: #555; color: var(--text-primary); }
 
+/* ── Sub-Filter Bar ──────────────────────────────────────────────────────── */
+.sub-filter-bar {
+  display: flex; gap: 8px; margin-bottom: 40px; margin-top: -20px;
+  flex-wrap: wrap;
+}
+.sub-filter-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.sub-filter-btn.active            { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.sub-filter-btn:hover:not(.active) { border-color: var(--border); color: var(--text-secondary); }
+
 /* ── Form select ──────────────────────────────────────────────────────────── */
 select.form-input {
   appearance: none; -webkit-appearance: none;

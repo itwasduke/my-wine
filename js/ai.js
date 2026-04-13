@@ -120,7 +120,8 @@ Extract information from the label and respond with ONLY a valid JSON object —
   "notes": "2–3 sentences of expert tasting notes appropriate for this wine or spirit's style, region, and vintage",
   "decant": "specific decanting recommendation: duration and brief reason, or No decanting needed if not applicable",
   "window": "drinking window or aging recommendation",
-  "type": "wine or spirit — classify this as exactly one of those two words"
+  "type": "wine or spirit — classify this as exactly one of those two words",
+  "colorStyle": "For wine: exactly one of [Red, White, Rose, Sparkling, Fortified]. For spirits: leave as empty string"
 }`;
 
   const result = await geminiModel.generateContent([
@@ -139,12 +140,38 @@ function populateAddForm(data) {
   document.getElementById('f-year').value   = data.year   || '';
   document.getElementById('f-region').value = data.region || '';
   document.getElementById('f-grape').value  = data.grape  || '';
+  document.getElementById('f-color').value  = data.colorStyle || '';
   document.getElementById('f-abv').value    = data.abv    || '';
   document.getElementById('f-temp').value   = data.temp   || '';
   document.getElementById('f-notes').value  = data.notes  || '';
   document.getElementById('f-decant').value = data.decant || '';
   document.getElementById('f-window').value = data.window || '';
   document.getElementById('f-type').value   = data.type === 'spirit' ? 'spirit' : 'wine';
+}
+
+export async function guessWineColor(bottle) {
+  let geminiModel;
+  try {
+    const { getVertexAI, getGenerativeModel } =
+      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
+    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
+  } catch (e) {
+    const { getAI, getGenerativeModel, GoogleAIBackend } =
+      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
+    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
+  }
+
+  const prompt = `Identify the color/style of this wine based on its name and grape:
+  Name: ${bottle.name}
+  Grape: ${bottle.grape}
+  Region: ${bottle.region}
+
+  Respond with ONLY one word from this list: [Red, White, Rose, Sparkling, Fortified]`;
+
+  const result = await geminiModel.generateContent(prompt);
+  const color = result.response.text().trim();
+  const valid = ['Red', 'White', 'Rose', 'Sparkling', 'Fortified'];
+  return valid.includes(color) ? color : 'Red'; // Default to Red if unsure
 }
 
 export function closeScanModal() {
@@ -172,6 +199,7 @@ export async function confirmAddBottle() {
     notes:       document.getElementById('f-notes').value.trim()  || '—',
     decant:      document.getElementById('f-decant').value.trim() || '—',
     window:      document.getElementById('f-window').value.trim() || '—',
+    colorStyle:  document.getElementById('f-color').value,
     status,
     statusLabel,
   };

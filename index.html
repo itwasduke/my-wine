@@ -71,6 +71,14 @@
     <button class="filter-btn"        data-filter="wine">Wine</button>
     <button class="filter-btn"        data-filter="spirits">Spirits</button>
   </div>
+
+  <div class="sub-filter-bar" id="subFilterBar" style="display:none;">
+    <button class="sub-filter-btn active" data-color="all">All</button>
+    <button class="sub-filter-btn"        data-color="Red">Red</button>
+    <button class="sub-filter-btn"        data-color="White">White</button>
+    <button class="sub-filter-btn"        data-color="Rose">Rosé</button>
+    <button class="sub-filter-btn"        data-color="Sparkling">Sparkling</button>
+  </div>
 </div>
 
 <main id="main-content">
@@ -123,6 +131,18 @@
       <div class="form-row">
         <label class="form-label">Grape / Style</label>
         <input type="text" id="f-grape" class="form-input" placeholder="e.g. Cabernet Sauvignon">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Wine Color / Style</label>
+        <select id="f-color" class="form-input">
+          <option value="">— (N/A for Spirits)</option>
+          <option value="Red">Red</option>
+          <option value="White">White</option>
+          <option value="Rose">Rosé</option>
+          <option value="Sparkling">Sparkling</option>
+          <option value="Fortified">Fortified</option>
+        </select>
       </div>
 
       <div class="form-divider"></div>
@@ -180,6 +200,12 @@
     <div class="modal-section-label">Inventory Maintenance</div>
     <p class="modal-text" style="font-size:0.85rem; margin-bottom:12px;">Bulk update missing professional scores and vintage chart ratings for your wines. This may take several minutes.</p>
     <button class="consume-btn" id="bulkUpdateBtn">Bulk Update Missing Scores</button>
+    
+    <div class="modal-divider" style="margin: 24px 0;"></div>
+    
+    <div class="modal-section-label">Maintenance</div>
+    <button class="consume-btn" id="bulkColorBtn" style="border-color:var(--text-muted); color:var(--text-secondary);">Bulk Auto-Tag Wine Colors</button>
+
     <div id="bulkUpdateStatus" class="modal-text" style="display:none; margin-top:16_px; font-style:italic; font-size:0.85rem; color:var(--accent);"></div>
   </div>
 </div>

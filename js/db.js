@@ -136,6 +136,38 @@ export async function bulkUpdateScores(onProgress) {
   renderInventory();
 }
 
+export async function bulkTagWineColor(onProgress) {
+  const winesToTag = Object.values(state.inventory).filter(w => {
+    return w.status !== 'spirits' && !w.colorStyle;
+  });
+
+  const total = winesToTag.length;
+  if (total === 0) {
+    onProgress('All wines already have color tags.');
+    return;
+  }
+
+  const { guessWineColor } = await import('./ai.js');
+
+  for (let i = 0; i < total; i++) {
+    const w = winesToTag[i];
+    onProgress(`Tagging ${i + 1} of ${total}: ${w.name}…`);
+    
+    try {
+      const color = await guessWineColor(w);
+      await updateDoc(doc(db, 'cellar', w.id), { colorStyle: color });
+      state.inventory[w.id].colorStyle = color;
+    } catch (e) {
+      console.error(`Failed to tag ${w.name}:`, e);
+    }
+    
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  onProgress(`Successfully tagged ${total} wines.`);
+  renderInventory();
+}
+
 export function confirmDeleteBottle(id) {
   if (!state.currentUser) return;
   const name = state.inventory[id]?.name || 'this bottle';
