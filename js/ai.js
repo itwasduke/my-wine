@@ -13,17 +13,22 @@ export async function handleImageSelected(event) {
   const form       = document.getElementById('addForm');
   const addBtn     = document.getElementById('addBtn');
 
+  // Show original preview immediately
   preview.src = URL.createObjectURL(file);
   preview.style.display = 'block';
   status.className = 'scan-status';
-  statusText.textContent = 'Reading label with Gemini…';
+  statusText.textContent = 'Optimizing image…';
   spinner.style.display = '';
   form.classList.remove('visible');
   addBtn.disabled = true;
   document.getElementById('scanOverlay').classList.add('active');
 
   try {
-    const { base64, mimeType } = await readFileAsBase64(file);
+    // Resize to max 1024px to speed up Gemini processing and save data
+    const { base64, mimeType } = await resizeImage(file, 1024);
+    
+    statusText.textContent = 'Reading label with Gemini…';
+    
     let geminiModel;
     let sdkLoadError;
 
@@ -61,10 +66,42 @@ export async function handleImageSelected(event) {
   }
 }
 
-function readFileAsBase64(file) {
+/**
+ * Resizes an image file to a maximum dimension while maintaining aspect ratio.
+ * Returns a promise that resolves with { base64, mimeType }.
+ */
+function resizeImage(file, maxDim) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload  = () => resolve({ base64: reader.result.split(',')[1], mimeType: file.type || 'image/jpeg' });
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = (height / width) * maxDim;
+            width = maxDim;
+          } else {
+            width = (width / height) * maxDim;
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85); // Compress slightly
+        resolve({
+          base64: dataUrl.split(',')[1],
+          mimeType: 'image/jpeg'
+        });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
