@@ -257,27 +257,34 @@ export function initUIListeners() {
   const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
   const bulkUpdateStatus = document.getElementById('bulkUpdateStatus');
 
-  settingsBtn.addEventListener('click', () => {
-    settingsOverlay.classList.add('active');
-  });
-
-  document.getElementById('closeSettingsBtn').addEventListener('click', () => {
-    settingsOverlay.classList.remove('active');
-  });
-
-  settingsOverlay.addEventListener('click', e => {
-    if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
-  });
-
-  bulkUpdateBtn.addEventListener('click', async () => {
-    bulkUpdateBtn.disabled = true;
-    bulkUpdateStatus.style.display = 'block';
-    const { bulkUpdateScores } = await import('./db.js');
-    await bulkUpdateScores((msg) => {
-      bulkUpdateStatus.textContent = msg;
+  if (settingsBtn && settingsOverlay) {
+    settingsBtn.addEventListener('click', () => {
+      settingsOverlay.classList.add('active');
     });
-    bulkUpdateBtn.disabled = false;
-  });
+
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    if (closeSettingsBtn) {
+      closeSettingsBtn.addEventListener('click', () => {
+        settingsOverlay.classList.remove('active');
+      });
+    }
+
+    settingsOverlay.addEventListener('click', e => {
+      if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+    });
+  }
+
+  if (bulkUpdateBtn) {
+    bulkUpdateBtn.addEventListener('click', async () => {
+      bulkUpdateBtn.disabled = true;
+      if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
+      const { bulkUpdateScores } = await import('./db.js');
+      await bulkUpdateScores((msg) => {
+        if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
+      });
+      bulkUpdateBtn.disabled = false;
+    });
+  }
 
   // Modal internal actions (consume, rate, delete)
   document.getElementById('modalContent').addEventListener('click', async e => {

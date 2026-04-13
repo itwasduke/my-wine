@@ -34,7 +34,7 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - **v1.5.0 (April 13, 2026)**:
     - Added Settings Gear to controls bar (only visible when signed in).
     - Implemented "Bulk Update" feature to find and update wines missing scores/vintages.
-    - Improved modal refresh logic when background updates occur.
+    - Fixed UI listeners for settings modal and improved background refresh logic.
 - **v1.4.3 (April 13, 2026)**:
     - Implemented Vintage Chart & Professional Score Lookup.
     - Added "Regional Vintage Rating" to bottle details modal.
