@@ -166,6 +166,21 @@ export function openModal(id) {
     <div class="modal-text">${w.decant}</div>
     <div class="modal-section-label">Drinking Window</div>
     <div class="modal-text">${w.window}</div>
+    
+    ${w.proScores ? `
+      <div class="modal-section-label">Professional Ratings</div>
+      <div class="modal-text" style="color:var(--ready); font-weight:500;">${w.proScores.scores}</div>
+      <div class="modal-text" style="font-size:0.85rem; font-style:italic;">${w.proScores.summary}</div>
+      ${w.proScores.vintage ? `
+        <div class="modal-section-label" style="margin-top:12px;">Regional Vintage Rating</div>
+        <div class="modal-text" style="font-weight:500;">${w.proScores.vintage}</div>
+      ` : ''}
+    ` : (state.currentUser ? `
+      <button class="consume-btn" style="border-color:var(--text-muted); color:var(--text-secondary); margin-top:16px;" data-action="lookup-scores" data-id="${id}">
+        🔍 Lookup Pro Scores & Vintage
+      </button>
+    ` : '')}
+
     ${showConsumeBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
       <button class="consume-btn" data-action="consume" data-id="${id}">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
     ${showRating ? `
@@ -242,6 +257,19 @@ export function initUIListeners() {
     if (action === 'consume') {
       const { markConsumed } = await import('./db.js');
       markConsumed(id);
+    } else if (action === 'lookup-scores') {
+      btn.disabled = true;
+      btn.textContent = 'Searching critics & vintage...';
+      const { lookupProScores } = await import('./ai.js');
+      const { saveProScores }   = await import('./db.js');
+      try {
+        const scores = await lookupProScores(state.inventory[id]);
+        await saveProScores(id, scores);
+      } catch (e) {
+        console.error('Score lookup failed:', e);
+        btn.disabled = false;
+        btn.textContent = 'Lookup Failed - Try Again';
+      }
     } else if (action === 'rate') {
       const { setRating } = await import('./db.js');
       setRating(id, value === 'true');

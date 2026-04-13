@@ -182,6 +182,43 @@ export async function confirmAddBottle() {
   btn.textContent = 'Add to Cellar';
 }
 
+export async function lookupProScores(bottle) {
+  let geminiModel;
+  try {
+    const { getVertexAI, getGenerativeModel } =
+      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
+    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
+  } catch (e) {
+    const { getAI, getGenerativeModel, GoogleAIBackend } =
+      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
+    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
+  }
+
+  const prompt = `You are an expert wine critic. Find professional scores and ratings for this bottle:
+  Name: ${bottle.name}
+  Vintage/Year: ${bottle.year}
+  Region: ${bottle.region}
+
+  Search for ratings from major critics like Robert Parker (RP), Wine Spectator (WS), Decanter, James Suckling (JS), and Vivino.
+  
+  Also, provide a "Vintage Chart" rating (0-100 or descriptive) for this region and year (e.g., how the 2018 vintage was overall in Bordeaux).
+
+  Provide a concise summary (max 2 sentences) of the consensus and a JSON object with specific scores if available.
+  Respond with ONLY a valid JSON object:
+  {
+    "summary": "Consensus summary here...",
+    "scores": "RP: 92, WS: 90, Vivino: 4.2",
+    "vintage": "94/100 (Exceptional year for Bordeaux)"
+  }`;
+
+  const result = await geminiModel.generateContent(prompt);
+  const text = result.response.text().trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/, '')
+    .trim();
+  return JSON.parse(text);
+}
+
 export function initAIListeners() {
   document.getElementById('fab').addEventListener('click', () => {
     if (!state.currentUser) return;

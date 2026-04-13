@@ -87,6 +87,16 @@ export async function saveNewBottle(data) {
   }
 }
 
+export async function saveProScores(id, scoreData) {
+  try {
+    await updateDoc(doc(db, 'cellar', id), { proScores: scoreData });
+    state.inventory[id].proScores = scoreData;
+    openModal(id); // Refresh modal to show scores
+  } catch (e) {
+    console.error('Failed to update scores in Firestore:', e);
+  }
+}
+
 export function confirmDeleteBottle(id) {
   if (!state.currentUser) return;
   const name = state.inventory[id]?.name || 'this bottle';

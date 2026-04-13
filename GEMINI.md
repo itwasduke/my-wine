@@ -31,6 +31,10 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.4.3 (April 13, 2026)**:
+    - Implemented Vintage Chart & Professional Score Lookup.
+    - Added "Regional Vintage Rating" to bottle details modal.
+    - Enhanced Gemini AI prompt to fetch regional vintage quality info.
 - **v1.4.2 (April 13, 2026)**:
     - Fixed Service Worker cache to include new JS modules and CSS.
     - Improved Sort Dropdown responsiveness on mobile (font-size bump to prevent iOS zoom).
@@ -49,5 +53,5 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - [ ] Personal user-editable tasting notes field.
 - [ ] Purchase price tracking.
 - [ ] Push notifications for "Drink Soon" bottles.
-- [ ] Vintage chart/score lookup.
+- [x] Vintage chart/score lookup.
 - [ ] Read-only sharing view for friends.
