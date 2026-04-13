@@ -1,0 +1,156 @@
+import { SECTIONS, state } from './state.js';
+
+export function updateAuthUI(user) {
+  state.currentUser = user;
+  const signInBtn = document.getElementById('signInBtn');
+  const userInfo  = document.getElementById('userInfo');
+  const fab       = document.getElementById('fab');
+  if (user) {
+    signInBtn.style.display = 'none';
+    userInfo.style.display  = 'flex';
+    const initial = document.getElementById('userInitial');
+    if (user.photoURL) {
+      initial.outerHTML = `<img class="auth-avatar" id="userInitial" src="${user.photoURL}" alt="${user.displayName || ''}">`;
+    } else {
+      initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+    }
+    fab.style.display = '';
+  } else {
+    signInBtn.style.display = '';
+    userInfo.style.display  = 'none';
+    fab.style.display       = 'none';
+  }
+  // Re-render open modal if any, so auth-gated buttons appear/disappear
+  const activeModal = document.getElementById('modalContent');
+  if (activeModal && document.getElementById('modalOverlay').classList.contains('active')) {
+    const openId = activeModal.dataset.openId;
+    if (openId) openModal(openId);
+  }
+  renderInventory();
+}
+
+export function renderInventory() {
+  const main   = document.getElementById('main-content');
+  const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
+  const byStatus = {};
+  Object.values(state.inventory).forEach(w => {
+    if (!byStatus[w.status]) byStatus[w.status] = [];
+    byStatus[w.status].push(w);
+  });
+  const visibleSections = SECTIONS.filter(sec => {
+    if (filter === 'wine')    return sec.status !== 'spirits';
+    if (filter === 'spirits') return sec.status === 'spirits' || sec.status === 'consumed';
+    return true;
+  });
+  main.innerHTML = visibleSections
+    .filter(sec => byStatus[sec.status]?.length)
+    .map(sec => {
+      let items = byStatus[sec.status];
+      let extraHeader = '';
+      if (sec.status === 'consumed') {
+        extraHeader = `
+          <div class="consumed-filter">
+            <button class="consumed-filter-btn${state.consumedLikedFilter === 'all' ? ' active' : ''}" onclick="setConsumedFilter('all')">All</button>
+            <button class="consumed-filter-btn${state.consumedLikedFilter === 'liked' ? ' active' : ''}" onclick="setConsumedFilter('liked')">Liked Only</button>
+          </div>`;
+        if (state.consumedLikedFilter === 'liked') {
+          items = items.filter(w => w.liked === true);
+        }
+      }
+      if (!items.length) return '';
+      return `
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title ${sec.cls}">${sec.label}</span>
+            <div class="section-line ${sec.cls}"></div>
+            ${extraHeader}
+          </div>
+          <div class="grid">
+            ${items.map(cardHTML).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+}
+
+function cardHTML(w) {
+  const badge = w.status === 'consumed'
+    ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
+    : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
+  const likedIcon = (w.status === 'consumed' && w.liked === true)
+    ? `<span class="card-liked-icon" title="Liked" style="color:var(--accent)">👍</span>`
+    : '';
+  return `
+    <div class="card ${w.status}" onclick="openModal('${w.id}')">
+      ${likedIcon}
+      <div class="card-year">${w.year}</div>
+      <div class="card-name">${w.name}</div>
+      <div class="card-region">${w.region}</div>
+      ${badge}
+    </div>
+  `;
+}
+
+export function openModal(id) {
+  const w = state.inventory[id];
+  if (!w) return;
+  const showConsumeBtn = state.currentUser && w.status !== 'consumed' && w.status !== 'cook';
+  const showRating     = state.currentUser && w.status === 'consumed';
+  const el = document.getElementById('modalContent');
+  el.dataset.openId = id;
+  el.innerHTML = `
+    <div class="modal-year">${w.year}</div>
+    <div class="modal-name">${w.name}</div>
+    <div class="modal-region">${w.region}</div>
+    <span class="modal-status status-${w.status}">${w.statusLabel}</span>
+    <div class="modal-divider"></div>
+    <div class="modal-meta">
+      <div class="meta-item"><span class="meta-label">Variety</span><span class="meta-value">${w.grape}</span></div>
+      <div class="meta-item"><span class="meta-label">ABV</span><span class="meta-value">${w.abv}</span></div>
+      <div class="meta-item"><span class="meta-label">Serve</span><span class="meta-value">${w.temp}</span></div>
+    </div>
+    <div class="modal-section-label">Tasting Notes</div>
+    <div class="modal-text">${w.notes}</div>
+    <div class="modal-section-label">Decanting</div>
+    <div class="modal-text">${w.decant}</div>
+    <div class="modal-section-label">Drinking Window</div>
+    <div class="modal-text">${w.window}</div>
+    ${showConsumeBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
+      <button class="consume-btn" onclick="markConsumed('${id}')">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
+    ${showRating ? `
+      <div class="rating-row">
+        <button class="rating-btn${w.liked === true ? ' liked-active' : ''}" onclick="setRating('${id}', true)">
+          <span>👍</span> Liked
+        </button>
+        <button class="rating-btn${w.liked === false ? ' disliked-active' : ''}" onclick="setRating('${id}', false)">
+          <span>👎</span> Didn't Like
+        </button>
+      </div>` : ''}
+    ${state.currentUser ? `<button class="delete-btn" onclick="confirmDeleteBottle('${id}')">Remove from Cellar</button>` : ''}
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+export function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+window.setFilter = function(filter) {
+  const bar = document.getElementById('filterBar');
+  bar.dataset.filter = filter;
+  bar.querySelectorAll('.filter-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.filter === filter)
+  );
+  renderInventory();
+};
+
+window.setConsumedFilter = function(filter) {
+  state.consumedLikedFilter = filter;
+  renderInventory();
+};
+
+window.openModal = openModal;
+window.closeModalDirect = closeModalDirect;
+window.closeModal = function(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+};
