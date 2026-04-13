@@ -1,8 +1,8 @@
 import { db } from './firebase.js';
-import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField } 
+import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp } 
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { state } from './state.js';
-import { renderInventory, closeModalDirect, openModal } from './ui.js';
+import { renderInventory, closeModalDirect, openModal, updateLastUpdatedUI } from './ui.js';
 import { closeScanModal } from './ai.js';
 
 export async function loadInventory() {
@@ -13,7 +13,16 @@ export async function loadInventory() {
     const snapshot = await getDocs(collection(db, 'cellar'));
     console.log('[Cellar] Snapshot received, docs:', snapshot.size);
     state.inventory = {};
-    snapshot.forEach(d => { state.inventory[d.id] = { id: d.id, ...d.data() }; });
+    let latest = 0;
+    snapshot.forEach(d => { 
+      const data = d.data();
+      state.inventory[d.id] = { id: d.id, ...data }; 
+      if (data.updatedAt) {
+        const ms = data.updatedAt.toMillis ? data.updatedAt.toMillis() : new Date(data.updatedAt).getTime();
+        if (ms > latest) latest = ms;
+      }
+    });
+    if (latest > 0) state.lastUpdated = new Date(latest);
     console.log('[Cellar] Inventory built, rendering…');
     renderInventory();
     console.log('[Cellar] Render complete');
@@ -30,6 +39,7 @@ export async function deleteBottle(id) {
   try {
     await deleteDoc(doc(db, 'cellar', id));
     delete state.inventory[id];
+    state.lastUpdated = new Date();
     closeModalDirect();
     renderInventory();
   } catch (e) {
@@ -42,10 +52,12 @@ export async function markConsumed(id) {
   if (!state.currentUser) return;
   try {
     const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed', consumedDate });
+    const update = { status: 'consumed', statusLabel: 'Consumed', consumedDate, updatedAt: serverTimestamp() };
+    await updateDoc(doc(db, 'cellar', id), update);
     state.inventory[id].status = 'consumed';
     state.inventory[id].statusLabel = 'Consumed';
     state.inventory[id].consumedDate = consumedDate;
+    state.lastUpdated = new Date();
     closeModalDirect();
     renderInventory();
   } catch (e) {
@@ -57,13 +69,14 @@ export async function setRating(id, liked) {
   try {
     const current = state.inventory[id].liked;
     const newValue = (current === liked) ? null : liked;
-    const update = newValue === null ? { liked: deleteField() } : { liked: newValue };
+    const update = newValue === null ? { liked: deleteField(), updatedAt: serverTimestamp() } : { liked: newValue, updatedAt: serverTimestamp() };
     await updateDoc(doc(db, 'cellar', id), update);
     if (newValue === null) {
       delete state.inventory[id].liked;
     } else {
       state.inventory[id].liked = newValue;
     }
+    state.lastUpdated = new Date();
     openModal(id);
     renderInventory();
   } catch (e) {
@@ -73,8 +86,10 @@ export async function setRating(id, liked) {
 
 export async function saveNewBottle(data) {
   try {
-    const ref = await addDoc(collection(db, 'cellar'), data);
-    state.inventory[ref.id] = { id: ref.id, ...data };
+    const finalData = { ...data, updatedAt: serverTimestamp() };
+    const ref = await addDoc(collection(db, 'cellar'), finalData);
+    state.inventory[ref.id] = { id: ref.id, ...finalData };
+    state.lastUpdated = new Date();
     closeScanModal();
     renderInventory();
   } catch (e) {
@@ -89,12 +104,14 @@ export async function saveNewBottle(data) {
 
 export async function saveProScores(id, scoreData) {
   try {
-    await updateDoc(doc(db, 'cellar', id), { proScores: scoreData });
+    await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;
+    state.lastUpdated = new Date();
     const activeModal = document.getElementById('modalContent');
     if (activeModal && activeModal.dataset.openId === id) {
       openModal(id); // Refresh modal if it's currently open
     }
+    updateLastUpdatedUI(); // Immediate UI update
   } catch (e) {
     console.error('Failed to update scores in Firestore:', e);
   }
@@ -132,6 +149,7 @@ export async function bulkUpdateScores(onProgress) {
     await new Promise(r => setTimeout(r, 800));
   }
 
+  state.lastUpdated = new Date();
   onProgress(`Successfully updated ${total} wines.`);
   renderInventory();
 }
@@ -155,7 +173,7 @@ export async function bulkTagWineColor(onProgress) {
     
     try {
       const color = await guessWineColor(w);
-      await updateDoc(doc(db, 'cellar', w.id), { colorStyle: color });
+      await updateDoc(doc(db, 'cellar', w.id), { colorStyle: color, updatedAt: serverTimestamp() });
       state.inventory[w.id].colorStyle = color;
     } catch (e) {
       console.error(`Failed to tag ${w.name}:`, e);
@@ -164,6 +182,7 @@ export async function bulkTagWineColor(onProgress) {
     await new Promise(r => setTimeout(r, 600));
   }
 
+  state.lastUpdated = new Date();
   onProgress(`Successfully tagged ${total} wines.`);
   renderInventory();
 }

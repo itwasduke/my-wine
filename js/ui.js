@@ -1,6 +1,27 @@
 import { SECTIONS, state } from './state.js';
 import { renderAnalytics } from './analytics.js';
 
+function formatRelativeTime(date) {
+  if (!date) return 'Never';
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 5) return 'Just now';
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export function updateLastUpdatedUI() {
+  const el = document.querySelector('.last-updated');
+  if (el) {
+    el.textContent = `Last updated: ${formatRelativeTime(state.lastUpdated)}`;
+  }
+}
+
+// Keep it fresh
+setInterval(updateLastUpdatedUI, 30000);
+
 export function updateAuthUI(user) {
   state.currentUser = user;
   const signInBtn = document.getElementById('signInBtn');
@@ -135,6 +156,7 @@ export function renderInventory() {
     main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match "${searchQuery}"</div>`;
   }
 
+  updateLastUpdatedUI();
   renderAnalytics();
 }
 

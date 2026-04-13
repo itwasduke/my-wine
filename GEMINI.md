@@ -31,6 +31,14 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.6.2 (April 13, 2026)**:
+    - Implemented dynamic "Last updated" header with relative time formatting (e.g., "Just now").
+    - Added background timestamp synchronization using Firestore `updatedAt` field.
+    - Synchronized app version numbering across footer and documentation.
+- **v1.6.1 (April 13, 2026)**:
+    - Added secondary sub-filter bar for Wines (All, Red, White, Rosé, Sparkling).
+    - Updated AI scan prompt to automatically detect wine color/style.
+    - Implemented "Bulk Auto-Tag Wine Colors" maintenance tool in settings.
 - **v1.6.0 (April 13, 2026)**:
     - Redesigned navigation with a slide-out Hamburger Menu (Drawer).
     - Moved Analytics Dashboard into a dedicated Modal overlay.
