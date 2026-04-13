@@ -36,6 +36,7 @@ export async function loadInventory() {
 }
 
 export async function deleteBottle(id) {
+  if (!state.currentUser) return;
   try {
     await deleteDoc(doc(db, 'cellar', id));
     delete state.inventory[id];
@@ -91,6 +92,7 @@ export async function markConsumed(id) {
 }
 
 export async function setRating(id, liked) {
+  if (!state.currentUser) return;
   try {
     const current = state.inventory[id].liked;
     const newValue = (current === liked) ? null : liked;
@@ -110,6 +112,7 @@ export async function setRating(id, liked) {
 }
 
 export async function saveNewBottle(data) {
+  if (!state.currentUser) return;
   try {
     // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
