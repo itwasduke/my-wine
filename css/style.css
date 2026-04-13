@@ -255,6 +255,7 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
   .analytics-value { font-size: 1rem; }
   .analytics-label { font-size: 0.55rem; }
   .search-sort-bar { flex-direction: column; gap: 10px; }
+  .sort-select { font-size: 16px; padding: 12px; }
 }
 
 /* ── Auth ─────────────────────────────────────────────────────────────────── */

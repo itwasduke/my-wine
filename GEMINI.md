@@ -31,6 +31,10 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.4.2 (April 13, 2026)**:
+    - Fixed Service Worker cache to include new JS modules and CSS.
+    - Improved Sort Dropdown responsiveness on mobile (font-size bump to prevent iOS zoom).
+    - Fixed bug where Stats would hide prematurely on slow loads.
 - **v1.4.1 (April 13, 2026)**:
     - Fixed mobile layout for Analytics Dashboard (responsive padding, flex-wrap, and smaller font sizes).
     - Implemented Real-Time Search & Sorting.

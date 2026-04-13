@@ -206,9 +206,9 @@ export function initUIListeners() {
   });
 
   // Sort select
-  document.getElementById('sortSelect').addEventListener('change', () => {
-    renderInventory();
-  });
+  const sortSelect = document.getElementById('sortSelect');
+  sortSelect.addEventListener('change', () => renderInventory());
+  sortSelect.addEventListener('input', () => renderInventory());
 
   // Main content clicks (Event Delegation for cards and consumed filters)
   document.getElementById('main-content').addEventListener('click', e => {
@@ -247,8 +247,7 @@ export function initUIListeners() {
       setRating(id, value === 'true');
     } else if (action === 'delete') {
       const { confirmDeleteBottle } = await import('./db.js');
-      const { confirmDeleteBottle: confirmDel } = await import('./db.js');
-      confirmDel(id);
+      confirmDeleteBottle(id);
     }
   });
 }

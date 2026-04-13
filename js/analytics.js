@@ -4,28 +4,33 @@ export function renderAnalytics() {
   const container = document.getElementById('analytics-dashboard');
   if (!container) return;
 
-  const activeBottles = Object.values(state.inventory).filter(w => w.status !== 'consumed');
+  const allBottles = Object.values(state.inventory);
+  const activeBottles = allBottles.filter(w => w.status !== 'consumed');
   
-  if (activeBottles.length === 0) {
+  // If we have NO bottles at all, it might still be loading, 
+  // but if we've fetched and it's empty, we hide it.
+  if (allBottles.length === 0) {
     container.style.display = 'none';
     return;
   }
 
   const total = activeBottles.length;
-  
+  if (total === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
   let wineCount = 0;
   let spiritsCount = 0;
   const regionCounts = {};
 
   activeBottles.forEach(w => {
-    // If status is spirits or type property indicates spirit
     if (w.status === 'spirits' || w.type === 'spirit') {
       spiritsCount++;
     } else {
       wineCount++;
     }
 
-    // Try to extract a simple region name if it's too long, or just use as is
     const region = w.region && w.region.trim();
     if (region && region !== '—' && region.toLowerCase() !== 'unknown') {
       regionCounts[region] = (regionCounts[region] || 0) + 1;
@@ -44,7 +49,6 @@ export function renderAnalytics() {
     }
   }
   
-  // Truncate long region names for the dashboard
   if (topRegion.length > 22) {
     topRegion = topRegion.substring(0, 20) + '…';
   }

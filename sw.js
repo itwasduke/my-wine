@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'cellar-shell-v2';
+const SHELL_CACHE = 'cellar-shell-v4';
 const FONT_CACHE  = 'cellar-fonts-v1';
 
 // App shell — everything needed to render the page offline
@@ -7,6 +7,15 @@ const APP_SHELL = [
   './index.html',
   './manifest.json',
   './icon.svg',
+  './css/style.css',
+  './js/app.js',
+  './js/state.js',
+  './js/ui.js',
+  './js/db.js',
+  './js/auth.js',
+  './js/ai.js',
+  './js/firebase.js',
+  './js/analytics.js',
 ];
 
 // ── Install: pre-cache app shell ──────────────────────────────────────────────
@@ -54,7 +63,7 @@ self.addEventListener('fetch', e => {
   }
 
   // App shell — network-first for HTML so updates are always picked up immediately.
-  // Static assets (icon, manifest) stay cache-first.
+  // Static assets (icon, manifest, modules) stay cache-first.
   if (url.origin === self.location.origin) {
     const isHtml = request.mode === 'navigate' ||
                    url.pathname === '/' ||
