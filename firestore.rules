@@ -6,14 +6,9 @@ service cloud.firestore {
       // Public read — the inventory is a personal display, no sensitive data.
       allow read: if true;
 
-      // Writes (create + update) require the signed-in owner UID.
-      // Replace [YOUR_UID_HERE] with your Firebase Auth UID after first sign-in:
-      //   Firebase Console → Authentication → Users → copy the User UID column.
-      allow create, update: if request.auth != null
-                            && request.auth.uid == "ZJgo9XDaDyT4Xwrvpsrlp1M7rk33";
-
-      // Deletes are permanently blocked.
-      allow delete: if false;
+      // All writes require the signed-in owner UID.
+      allow create, update, delete: if request.auth != null
+                                    && request.auth.uid == "ZJgo9XDaDyT4Xwrvpsrlp1M7rk33";
     }
   }
 }

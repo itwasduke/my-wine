@@ -600,7 +600,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.2.0</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.2.1</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -689,7 +689,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 <script type="module">
 import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { initializeFirestore, persistentLocalCache,
-         collection, getDocs, doc, updateDoc, addDoc, deleteField }
+         collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -911,9 +911,29 @@ window.openModal = function(id) {
           <span>👎</span> Didn't Like
         </button>
       </div>` : ''}
+    ${currentUser ? `<button class="delete-btn" onclick="confirmDeleteBottle('${id}', ${JSON.stringify(w.name)})">Remove from Cellar</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
 };
+
+window.confirmDeleteBottle = function(id, name) {
+  if (!currentUser) return;
+  if (confirm(`Remove "${name}" from your cellar?\n\nThis cannot be undone.`)) {
+    deleteBottle(id);
+  }
+};
+
+async function deleteBottle(id) {
+  try {
+    await deleteDoc(doc(db, 'cellar', id));
+    delete inventory[id];
+    closeModalDirect();
+    renderInventory();
+  } catch (e) {
+    console.error('Failed to delete from Firestore:', e);
+    alert('Could not remove bottle — check your connection and try again.');
+  }
+}
 
 window.markConsumed = async function(id) {
   if (!currentUser) return;
