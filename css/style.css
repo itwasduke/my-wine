@@ -425,6 +425,44 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 .analytics-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); }
 .analytics-divider { width: 1px; height: 32px; background: var(--border); }
 
+/* ── Search and Sort Bar ────────────────────────────────────────────────── */
+.search-sort-bar {
+  display: flex; gap: 12px; margin-bottom: 20px;
+}
+.search-wrapper { position: relative; flex: 1; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; }
+.search-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 10px 10px 38px;
+  color: var(--text-primary);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.sort-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  outline: none;
+  cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23A0A0A0' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 30px;
+}
+.sort-select:focus { border-color: var(--accent); }
+
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; }
 .filter-btn {

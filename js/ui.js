@@ -1,4 +1,5 @@
 import { SECTIONS, state } from './state.js';
+import { renderAnalytics } from './analytics.js';
 
 export function updateAuthUI(user) {
   state.currentUser = user;
@@ -32,20 +33,64 @@ export function updateAuthUI(user) {
 export function renderInventory() {
   const main   = document.getElementById('main-content');
   const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
+  const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+  const sortBy = document.getElementById('sortSelect')?.value || 'newest';
+
+  // 1. Convert to array and filter by Search + Type Filter
+  let items = Object.values(state.inventory).filter(w => {
+    // Type Filter
+    const matchesFilter = 
+      (filter === 'all') || 
+      (filter === 'wine' && w.status !== 'spirits') || 
+      (filter === 'spirits' && (w.status === 'spirits' || w.status === 'consumed'));
+    
+    if (!matchesFilter) return false;
+
+    // Search Query
+    if (searchQuery) {
+      const searchStr = `${w.name} ${w.region} ${w.grape} ${w.year}`.toLowerCase();
+      return searchStr.includes(searchQuery);
+    }
+    
+    return true;
+  });
+
+  // 2. Sort
+  items.sort((a, b) => {
+    switch (sortBy) {
+      case 'year-asc':
+        return (parseInt(a.year) || 0) - (parseInt(b.year) || 0);
+      case 'year-desc':
+        return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+      case 'name-asc':
+        return a.name.localeCompare(b.name);
+      case 'name-desc':
+        return b.name.localeCompare(a.name);
+      case 'oldest':
+        return a.id.localeCompare(b.id); // Fallback: ID sorting
+      case 'newest':
+      default:
+        return b.id.localeCompare(a.id); // Fallback: Reverse ID sorting
+    }
+  });
+
+  // 3. Group by Status
   const byStatus = {};
-  Object.values(state.inventory).forEach(w => {
+  items.forEach(w => {
     if (!byStatus[w.status]) byStatus[w.status] = [];
     byStatus[w.status].push(w);
   });
+
   const visibleSections = SECTIONS.filter(sec => {
     if (filter === 'wine')    return sec.status !== 'spirits';
     if (filter === 'spirits') return sec.status === 'spirits' || sec.status === 'consumed';
     return true;
   });
+
   main.innerHTML = visibleSections
     .filter(sec => byStatus[sec.status]?.length)
     .map(sec => {
-      let items = byStatus[sec.status];
+      let sectionItems = byStatus[sec.status];
       let extraHeader = '';
       if (sec.status === 'consumed') {
         extraHeader = `
@@ -54,10 +99,10 @@ export function renderInventory() {
             <button class="consumed-filter-btn${state.consumedLikedFilter === 'liked' ? ' active' : ''}" data-filter="liked">Liked Only</button>
           </div>`;
         if (state.consumedLikedFilter === 'liked') {
-          items = items.filter(w => w.liked === true);
+          sectionItems = sectionItems.filter(w => w.liked === true);
         }
       }
-      if (!items.length) return '';
+      if (!sectionItems.length) return '';
       return `
         <div class="section">
           <div class="section-header">
@@ -66,12 +111,16 @@ export function renderInventory() {
             ${extraHeader}
           </div>
           <div class="grid">
-            ${items.map(cardHTML).join('')}
+            ${sectionItems.map(cardHTML).join('')}
           </div>
         </div>
       `;
     }).join('');
   
+  if (main.innerHTML === '' && searchQuery) {
+    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match "${searchQuery}"</div>`;
+  }
+
   renderAnalytics();
 }
 
@@ -151,6 +200,16 @@ export function initUIListeners() {
     renderInventory();
   });
 
+  // Search input
+  document.getElementById('searchInput').addEventListener('input', () => {
+    renderInventory();
+  });
+
+  // Sort select
+  document.getElementById('sortSelect').addEventListener('change', () => {
+    renderInventory();
+  });
+
   // Main content clicks (Event Delegation for cards and consumed filters)
   document.getElementById('main-content').addEventListener('click', e => {
     // Card clicks
@@ -188,11 +247,8 @@ export function initUIListeners() {
       setRating(id, value === 'true');
     } else if (action === 'delete') {
       const { confirmDeleteBottle } = await import('./db.js');
-      confirmDeleteBottle(id);
-    }
-  });
-}
-Bottle(id);
+      const { confirmDeleteBottle: confirmDel } = await import('./db.js');
+      confirmDel(id);
     }
   });
 }

@@ -42,6 +42,21 @@
   <!-- Analytics Dashboard -->
   <div id="analytics-dashboard" class="analytics-dashboard" style="display:none;"></div>
 
+  <div class="search-sort-bar">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name, region, or grape…" class="search-input">
+    </div>
+    <select id="sortSelect" class="sort-select">
+      <option value="newest">Newest Added</option>
+      <option value="oldest">Oldest Added</option>
+      <option value="year-desc">Vintage (Newest)</option>
+      <option value="year-asc">Vintage (Oldest)</option>
+      <option value="name-asc">A–Z</option>
+      <option value="name-desc">Z–A</option>
+    </select>
+  </div>
+
   <div class="filter-bar" id="filterBar" data-filter="all">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn"        data-filter="wine">Wine</button>
