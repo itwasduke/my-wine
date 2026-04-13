@@ -172,12 +172,14 @@ function cardHTML(w) {
     : '';
   return `
     <div class="card ${w.status}" data-id="${w.id}">
-      ${qtyBadge}
       ${likedIcon}
       <div class="card-year">${w.year}</div>
       <div class="card-name">${w.name}</div>
       <div class="card-region">${w.region}</div>
-      ${badge}
+      <div class="card-footer">
+        <div class="card-badges-left">${badge}</div>
+        <div class="card-badges-right">${qtyBadge}</div>
+      </div>
     </div>
   `;
 }

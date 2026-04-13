@@ -31,6 +31,9 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.7.3 (April 13, 2026)**:
+    - UI Refinement: Moved quantity badge from top-left to bottom-right of inventory cards.
+    - Fixed overlap issues between quantity badge and vintage year.
 - **v1.7.2 (April 13, 2026)**:
     - Expanded Security: Added explicit authentication guards to all write operations (Add, Delete, Rate).
     - Unified protection for inventory modifications across UI and database logic.
