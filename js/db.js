@@ -3,6 +3,7 @@ import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { state } from './state.js';
 import { renderInventory, closeModalDirect, openModal } from './ui.js';
+import { closeScanModal } from './ai.js';
 
 export async function loadInventory() {
   console.log('[Cellar] loadInventory() called');
@@ -74,7 +75,7 @@ export async function saveNewBottle(data) {
   try {
     const ref = await addDoc(collection(db, 'cellar'), data);
     state.inventory[ref.id] = { id: ref.id, ...data };
-    window.closeScanModal(); // defined in ai.js
+    closeScanModal();
     renderInventory();
   } catch (e) {
     console.error('Failed to save to Firestore:', e);
@@ -86,13 +87,10 @@ export async function saveNewBottle(data) {
   }
 }
 
-window.confirmDeleteBottle = function(id) {
+export function confirmDeleteBottle(id) {
   if (!state.currentUser) return;
   const name = state.inventory[id]?.name || 'this bottle';
   if (confirm(`Remove "${name}" from your cellar?\n\nThis cannot be undone.`)) {
     deleteBottle(id);
   }
-};
-
-window.markConsumed = markConsumed;
-window.setRating = setRating;
+}

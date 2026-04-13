@@ -21,7 +21,7 @@ export async function signOutUser() {
 
 export function initAuth() {
   onAuthStateChanged(auth, user => updateAuthUI(user));
+  
+  document.getElementById('signInBtn').addEventListener('click', signIn);
+  document.getElementById('signOutBtn').addEventListener('click', signOutUser);
 }
-
-window.signIn = signIn;
-window.signOutUser = signOutUser;

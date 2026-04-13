@@ -1,16 +1,19 @@
 import { initAuth } from './auth.js';
 import { loadInventory } from './db.js';
-import { closeModalDirect, closeScanModal } from './ui.js';
+import { initUIListeners, closeModalDirect } from './ui.js';
+import { initAIListeners, closeScanModal } from './ai.js';
 
 // Initialize
 initAuth();
 loadInventory();
+initUIListeners();
+initAIListeners();
 
 // Global Escape Key Listener
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('scanOverlay').classList.contains('active')) {
-      if (typeof window.closeScanModal === 'function') window.closeScanModal();
+      closeScanModal();
     } else {
       closeModalDirect();
     }

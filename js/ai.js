@@ -118,15 +118,7 @@ export function closeScanModal() {
   preview.style.display = 'none';
 }
 
-window.openAddBottle = function() {
-  if (!state.currentUser) return;
-  document.getElementById('cameraInput').value = '';
-  document.getElementById('cameraInput').click();
-};
-
-window.handleImageSelected = handleImageSelected;
-window.closeScanModal = closeScanModal;
-window.confirmAddBottle = async function() {
+export async function confirmAddBottle() {
   if (!state.currentUser) return;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
@@ -151,4 +143,17 @@ window.confirmAddBottle = async function() {
   btn.textContent = 'Saving…';
   await saveNewBottle(data);
   btn.textContent = 'Add to Cellar';
-};
+}
+
+export function initAIListeners() {
+  document.getElementById('fab').addEventListener('click', () => {
+    if (!state.currentUser) return;
+    document.getElementById('cameraInput').value = '';
+    document.getElementById('cameraInput').click();
+  });
+
+  document.getElementById('cameraInput').addEventListener('change', handleImageSelected);
+  document.getElementById('closeScanBtn').addEventListener('click', closeScanModal);
+  document.getElementById('cancelScanBtn').addEventListener('click', closeScanModal);
+  document.getElementById('addBtn').addEventListener('click', confirmAddBottle);
+}
