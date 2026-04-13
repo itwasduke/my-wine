@@ -132,7 +132,8 @@ export function renderInventory() {
   items.forEach(w => {
     let key = w.status;
     if (filter === 'consumed') {
-      const isSpirit = (w.type === 'spirit' || w.statusLabel === 'Spirits');
+      const name = (w.name || '').toLowerCase();
+      const isSpirit = (w.type === 'spirit' || w.statusLabel === 'Spirits' || name.includes('piggyback') || name.includes('powers'));
       key = isSpirit ? 'consumed-spirits' : 'consumed-wine';
     }
     if (!byStatus[key]) byStatus[key] = [];

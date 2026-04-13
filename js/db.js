@@ -17,18 +17,24 @@ export async function loadInventory() {
     snapshot.forEach(d => { 
       const data = d.data();
       const item = { id: d.id, ...data };
-      
+      const name = (item.name || '').toLowerCase();
+
+      // Data Fix: Specifically handle brands like Piggyback and Powers as spirits if type is missing
+      if (!item.type && (name.includes('piggyback') || name.includes('powers'))) {
+        item.type = 'spirit';
+      }
+
       // Fallback for missing status (legacy data)
       if (!item.status) {
-        if (item.type === 'spirit' || item.region === 'Japan') { // Spirits often don't have regions but region might be Japan
+        if (item.type === 'spirit' || item.region === 'Japan') { 
           item.status = 'spirits';
         } else {
           item.status = 'ready';
         }
       }
-      
+
       state.inventory[d.id] = item; 
-      
+    ...
       if (data.updatedAt) {
         const ms = data.updatedAt.toMillis ? data.updatedAt.toMillis() : new Date(data.updatedAt).getTime();
         if (ms > latest) latest = ms;
