@@ -161,6 +161,9 @@ export function renderInventory() {
 }
 
 function cardHTML(w) {
+  const qtyBadge = (parseInt(w.quantity) > 1) 
+    ? `<span class="card-qty">×${w.quantity}</span>` 
+    : '';
   const badge = w.status === 'consumed'
     ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
     : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
@@ -169,6 +172,7 @@ function cardHTML(w) {
     : '';
   return `
     <div class="card ${w.status}" data-id="${w.id}">
+      ${qtyBadge}
       ${likedIcon}
       <div class="card-year">${w.year}</div>
       <div class="card-name">${w.name}</div>
@@ -196,6 +200,22 @@ export function openModal(id) {
       <div class="meta-item"><span class="meta-label">ABV</span><span class="meta-value">${w.abv}</span></div>
       <div class="meta-item"><span class="meta-label">Serve</span><span class="meta-value">${w.temp}</span></div>
     </div>
+
+    <div class="qty-row">
+      <div class="meta-item">
+        <span class="meta-label">In Stock</span>
+        <div class="qty-controls">
+          <button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>
+          <span class="qty-value">${w.quantity || 1}</span>
+          <button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>
+        </div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Lifetime Consumed</span>
+        <span class="meta-value" style="font-weight:500; font-size:1.1rem; margin-top:4px;">${w.consumedCount || 0}</span>
+      </div>
+    </div>
+
     <div class="modal-section-label">Tasting Notes</div>
     <div class="modal-text">${w.notes}</div>
     <div class="modal-section-label">Decanting</div>
@@ -378,6 +398,12 @@ export function initUIListeners() {
     if (action === 'consume') {
       const { markConsumed } = await import('./db.js');
       markConsumed(id);
+    } else if (action === 'qty-dec' || action === 'qty-inc') {
+      const { updateQuantity } = await import('./db.js');
+      const w = state.inventory[id];
+      const current = parseInt(w.quantity) || 1;
+      const change = action === 'qty-inc' ? 1 : -1;
+      updateQuantity(id, current + change);
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';

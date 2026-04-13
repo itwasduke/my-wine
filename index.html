@@ -88,7 +88,7 @@
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.6.2</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.7.0</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -110,9 +110,15 @@
 
     <!-- The form is hidden until AI extraction is done -->
     <div class="add-form" id="addForm">
-      <div class="form-row">
-        <label class="form-label">Bottle Name</label>
-        <input type="text" id="f-name" class="form-input" placeholder="Producer / Vineyard / Name">
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Bottle Name</label>
+          <input type="text" id="f-name" class="form-input" placeholder="Producer / Vineyard / Name">
+        </div>
+        <div>
+          <label class="form-label">Quantity</label>
+          <input type="number" id="f-qty" class="form-input" value="1" min="1">
+        </div>
       </div>
       <div class="form-row-2">
         <div>

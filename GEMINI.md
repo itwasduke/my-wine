@@ -31,6 +31,12 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.7.0 (April 13, 2026)**:
+    - Implemented Quantity Tracking: track multiple bottles per wine entry.
+    - Added "Lifetime Consumed" counter to preserve history across restocks.
+    - Intelligent Restock Flow: scanning a previously finished wine offers to restock the existing entry.
+    - Added quantity controls (+/-) to the bottle details modal.
+    - Visual quantity badges (e.g. x3) on inventory cards.
 - **v1.6.2 (April 13, 2026)**:
     - Implemented dynamic "Last updated" header with relative time formatting (e.g., "Just now").
     - Added background timestamp synchronization using Firestore `updatedAt` field.

@@ -51,15 +51,40 @@ export async function deleteBottle(id) {
 export async function markConsumed(id) {
   if (!state.currentUser) return;
   try {
-    const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const update = { status: 'consumed', statusLabel: 'Consumed', consumedDate, updatedAt: serverTimestamp() };
+    const w = state.inventory[id];
+    const currentQty = parseInt(w.quantity) || 1;
+    const currentConsumed = parseInt(w.consumedCount) || 0;
+    
+    let update = { 
+      updatedAt: serverTimestamp(),
+      consumedCount: currentConsumed + 1
+    };
+
+    if (currentQty > 1) {
+      // Just decrement
+      update.quantity = currentQty - 1;
+      state.inventory[id].quantity = update.quantity;
+      state.inventory[id].consumedCount = update.consumedCount;
+    } else {
+      // Last bottle: move to consumed
+      const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      update.quantity = 0;
+      update.status = 'consumed';
+      update.statusLabel = 'Consumed';
+      update.consumedDate = consumedDate;
+      
+      state.inventory[id].quantity = 0;
+      state.inventory[id].status = 'consumed';
+      state.inventory[id].statusLabel = 'Consumed';
+      state.inventory[id].consumedDate = consumedDate;
+      state.inventory[id].consumedCount = update.consumedCount;
+      closeModalDirect();
+    }
+
     await updateDoc(doc(db, 'cellar', id), update);
-    state.inventory[id].status = 'consumed';
-    state.inventory[id].statusLabel = 'Consumed';
-    state.inventory[id].consumedDate = consumedDate;
     state.lastUpdated = new Date();
-    closeModalDirect();
     renderInventory();
+    if (currentQty > 1) openModal(id); // Keep modal open if more left
   } catch (e) {
     console.error('Failed to update Firestore:', e);
   }
@@ -86,6 +111,40 @@ export async function setRating(id, liked) {
 
 export async function saveNewBottle(data) {
   try {
+    // Check for existing bottle (Duplicate / Restock)
+    const existingId = Object.keys(state.inventory).find(id => {
+      const w = state.inventory[id];
+      return w.name.toLowerCase() === data.name.toLowerCase() &&
+             w.year === data.year &&
+             w.region.toLowerCase() === data.region.toLowerCase();
+    });
+
+    if (existingId) {
+      const w = state.inventory[existingId];
+      const newQty = parseInt(data.quantity) || 1;
+      const totalQty = (parseInt(w.quantity) || 0) + newQty;
+      
+      if (confirm(`You already have "${w.name}" (${w.year}) in your cellar.\n\nRestock ${newQty} more to the existing entry?`)) {
+        const update = { 
+          quantity: totalQty,
+          status: data.status, // Restock to Ready/Spirits
+          statusLabel: data.statusLabel,
+          updatedAt: serverTimestamp()
+        };
+        if (w.status === 'consumed') {
+          update.consumedDate = deleteField();
+        }
+        await updateDoc(doc(db, 'cellar', existingId), update);
+        state.inventory[existingId] = { ...state.inventory[existingId], ...update };
+        if (update.consumedDate) delete state.inventory[existingId].consumedDate;
+        state.lastUpdated = new Date();
+        closeScanModal();
+        renderInventory();
+        openModal(existingId);
+        return;
+      }
+    }
+
     const finalData = { ...data, updatedAt: serverTimestamp() };
     const ref = await addDoc(collection(db, 'cellar'), finalData);
     state.inventory[ref.id] = { id: ref.id, ...finalData };
@@ -99,6 +158,38 @@ export async function saveNewBottle(data) {
     status.className = 'scan-status error';
     document.getElementById('scanStatusText').textContent = 'Save failed — check Firestore rules';
     document.getElementById('scanSpinner').style.display = 'none';
+  }
+}
+
+export async function updateQuantity(id, newQty) {
+  try {
+    const qty = Math.max(0, newQty);
+    let update = { quantity: qty, updatedAt: serverTimestamp() };
+    if (qty === 0) {
+      const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      update.status = 'consumed';
+      update.statusLabel = 'Consumed';
+      update.consumedDate = consumedDate;
+      state.inventory[id].status = 'consumed';
+      state.inventory[id].statusLabel = 'Consumed';
+      state.inventory[id].consumedDate = consumedDate;
+    } else if (state.inventory[id].status === 'consumed') {
+      // Manual restock
+      update.status = 'ready';
+      update.statusLabel = 'Ready to Drink';
+      update.consumedDate = deleteField();
+      state.inventory[id].status = 'ready';
+      state.inventory[id].statusLabel = 'Ready to Drink';
+      delete state.inventory[id].consumedDate;
+    }
+    
+    await updateDoc(doc(db, 'cellar', id), update);
+    state.inventory[id].quantity = qty;
+    state.lastUpdated = new Date();
+    openModal(id);
+    renderInventory();
+  } catch (e) {
+    console.error('Failed to update quantity:', e);
   }
 }
 
