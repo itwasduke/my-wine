@@ -10,7 +10,7 @@ service cloud.firestore {
       // Replace [YOUR_UID_HERE] with your Firebase Auth UID after first sign-in:
       //   Firebase Console → Authentication → Users → copy the User UID column.
       allow create, update: if request.auth != null
-                            && request.auth.uid == "[YOUR_UID_HERE]";
+                            && request.auth.uid == "ZJgo9XDaDyT4Xwrvpsrlp1M7rk33";
 
       // Deletes are permanently blocked.
       allow delete: if false;
