@@ -217,6 +217,85 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
   background: rgba(252,129,129,0.05);
 }
 
+/* ── Rating buttons ───────────────────────────────────────────────────────── */
+.rating-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.rating-btn {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 2px;
+  color: var(--ash);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.rating-btn:hover {
+  border-color: rgba(201,168,76,0.35);
+  color: var(--cream);
+}
+.rating-btn.liked-active {
+  background: rgba(201,168,76,0.14);
+  border-color: rgba(201,168,76,0.55);
+  color: var(--gold);
+}
+.rating-btn.disliked-active {
+  background: rgba(140,123,107,0.12);
+  border-color: rgba(140,123,107,0.38);
+  color: var(--ash);
+}
+
+/* Card liked indicator */
+.card-liked-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+/* Consumed section liked filter */
+.consumed-filter {
+  display: flex;
+  gap: 5px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.consumed-filter-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 1px;
+  border: 1px solid rgba(201,168,76,0.15);
+  background: transparent;
+  color: var(--ash);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.consumed-filter-btn.active {
+  background: rgba(201,168,76,0.1);
+  border-color: rgba(201,168,76,0.38);
+  color: var(--gold);
+}
+.consumed-filter-btn:hover:not(.active) {
+  border-color: rgba(201,168,76,0.28);
+  color: var(--cream);
+}
+
 footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,168,76,0.08); }
 .footer-text { font-size: 0.75rem; color: rgba(140,123,107,0.5); letter-spacing: 0.15em; }
 
@@ -225,86 +304,65 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(201,
   .modal { padding: 30px 24px; }
 }
 
-/* PIN modal */
-.pin-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(10,6,2,0.94);
-  z-index: 2000;
+/* ── Auth ─────────────────────────────────────────────────────────────────── */
+#auth-area {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
-  backdrop-filter: blur(8px);
+  gap: 8px;
 }
-.pin-overlay.active { display: flex; }
-.pin-modal {
-  background: linear-gradient(145deg, #162A18, #0D1F0F);
-  border: 1px solid rgba(201,168,76,0.25);
-  border-radius: 2px;
-  max-width: 340px;
-  width: 100%;
-  padding: 40px 36px 36px;
-  position: relative;
-  text-align: center;
-}
-.pin-title {
+.auth-btn {
   font-family: 'Cinzel', serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 8px;
-}
-.pin-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--ash);
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
-.pin-input {
-  display: block;
-  width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(201,168,76,0.25);
-  border-radius: 2px;
-  color: var(--cream);
-  font-family: 'Cinzel', serif;
-  font-size: 2rem;
-  letter-spacing: 0.6em;
-  text-align: center;
-  padding: 14px 14px 14px 28px;
-  outline: none;
-  margin-bottom: 10px;
-  transition: border-color 0.2s;
-}
-.pin-input:focus { border-color: rgba(201,168,76,0.5); }
-.pin-error {
-  font-size: 0.72rem;
-  color: #FC8181;
-  letter-spacing: 0.12em;
-  min-height: 20px;
-  margin-bottom: 16px;
-  font-family: 'Raleway', sans-serif;
-}
-.pin-submit {
-  width: 100%;
-  padding: 12px;
-  background: rgba(107,26,42,0.3);
-  border: 1px solid rgba(155,58,74,0.5);
-  border-radius: 2px;
-  color: var(--wine-light);
-  font-family: 'Cinzel', serif;
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
+  padding: 7px 16px;
+  border-radius: 1px;
+  border: 1px solid rgba(201,168,76,0.22);
+  background: transparent;
+  color: rgba(201,168,76,0.6);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
-.pin-submit:hover { background: rgba(107,26,42,0.55); color: var(--cream); }
-.pin-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.auth-btn:hover {
+  border-color: rgba(201,168,76,0.48);
+  color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+.auth-user { display: flex; align-items: center; gap: 8px; }
+.auth-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.3);
+  object-fit: cover;
+}
+.auth-initial {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.3);
+  background: rgba(201,168,76,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  color: var(--gold);
+}
+.auth-signout {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 1px;
+  border: 1px solid rgba(140,123,107,0.18);
+  background: transparent;
+  color: rgba(140,123,107,0.45);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-signout:hover { border-color: rgba(140,123,107,0.38); color: var(--ash); }
 
 /* ── FAB ──────────────────────────────────────────────────────────────────── */
 .fab {
@@ -510,6 +568,13 @@ select.form-input option { background: #162A18; color: var(--cream); }
 <body>
 
 <header>
+  <div id="auth-area">
+    <button class="auth-btn" id="signInBtn" onclick="signIn()">Sign In</button>
+    <div class="auth-user" id="userInfo" style="display:none">
+      <div class="auth-initial" id="userInitial"></div>
+      <button class="auth-signout" onclick="signOutUser()">Sign Out</button>
+    </div>
+  </div>
   <div class="header-rule">
     <div class="rule-line"></div>
     <div class="rule-diamond"></div>
@@ -535,7 +600,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.1.1</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.2.0</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -543,8 +608,8 @@ select.form-input option { background: #162A18; color: var(--cream); }
      Browsers that don't support capture ignore the attribute and show the file picker instead. -->
 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageSelected(event)">
 
-<!-- Floating add button -->
-<button class="fab" onclick="openAddBottle()" aria-label="Add a bottle">+</button>
+<!-- Floating add button — hidden until signed in -->
+<button class="fab" id="fab" onclick="openAddBottle()" aria-label="Add a bottle" style="display:none">+</button>
 
 <!-- Scan / Add Bottle Modal -->
 <div class="scan-overlay" id="scanOverlay">
@@ -621,28 +686,15 @@ select.form-input option { background: #162A18; color: var(--cream); }
   </div>
 </div>
 
-<!-- PIN Modal -->
-<div class="pin-overlay" id="pinOverlay">
-  <div class="pin-modal">
-    <button class="modal-close" onclick="closePinModal()">×</button>
-    <div class="pin-title">Confirm</div>
-    <div class="pin-subtitle" id="pinSubtitle">Enter your 4-digit PIN to mark this bottle as consumed</div>
-    <input class="pin-input" id="pinInput" type="password" inputmode="numeric"
-      maxlength="4" placeholder="····" autocomplete="off"
-      oninput="this.value=this.value.replace(/\D/g,'')"
-      onkeydown="if(event.key==='Enter')submitPin()">
-    <div class="pin-error" id="pinError"></div>
-    <button class="pin-submit" id="pinSubmit" onclick="submitPin()">Confirm</button>
-  </div>
-</div>
-
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { initializeFirestore, persistentLocalCache,
-         collection, getDocs, doc, updateDoc, addDoc, deleteDoc }
+         collection, getDocs, doc, updateDoc, addDoc, deleteField }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-// NOTE: Vertex AI SDK is loaded lazily inside openAddBottle() so that a missing
-// or broken CDN module cannot prevent the inventory from loading.
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+// NOTE: Vertex AI SDK is loaded lazily inside handleImageSelected() so that a
+// missing or broken CDN module cannot prevent the inventory from loading.
 
 const firebaseConfig = {
   apiKey: "AIzaSyDSI59xpcHzwk6mwHA9ocQZePfjoGpholw",
@@ -654,24 +706,65 @@ const firebaseConfig = {
 };
 
 console.log('[Cellar] Initializing Firebase…');
-const app = initializeApp(firebaseConfig);
-const db  = initializeFirestore(app, { localCache: persistentLocalCache() });
-console.log('[Cellar] Firebase ready, db:', !!db);
-
-// PIN stored as SHA-256 hash — the plain-text PIN is never in source.
-// To change the PIN: run  echo -n "YOURPIN" | shasum -a 256  and replace the hash below.
-const PIN_HASH = '3f735c67d29014733cf56508d3c5dba2c87abb07313998e23b49b7c8cc0d7e4a';
-
-async function hashPin(pin) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
+const app  = initializeApp(firebaseConfig);
+const db   = initializeFirestore(app, { localCache: persistentLocalCache() });
+const auth = getAuth(app);
+console.log('[Cellar] Firebase ready');
 
 // In-memory cache of all inventory documents (id -> data)
-let inventory        = {};
-let pendingConsumeId = null;
-let pendingAddData   = null;
-let pinAction        = null; // 'consume' | 'add'
+let inventory          = {};
+let currentUser        = null; // Firebase Auth user, or null
+let consumedLikedFilter = 'all'; // 'all' | 'liked'
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+
+function updateAuthUI(user) {
+  currentUser = user;
+  const signInBtn = document.getElementById('signInBtn');
+  const userInfo  = document.getElementById('userInfo');
+  const fab       = document.getElementById('fab');
+  if (user) {
+    signInBtn.style.display = 'none';
+    userInfo.style.display  = 'flex';
+    const initial = document.getElementById('userInitial');
+    if (user.photoURL) {
+      initial.outerHTML = `<img class="auth-avatar" id="userInitial" src="${user.photoURL}" alt="${user.displayName || ''}">`;
+    } else {
+      initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+    }
+    fab.style.display = '';
+  } else {
+    signInBtn.style.display = '';
+    userInfo.style.display  = 'none';
+    fab.style.display       = 'none';
+  }
+  // Re-render open modal if any, so auth-gated buttons appear/disappear
+  const activeModal = document.getElementById('modalContent');
+  if (activeModal && document.getElementById('modalOverlay').classList.contains('active')) {
+    const openId = activeModal.dataset.openId;
+    if (openId) openModal(openId);
+  }
+  renderInventory();
+}
+
+window.signIn = async function() {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    console.error('[Cellar] Sign-in failed:', e);
+  }
+};
+
+window.signOutUser = async function() {
+  try {
+    await signOut(auth);
+  } catch (e) {
+    console.error('[Cellar] Sign-out failed:', e);
+  }
+};
+
+onAuthStateChanged(auth, user => updateAuthUI(user));
 
 const SECTIONS = [
   { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },
@@ -688,6 +781,11 @@ window.setFilter = function(filter) {
   bar.querySelectorAll('.filter-btn').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.filter === filter)
   );
+  renderInventory();
+};
+
+window.setConsumedFilter = function(filter) {
+  consumedLikedFilter = filter;
   renderInventory();
 };
 
@@ -729,25 +827,45 @@ function renderInventory() {
   });
   main.innerHTML = visibleSections
     .filter(sec => byStatus[sec.status]?.length)
-    .map(sec => `
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title ${sec.cls}">${sec.label}</span>
-          <div class="section-line ${sec.cls}"></div>
+    .map(sec => {
+      let items = byStatus[sec.status];
+      let extraHeader = '';
+      if (sec.status === 'consumed') {
+        extraHeader = `
+          <div class="consumed-filter">
+            <button class="consumed-filter-btn${consumedLikedFilter === 'all' ? ' active' : ''}" onclick="setConsumedFilter('all')">All</button>
+            <button class="consumed-filter-btn${consumedLikedFilter === 'liked' ? ' active' : ''}" onclick="setConsumedFilter('liked')">Liked Only</button>
+          </div>`;
+        if (consumedLikedFilter === 'liked') {
+          items = items.filter(w => w.liked === true);
+        }
+      }
+      if (!items.length) return '';
+      return `
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title ${sec.cls}">${sec.label}</span>
+            <div class="section-line ${sec.cls}"></div>
+            ${extraHeader}
+          </div>
+          <div class="grid">
+            ${items.map(cardHTML).join('')}
+          </div>
         </div>
-        <div class="grid">
-          ${byStatus[sec.status].map(cardHTML).join('')}
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 }
 
 function cardHTML(w) {
   const badge = w.status === 'consumed'
     ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
     : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
+  const likedIcon = (w.status === 'consumed' && w.liked === true)
+    ? `<span class="card-liked-icon" title="Liked" style="color:var(--gold)">👍</span>`
+    : '';
   return `
     <div class="card ${w.status}" onclick="openModal('${w.id}')">
+      ${likedIcon}
       <div class="card-year">${w.year}</div>
       <div class="card-name">${w.name}</div>
       <div class="card-region">${w.region}</div>
@@ -761,8 +879,11 @@ function cardHTML(w) {
 window.openModal = function(id) {
   const w = inventory[id];
   if (!w) return;
-  const showBtn = w.status !== 'consumed' && w.status !== 'cook';
-  document.getElementById('modalContent').innerHTML = `
+  const showConsumeBtn = currentUser && w.status !== 'consumed' && w.status !== 'cook';
+  const showRating     = currentUser && w.status === 'consumed';
+  const el = document.getElementById('modalContent');
+  el.dataset.openId = id;
+  el.innerHTML = `
     <div class="modal-year">${w.year}</div>
     <div class="modal-name">${w.name}</div>
     <div class="modal-region">${w.region}</div>
@@ -779,14 +900,23 @@ window.openModal = function(id) {
     <div class="modal-text">${w.decant}</div>
     <div class="modal-section-label">Drinking Window</div>
     <div class="modal-text">${w.window}</div>
-    ${showBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
-      <button class="consume-btn" onclick="showPinModal('${id}')">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
-    <button class="delete-btn" onclick="showDeleteModal('${id}')">Remove from Cellar</button>
+    ${showConsumeBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
+      <button class="consume-btn" onclick="markConsumed('${id}')">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
+    ${showRating ? `
+      <div class="rating-row">
+        <button class="rating-btn${w.liked === true ? ' liked-active' : ''}" onclick="setRating('${id}', true)">
+          <span>👍</span> Liked
+        </button>
+        <button class="rating-btn${w.liked === false ? ' disliked-active' : ''}" onclick="setRating('${id}', false)">
+          <span>👎</span> Didn't Like
+        </button>
+      </div>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
 };
 
-async function markConsumed(id) {
+window.markConsumed = async function(id) {
+  if (!currentUser) return;
   try {
     const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     await updateDoc(doc(db, 'cellar', id), { status: 'consumed', statusLabel: 'Consumed', consumedDate });
@@ -798,18 +928,27 @@ async function markConsumed(id) {
   } catch (e) {
     console.error('Failed to update Firestore:', e);
   }
-}
+};
 
-async function deleteBottle(id) {
+window.setRating = async function(id, liked) {
   try {
-    await deleteDoc(doc(db, 'cellar', id));
-    delete inventory[id];
-    closeModalDirect();
+    // Toggle off if tapping the already-selected rating
+    const current = inventory[id].liked;
+    const newValue = (current === liked) ? null : liked;
+    const update = newValue === null ? { liked: deleteField() } : { liked: newValue };
+    await updateDoc(doc(db, 'cellar', id), update);
+    if (newValue === null) {
+      delete inventory[id].liked;
+    } else {
+      inventory[id].liked = newValue;
+    }
+    // Refresh modal content in place
+    openModal(id);
     renderInventory();
   } catch (e) {
-    console.error('Failed to delete from Firestore:', e);
+    console.error('Failed to set rating:', e);
   }
-}
+};
 
 window.closeModal = function(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
@@ -819,67 +958,10 @@ function closeModalDirect() {
 }
 window.closeModalDirect = closeModalDirect;
 
-// ── PIN ───────────────────────────────────────────────────────────────────
-
-function openPinModal(action, subtitle) {
-  pinAction = action;
-  document.getElementById('pinSubtitle').textContent = subtitle;
-  document.getElementById('pinInput').value = '';
-  document.getElementById('pinError').textContent = '';
-  document.getElementById('pinSubmit').disabled = false;
-  document.getElementById('pinSubmit').textContent = 'Confirm';
-  document.getElementById('pinOverlay').classList.add('active');
-  setTimeout(() => document.getElementById('pinInput').focus(), 50);
-}
-
-window.showPinModal = function(id) {
-  pendingConsumeId = id;
-  openPinModal('consume', 'Enter your 4-digit PIN to mark this bottle as consumed');
-};
-
-window.showDeleteModal = function(id) {
-  pendingConsumeId = id;
-  openPinModal('delete', 'Enter your 4-digit PIN to permanently remove this bottle');
-};
-
-window.submitPin = async function() {
-  const entered = document.getElementById('pinInput').value;
-  if (entered.length !== 4) {
-    document.getElementById('pinError').textContent = 'Please enter a 4-digit PIN.';
-    return;
-  }
-  const btn = document.getElementById('pinSubmit');
-  btn.disabled = true;
-  btn.textContent = 'Verifying…';
-  const hash = await hashPin(entered);
-  if (hash === PIN_HASH) {
-    // Capture before closePinModal() nulls them out
-    const action    = pinAction;
-    const consumeId = pendingConsumeId;
-    const addData   = pendingAddData;
-    closePinModal();
-    if (action === 'consume') await markConsumed(consumeId);
-    else if (action === 'delete') await deleteBottle(consumeId);
-    else if (action === 'add') await saveNewBottle(addData);
-  } else {
-    document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
-    document.getElementById('pinInput').value = '';
-    document.getElementById('pinInput').focus();
-    btn.disabled = false;
-    btn.textContent = 'Confirm';
-  }
-};
-
-window.closePinModal = function() {
-  document.getElementById('pinOverlay').classList.remove('active');
-  pendingConsumeId = null;
-  pendingAddData   = null;
-  pinAction        = null;
-};
-
 // ── Add Bottle ────────────────────────────────────────────────────────────
 
 window.openAddBottle = function() {
+  if (!currentUser) return;
   document.getElementById('cameraInput').value = '';
   document.getElementById('cameraInput').click();
 };
@@ -1004,13 +1086,14 @@ function populateAddForm(data) {
   document.getElementById('f-type').value   = data.type === 'spirit' ? 'spirit' : 'wine';
 }
 
-window.confirmAddBottle = function() {
+window.confirmAddBottle = async function() {
+  if (!currentUser) return;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
   const isSpirit   = document.getElementById('f-type').value === 'spirit';
   const status      = isSpirit ? 'spirits' : 'ready';
   const statusLabel = isSpirit ? 'Spirits'  : 'Ready to Drink';
-  pendingAddData = {
+  const data = {
     name,
     year:        document.getElementById('f-year').value.trim()   || 'NV',
     region:      document.getElementById('f-region').value.trim() || '—',
@@ -1023,12 +1106,15 @@ window.confirmAddBottle = function() {
     status,
     statusLabel,
   };
-  openPinModal('add', 'Enter your 4-digit PIN to add this bottle to the cellar');
+  const btn = document.getElementById('addBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  await saveNewBottle(data);
+  btn.textContent = 'Add to Cellar';
 };
 
 window.closeScanModal = function() {
   document.getElementById('scanOverlay').classList.remove('active');
-  pendingAddData = null;
   const preview = document.getElementById('scanPreview');
   URL.revokeObjectURL(preview.src);
   preview.src = '';
@@ -1056,8 +1142,7 @@ async function saveNewBottle(data) {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (document.getElementById('pinOverlay').classList.contains('active'))  closePinModal();
-    else if (document.getElementById('scanOverlay').classList.contains('active')) closeScanModal();
+    if (document.getElementById('scanOverlay').classList.contains('active')) closeScanModal();
     else closeModalDirect();
   }
 });
