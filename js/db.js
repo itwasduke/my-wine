@@ -16,7 +16,19 @@ export async function loadInventory() {
     let latest = 0;
     snapshot.forEach(d => { 
       const data = d.data();
-      state.inventory[d.id] = { id: d.id, ...data }; 
+      const item = { id: d.id, ...data };
+      
+      // Fallback for missing status (legacy data)
+      if (!item.status) {
+        if (item.type === 'spirit' || item.region === 'Japan') { // Spirits often don't have regions but region might be Japan
+          item.status = 'spirits';
+        } else {
+          item.status = 'ready';
+        }
+      }
+      
+      state.inventory[d.id] = item; 
+      
       if (data.updatedAt) {
         const ms = data.updatedAt.toMillis ? data.updatedAt.toMillis() : new Date(data.updatedAt).getTime();
         if (ms > latest) latest = ms;

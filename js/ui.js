@@ -75,13 +75,13 @@ export function renderInventory() {
     // Main Filter logic
     let matchesMain = false;
     if (filter === 'all') {
-      matchesMain = true;
+      matchesMain = (w.status !== 'consumed');
     } else if (filter === 'wine') {
       // Wine only, exclude spirits and consumed
       matchesMain = (w.status !== 'spirits' && w.status !== 'consumed');
     } else if (filter === 'spirits') {
       // Spirits only, exclude consumed
-      matchesMain = (w.status === 'spirits');
+      matchesMain = (w.status === 'spirits' && w.status !== 'consumed');
     } else if (filter === 'consumed') {
       // Consumed only
       matchesMain = (w.status === 'consumed');
@@ -130,15 +130,25 @@ export function renderInventory() {
   // 3. Group by Status
   const byStatus = {};
   items.forEach(w => {
-    if (!byStatus[w.status]) byStatus[w.status] = [];
-    byStatus[w.status].push(w);
+    let key = w.status;
+    if (filter === 'consumed') {
+      const isSpirit = (w.type === 'spirit' || w.statusLabel === 'Spirits');
+      key = isSpirit ? 'consumed-spirits' : 'consumed-wine';
+    }
+    if (!byStatus[key]) byStatus[key] = [];
+    byStatus[key].push(w);
   });
 
-  const visibleSections = SECTIONS.filter(sec => {
-    if (filter === 'wine')    return sec.status !== 'spirits';
-    if (filter === 'spirits') return sec.status === 'spirits' || sec.status === 'consumed';
-    return true;
-  });
+  const visibleSections = (filter === 'consumed') 
+    ? [
+        { status: 'consumed-wine',    label: 'Consumed Wine',    cls: 'consumed' },
+        { status: 'consumed-spirits', label: 'Consumed Spirits', cls: 'consumed' }
+      ]
+    : SECTIONS.filter(sec => {
+        if (filter === 'wine')     return (sec.status !== 'spirits' && sec.status !== 'consumed');
+        if (filter === 'spirits')  return (sec.status === 'spirits');
+        return sec.status !== 'consumed'; // default for 'all'
+      });
 
   main.innerHTML = visibleSections
     .filter(sec => byStatus[sec.status]?.length)
@@ -157,8 +167,11 @@ export function renderInventory() {
       `;
     }).join('');
   
-  if (main.innerHTML === '' && searchQuery) {
-    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match "${searchQuery}"</div>`;
+  if (main.innerHTML === '') {
+    const emptyMsg = searchQuery 
+      ? `No bottles match "${searchQuery}"`
+      : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.");
+    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${emptyMsg}</div>`;
   }
 
   updateLastUpdatedUI();

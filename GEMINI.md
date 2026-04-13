@@ -31,6 +31,11 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.1 (April 13, 2026)**:
+    - Enhanced "Consumed" tab: now automatically splits finished bottles into "Consumed Wine" and "Consumed Spirits" sub-sections.
+    - Added "For Cooking" section to track culinary wines.
+    - Added empty state messaging for all filter tabs.
+    - Improved legacy data handling with automatic status fallbacks.
 - **v1.8.0 (April 13, 2026)**:
     - Dedicated "Consumed" filter tab: isolate finished bottles from active inventory.
     - Improved "Wine" and "Spirits" filters to exclude consumed items for a cleaner view.
