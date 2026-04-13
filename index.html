@@ -600,7 +600,7 @@ select.form-input option { background: #162A18; color: var(--cream); }
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.2.1</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v1.2.2</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -911,13 +911,14 @@ window.openModal = function(id) {
           <span>👎</span> Didn't Like
         </button>
       </div>` : ''}
-    ${currentUser ? `<button class="delete-btn" onclick="confirmDeleteBottle('${id}', ${JSON.stringify(w.name)})">Remove from Cellar</button>` : ''}
+    ${currentUser ? `<button class="delete-btn" onclick="confirmDeleteBottle('${id}')">Remove from Cellar</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
 };
 
-window.confirmDeleteBottle = function(id, name) {
+window.confirmDeleteBottle = function(id) {
   if (!currentUser) return;
+  const name = inventory[id]?.name || 'this bottle';
   if (confirm(`Remove "${name}" from your cellar?\n\nThis cannot be undone.`)) {
     deleteBottle(id);
   }
