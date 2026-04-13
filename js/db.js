@@ -162,6 +162,7 @@ export async function saveNewBottle(data) {
 }
 
 export async function updateQuantity(id, newQty) {
+  if (!state.currentUser) return;
   try {
     const qty = Math.max(0, newQty);
     let update = { quantity: qty, updatedAt: serverTimestamp() };

@@ -205,9 +205,9 @@ export function openModal(id) {
       <div class="meta-item">
         <span class="meta-label">In Stock</span>
         <div class="qty-controls">
-          <button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>
+          ${state.currentUser ? `<button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>` : ''}
           <span class="qty-value">${w.quantity || 1}</span>
-          <button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>
+          ${state.currentUser ? `<button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>` : ''}
         </div>
       </div>
       <div class="meta-item">

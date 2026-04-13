@@ -31,6 +31,9 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.7.1 (April 13, 2026)**:
+    - Security Fix: Restricted quantity adjustment buttons (+/-) to signed-in users only.
+    - Added backend authentication check for manual quantity updates.
 - **v1.7.0 (April 13, 2026)**:
     - Implemented Quantity Tracking: track multiple bottles per wine entry.
     - Added "Lifetime Consumed" counter to preserve history across restocks.
