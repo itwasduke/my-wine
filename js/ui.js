@@ -71,6 +71,8 @@ export function renderInventory() {
         </div>
       `;
     }).join('');
+  
+  renderAnalytics();
 }
 
 function cardHTML(w) {
@@ -187,6 +189,10 @@ export function initUIListeners() {
     } else if (action === 'delete') {
       const { confirmDeleteBottle } = await import('./db.js');
       confirmDeleteBottle(id);
+    }
+  });
+}
+Bottle(id);
     }
   });
 }

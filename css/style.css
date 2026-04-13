@@ -414,6 +414,17 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 .btn-add:hover:not(:disabled) { background: var(--accent-dim); color: var(--text-primary); }
 .btn-add:disabled { opacity: 0.3; cursor: not-allowed; }
 
+/* ── Analytics Dashboard ────────────────────────────────────────────────── */
+.analytics-dashboard {
+  display: flex; gap: 20px; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  padding: 16px 20px; margin-bottom: 24px;
+}
+.analytics-stat { text-align: center; flex: 1; }
+.analytics-value { font-family: 'Cinzel', serif; font-size: 1.25rem; color: var(--text-primary); margin-bottom: 4px; }
+.analytics-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); }
+.analytics-divider { width: 1px; height: 32px; background: var(--border); }
+
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; }
 .filter-btn {
