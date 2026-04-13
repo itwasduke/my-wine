@@ -6,7 +6,7 @@ export function updateAuthUI(user) {
   const signInBtn = document.getElementById('signInBtn');
   const userInfo  = document.getElementById('userInfo');
   const fab       = document.getElementById('fab');
-  const settingsBtn = document.getElementById('settingsBtn');
+  const menuBtn   = document.getElementById('menuBtn');
   if (user) {
     signInBtn.style.display = 'none';
     userInfo.style.display  = 'flex';
@@ -17,12 +17,12 @@ export function updateAuthUI(user) {
       initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
     }
     fab.style.display = '';
-    if (settingsBtn) settingsBtn.style.display = 'flex';
+    if (menuBtn) menuBtn.style.display = 'flex';
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';
     fab.style.display       = 'none';
-    if (settingsBtn) settingsBtn.style.display = 'none';
+    if (menuBtn) menuBtn.style.display = 'none';
   }
   // Re-render open modal if any
   const activeModal = document.getElementById('modalContent');
@@ -251,28 +251,50 @@ export function initUIListeners() {
   });
   document.getElementById('closeModalBtn').addEventListener('click', closeModalDirect);
 
-  // Settings
-  const settingsBtn = document.getElementById('settingsBtn');
-  const settingsOverlay = document.getElementById('settingsOverlay');
+  // ── Hamburger Menu & Modals ───────────────────────────────────────────────
+  const menuBtn         = document.getElementById('menuBtn');
+  const menuDrawer      = document.getElementById('menuDrawer');
+  const menuOverlay     = document.getElementById('menuOverlay');
+  const closeDrawerBtn  = document.getElementById('closeDrawerBtn');
+  const navAnalytics    = document.getElementById('navAnalytics');
+  const navSettings     = document.getElementById('navSettings');
+  
+  const analyticsOverlay = document.getElementById('analyticsOverlay');
+  const closeAnalyticsBtn = document.getElementById('closeAnalyticsBtn');
+  const settingsOverlay  = document.getElementById('settingsOverlay');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+
+  const toggleDrawer = (open) => {
+    menuDrawer.classList.toggle('active', open);
+    menuOverlay.classList.toggle('active', open);
+  };
+
+  menuBtn.addEventListener('click', () => toggleDrawer(true));
+  closeDrawerBtn.addEventListener('click', () => toggleDrawer(false));
+  menuOverlay.addEventListener('click', () => toggleDrawer(false));
+
+  navAnalytics.addEventListener('click', () => {
+    toggleDrawer(false);
+    analyticsOverlay.classList.add('active');
+  });
+
+  navSettings.addEventListener('click', () => {
+    toggleDrawer(false);
+    settingsOverlay.classList.add('active');
+  });
+
+  closeAnalyticsBtn.addEventListener('click', () => analyticsOverlay.classList.remove('active'));
+  analyticsOverlay.addEventListener('click', (e) => {
+    if (e.target === analyticsOverlay) analyticsOverlay.classList.remove('active');
+  });
+
+  closeSettingsBtn.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+  settingsOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+  });
+
   const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
   const bulkUpdateStatus = document.getElementById('bulkUpdateStatus');
-
-  if (settingsBtn && settingsOverlay) {
-    settingsBtn.addEventListener('click', () => {
-      settingsOverlay.classList.add('active');
-    });
-
-    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-    if (closeSettingsBtn) {
-      closeSettingsBtn.addEventListener('click', () => {
-        settingsOverlay.classList.remove('active');
-      });
-    }
-
-    settingsOverlay.addEventListener('click', e => {
-      if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
-    });
-  }
 
   if (bulkUpdateBtn) {
     bulkUpdateBtn.addEventListener('click', async () => {

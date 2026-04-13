@@ -20,7 +20,18 @@
 </head>
 <body>
 
+<div id="menuOverlay" class="drawer-overlay"></div>
+<div id="menuDrawer" class="menu-drawer">
+  <button class="drawer-close" id="closeDrawerBtn">×</button>
+  <div class="drawer-header">The Cellar</div>
+  <div class="drawer-menu">
+    <button class="drawer-item" id="navAnalytics">📊 Analytics Dashboard</button>
+    <button class="drawer-item" id="navSettings">⚙️ Inventory Settings</button>
+  </div>
+</div>
+
 <header>
+  <button id="menuBtn" class="menu-btn" title="Menu" style="display:none">≡</button>
   <div id="auth-area">
     <button class="auth-btn" id="signInBtn">Sign In</button>
     <div class="auth-user" id="userInfo" style="display:none">
@@ -39,8 +50,6 @@
 </header>
 
 <div class="controls-container">
-  <!-- Analytics Dashboard -->
-  <div id="analytics-dashboard" class="analytics-dashboard" style="display:none;"></div>
 
   <div class="search-sort-bar">
     <div class="search-wrapper">
@@ -55,7 +64,6 @@
       <option value="name-asc">A–Z</option>
       <option value="name-desc">Z–A</option>
     </select>
-    <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
   </div>
 
   <div class="filter-bar" id="filterBar" data-filter="all">
@@ -172,7 +180,17 @@
     <div class="modal-section-label">Inventory Maintenance</div>
     <p class="modal-text" style="font-size:0.85rem; margin-bottom:12px;">Bulk update missing professional scores and vintage chart ratings for your wines. This may take several minutes.</p>
     <button class="consume-btn" id="bulkUpdateBtn">Bulk Update Missing Scores</button>
-    <div id="bulkUpdateStatus" class="modal-text" style="display:none; margin-top:16px; font-style:italic; font-size:0.85rem; color:var(--accent);"></div>
+    <div id="bulkUpdateStatus" class="modal-text" style="display:none; margin-top:16_px; font-style:italic; font-size:0.85rem; color:var(--accent);"></div>
+  </div>
+</div>
+
+<!-- Analytics Modal -->
+<div class="modal-overlay" id="analyticsOverlay">
+  <div class="modal">
+    <button class="modal-close" id="closeAnalyticsBtn">×</button>
+    <div class="modal-name">Cellar Analytics</div>
+    <div class="modal-divider"></div>
+    <div id="analytics-dashboard" class="analytics-dashboard-modal"></div>
   </div>
 </div>
 

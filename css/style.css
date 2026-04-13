@@ -426,16 +426,88 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 .btn-add:hover:not(:disabled) { background: var(--accent-dim); color: var(--text-primary); }
 .btn-add:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ── Analytics Dashboard ────────────────────────────────────────────────── */
-.analytics-dashboard {
-  display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-  padding: 16px 20px; margin-bottom: 24px;
+/* ── Hamburger Menu & Drawer ─────────────────────────────────────────────── */
+.menu-btn {
+  position: absolute;
+  top: 16px; left: 20px;
+  background: transparent;
+  border: 1px solid rgba(160,160,160,0.22);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 600;
 }
-.analytics-stat { text-align: center; flex: 1; }
-.analytics-value { font-family: 'Cinzel', serif; font-size: 1.25rem; color: var(--text-primary); margin-bottom: 4px; }
-.analytics-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); }
-.analytics-divider { width: 1px; height: 32px; background: var(--border); }
+.menu-btn:hover { border-color: rgba(160,160,160,0.45); color: var(--text-primary); background: var(--surface-hover); }
+
+.menu-drawer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 280px; height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 40px 24px;
+  display: flex; flex-direction: column;
+}
+.menu-drawer.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+
+.drawer-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1900;
+}
+.drawer-overlay.active { display: block; }
+
+.drawer-close {
+  position: absolute;
+  top: 14px; right: 18px;
+  background: none; border: none;
+  color: var(--text-muted); font-size: 1.8rem;
+  cursor: pointer; line-height: 1;
+}
+.drawer-close:hover { color: var(--text-primary); }
+
+.drawer-header {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem; letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 40px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawer-menu { display: flex; flex-direction: column; gap: 12px; }
+.drawer-item {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; padding: 14px 18px;
+  color: var(--text-primary);
+  font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.15em;
+  text-align: left; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 12px;
+}
+.drawer-item:hover { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
+
+/* ── Analytics Dashboard Modal ────────────────────────────────────────── */
+.analytics-dashboard-modal {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 10px 0;
+}
+.analytics-dashboard-modal .analytics-stat {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border); border-radius: 6px;
+}
+.analytics-dashboard-modal .analytics-value { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--accent); margin-bottom: 0; }
+.analytics-dashboard-modal .analytics-label { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; }
+.analytics-dashboard-modal .analytics-divider { display: none; }
 
 /* ── Search and Sort Bar ────────────────────────────────────────────────── */
 .search-sort-bar {
@@ -474,21 +546,6 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
   padding-right: 30px;
 }
 .sort-select:focus { border-color: var(--accent); }
-
-.settings-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.settings-btn:hover { border-color: #555; color: var(--text-primary); background: var(--surface-hover); }
 
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; }
