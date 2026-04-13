@@ -91,10 +91,49 @@ export async function saveProScores(id, scoreData) {
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData });
     state.inventory[id].proScores = scoreData;
-    openModal(id); // Refresh modal to show scores
+    const activeModal = document.getElementById('modalContent');
+    if (activeModal && activeModal.dataset.openId === id) {
+      openModal(id); // Refresh modal if it's currently open
+    }
   } catch (e) {
     console.error('Failed to update scores in Firestore:', e);
   }
+}
+
+export async function bulkUpdateScores(onProgress) {
+  const winesToUpdate = Object.values(state.inventory).filter(w => {
+    // Only wines, skip spirits
+    if (w.status === 'spirits') return false;
+    // Missing scores OR missing the new vintage field
+    return !w.proScores || !w.proScores.vintage;
+  });
+
+  const total = winesToUpdate.length;
+  if (total === 0) {
+    onProgress('All wines are already up to date.');
+    return;
+  }
+
+  const { lookupProScores } = await import('./ai.js');
+
+  for (let i = 0; i < total; i++) {
+    const w = winesToUpdate[i];
+    onProgress(`Updating ${i + 1} of ${total}: ${w.name}…`);
+    
+    try {
+      const scores = await lookupProScores(w);
+      await saveProScores(w.id, scores);
+    } catch (e) {
+      console.error(`Failed to update ${w.name}:`, e);
+      // Continue to next bottle even if one fails
+    }
+    
+    // Small delay to be kind to the API rate limits
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  onProgress(`Successfully updated ${total} wines.`);
+  renderInventory();
 }
 
 export function confirmDeleteBottle(id) {

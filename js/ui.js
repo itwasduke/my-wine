@@ -6,6 +6,7 @@ export function updateAuthUI(user) {
   const signInBtn = document.getElementById('signInBtn');
   const userInfo  = document.getElementById('userInfo');
   const fab       = document.getElementById('fab');
+  const settingsBtn = document.getElementById('settingsBtn');
   if (user) {
     signInBtn.style.display = 'none';
     userInfo.style.display  = 'flex';
@@ -16,10 +17,12 @@ export function updateAuthUI(user) {
       initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
     }
     fab.style.display = '';
+    if (settingsBtn) settingsBtn.style.display = 'flex';
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';
     fab.style.display       = 'none';
+    if (settingsBtn) settingsBtn.style.display = 'none';
   }
   // Re-render open modal if any
   const activeModal = document.getElementById('modalContent');
@@ -247,6 +250,34 @@ export function initUIListeners() {
     if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
   });
   document.getElementById('closeModalBtn').addEventListener('click', closeModalDirect);
+
+  // Settings
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
+  const bulkUpdateStatus = document.getElementById('bulkUpdateStatus');
+
+  settingsBtn.addEventListener('click', () => {
+    settingsOverlay.classList.add('active');
+  });
+
+  document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+    settingsOverlay.classList.remove('active');
+  });
+
+  settingsOverlay.addEventListener('click', e => {
+    if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+  });
+
+  bulkUpdateBtn.addEventListener('click', async () => {
+    bulkUpdateBtn.disabled = true;
+    bulkUpdateStatus.style.display = 'block';
+    const { bulkUpdateScores } = await import('./db.js');
+    await bulkUpdateScores((msg) => {
+      bulkUpdateStatus.textContent = msg;
+    });
+    bulkUpdateBtn.disabled = false;
+  });
 
   // Modal internal actions (consume, rate, delete)
   document.getElementById('modalContent').addEventListener('click', async e => {

@@ -475,6 +475,21 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 }
 .sort-select:focus { border-color: var(--accent); }
 
+.settings-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settings-btn:hover { border-color: #555; color: var(--text-primary); background: var(--surface-hover); }
+
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; }
 .filter-btn {

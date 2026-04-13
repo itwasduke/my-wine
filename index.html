@@ -55,6 +55,7 @@
       <option value="name-asc">A–Z</option>
       <option value="name-desc">Z–A</option>
     </select>
+    <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
   </div>
 
   <div class="filter-bar" id="filterBar" data-filter="all">
@@ -159,6 +160,19 @@
   <div class="modal">
     <button class="modal-close" id="closeModalBtn">×</button>
     <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <button class="modal-close" id="closeSettingsBtn">×</button>
+    <div class="modal-name">Settings</div>
+    <div class="modal-divider"></div>
+    <div class="modal-section-label">Inventory Maintenance</div>
+    <p class="modal-text" style="font-size:0.85rem; margin-bottom:12px;">Bulk update missing professional scores and vintage chart ratings for your wines. This may take several minutes.</p>
+    <button class="consume-btn" id="bulkUpdateBtn">Bulk Update Missing Scores</button>
+    <div id="bulkUpdateStatus" class="modal-text" style="display:none; margin-top:16px; font-style:italic; font-size:0.85rem; color:var(--accent);"></div>
   </div>
 </div>
 
