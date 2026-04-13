@@ -65,18 +65,36 @@ export function renderInventory() {
   if (subFilterBar) {
     subFilterBar.style.display = (filter === 'wine') ? 'flex' : 'none';
   }
+  const consumedFilterBar = document.getElementById('consumedFilterBar');
+  if (consumedFilterBar) {
+    consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
+  }
 
   // 1. Convert to array and filter by Search + Type Filter + Color Filter
   let items = Object.values(state.inventory).filter(w => {
-    // Type Filter
-    const matchesFilter = 
-      (filter === 'all') || 
-      (filter === 'wine' && w.status !== 'spirits') || 
-      (filter === 'spirits' && (w.status === 'spirits' || w.status === 'consumed'));
+    // Main Filter logic
+    let matchesMain = false;
+    if (filter === 'all') {
+      matchesMain = true;
+    } else if (filter === 'wine') {
+      // Wine only, exclude spirits and consumed
+      matchesMain = (w.status !== 'spirits' && w.status !== 'consumed');
+    } else if (filter === 'spirits') {
+      // Spirits only, exclude consumed
+      matchesMain = (w.status === 'spirits');
+    } else if (filter === 'consumed') {
+      // Consumed only
+      matchesMain = (w.status === 'consumed');
+    }
     
-    if (!matchesFilter) return false;
+    if (!matchesMain) return false;
 
-    // Sub-Filter (Wine Color)
+    // Consumed Sub-Filter (Liked vs All)
+    if (filter === 'consumed' && state.consumedLikedFilter === 'liked') {
+      if (w.liked !== true) return false;
+    }
+
+    // Wine Sub-Filter (Color)
     if (filter === 'wine' && state.wineColorFilter !== 'all') {
       if (w.colorStyle !== state.wineColorFilter) return false;
     }
@@ -126,24 +144,11 @@ export function renderInventory() {
     .filter(sec => byStatus[sec.status]?.length)
     .map(sec => {
       let sectionItems = byStatus[sec.status];
-      let extraHeader = '';
-      if (sec.status === 'consumed') {
-        extraHeader = `
-          <div class="consumed-filter">
-            <button class="consumed-filter-btn${state.consumedLikedFilter === 'all' ? ' active' : ''}" data-filter="all">All</button>
-            <button class="consumed-filter-btn${state.consumedLikedFilter === 'liked' ? ' active' : ''}" data-filter="liked">Liked Only</button>
-          </div>`;
-        if (state.consumedLikedFilter === 'liked') {
-          sectionItems = sectionItems.filter(w => w.liked === true);
-        }
-      }
-      if (!sectionItems.length) return '';
       return `
         <div class="section">
           <div class="section-header">
             <span class="section-title ${sec.cls}">${sec.label}</span>
             <div class="section-line ${sec.cls}"></div>
-            ${extraHeader}
           </div>
           <div class="grid">
             ${sectionItems.map(cardHTML).join('')}
@@ -270,10 +275,13 @@ export function initUIListeners() {
     bar.querySelectorAll('.filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.filter === filter)
     );
-    state.wineColorFilter = 'all'; // Reset sub-filter on main change
-    document.querySelectorAll('.sub-filter-btn').forEach(b => 
-      b.classList.toggle('active', b.dataset.color === 'all')
-    );
+    state.wineColorFilter = 'all'; // Reset sub-filters on main change
+    state.consumedLikedFilter = 'all'; 
+    document.querySelectorAll('.sub-filter-btn').forEach(b => {
+      const isWineAll = b.dataset.color === 'all';
+      const isConsumedAll = b.dataset.liked === 'all';
+      b.classList.toggle('active', isWineAll || isConsumedAll);
+    });
     renderInventory();
   });
 
@@ -288,6 +296,17 @@ export function initUIListeners() {
     renderInventory();
   });
 
+  // Sub-filter clicks (Consumed)
+  document.getElementById('consumedFilterBar').addEventListener('click', e => {
+    const btn = e.target.closest('.sub-filter-btn');
+    if (!btn) return;
+    state.consumedLikedFilter = btn.dataset.liked;
+    document.querySelectorAll('#consumedFilterBar .sub-filter-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.liked === state.consumedLikedFilter)
+    );
+    renderInventory();
+  });
+
   // Search input
   document.getElementById('searchInput').addEventListener('input', () => {
     renderInventory();
@@ -298,20 +317,13 @@ export function initUIListeners() {
   sortSelect.addEventListener('change', () => renderInventory());
   sortSelect.addEventListener('input', () => renderInventory());
 
-  // Main content clicks (Event Delegation for cards and consumed filters)
+  // Main content clicks (Event Delegation for cards)
   document.getElementById('main-content').addEventListener('click', e => {
     // Card clicks
     const card = e.target.closest('.card');
     if (card) {
       openModal(card.dataset.id);
       return;
-    }
-
-    // Consumed section filter clicks
-    const filterBtn = e.target.closest('.consumed-filter-btn');
-    if (filterBtn) {
-      state.consumedLikedFilter = filterBtn.dataset.filter;
-      renderInventory();
     }
   });
 

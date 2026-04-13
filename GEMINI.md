@@ -31,6 +31,10 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.0 (April 13, 2026)**:
+    - Dedicated "Consumed" filter tab: isolate finished bottles from active inventory.
+    - Improved "Wine" and "Spirits" filters to exclude consumed items for a cleaner view.
+    - Relocated "All" vs "Liked Only" filters to a secondary sub-filter bar under the Consumed tab.
 - **v1.7.3 (April 13, 2026)**:
     - UI Refinement: Moved quantity badge from top-left to bottom-right of inventory cards.
     - Fixed overlap issues between quantity badge and vintage year.
