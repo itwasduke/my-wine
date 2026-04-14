@@ -1,11 +1,14 @@
 import { initAuth } from './auth.js';
-import { initUIListeners, closeModalDirect } from './ui.js';
+import { initUIListeners, closeModalDirect, renderInventory } from './ui.js';
 import { initAIListeners, closeScanModal } from './ai.js';
 
 // Initialize
 initAuth();
 initUIListeners();
 initAIListeners();
+
+// Initial render (shows Welcome if not signed in)
+renderInventory();
 
 // Global Escape Key Listener
 document.addEventListener('keydown', e => {
