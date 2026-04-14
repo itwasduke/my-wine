@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.6 (April 14, 2026)**:
+    - UX Fix: Improved readability of the Welcome screen by adding a frosted-glass background (blur + semi-transparent overlay) to the main text container, ensuring contrast against the new background image.
 - **v2.0.5 (April 14, 2026)**:
     - UI Refinement: Removed the "A personal inventory" tagline for a cleaner, more minimalist header.
 - **v2.0.4 (April 14, 2026)**:

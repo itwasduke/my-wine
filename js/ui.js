@@ -237,10 +237,10 @@ function cardHTML(w) {
 function renderWelcome() {
   const main = document.getElementById('main-content');
   main.innerHTML = `
-    <div class="welcome-container" style="max-width:800px; margin:0 auto; padding:40px 0; line-height:1.8;">
-      
+    <div class="welcome-container" style="max-width:800px; margin:0 auto; padding:40px; line-height:1.8; background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); border-radius:12px; border:1px solid var(--border);">
+
       <div style="text-align:center; padding-bottom:40px;">
-        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Browse the collection in read-only mode.</p>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px; letter-spacing:0.05em;">Browse the collection in read-only mode.</p>
         <button class="consume-btn" id="welcomeViewBtn" style="max-width:300px; margin:0 auto; border-color:var(--accent); color:var(--accent);">View the Collection</button>
       </div>
 
@@ -248,9 +248,9 @@ function renderWelcome() {
         <span class="section-title ready">Welcome to The Cellar</span>
         <div class="section-line ready"></div>
       </div>
-      
+
       <p class="modal-text" style="font-size:1.1rem; margin-bottom:32px; color:var(--text-primary);">
-        The Cellar is your high-end, personal inventory for tracking fine wines and rare spirits. 
+        The Cellar is your high-end, personal inventory for tracking fine wines and rare spirits.
         Designed for serious collectors, it combines a mobile-first experience with powerful AI label scanning.
       </p>
 
@@ -274,12 +274,11 @@ function renderWelcome() {
       </div>
 
       <div style="text-align:center; padding-top:20px;">
-        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Sign in with your Google account to begin your collection.</p>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px; letter-spacing:0.05em;">Sign in with your Google account to begin your collection.</p>
         <button class="consume-btn" id="welcomeSignInBtn" style="max-width:300px; margin:0 auto;">Sign In — Manage Collection</button>
       </div>
     </div>
   `;
-  
   // Attach event listener to the welcome sign in button
   const welcomeSignInBtn = document.getElementById('welcomeSignInBtn');
   if (welcomeSignInBtn) {
