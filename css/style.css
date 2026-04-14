@@ -8,7 +8,13 @@ main {
 .controls-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 24px 40px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 400;
 }
 
 /* ── Auth Area ──────────────────────────────────────────────────────────── */
@@ -193,8 +199,8 @@ main {
   padding: 7px 18px;
   border-radius: 4px;
   border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-secondary);
+  background: rgba(255,255,255,0.03);
+  color: #DDD;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -206,16 +212,17 @@ main {
 }
 
 .filter-btn:hover:not(.active) {
-  border-color: #555;
+  border-color: #777;
   color: var(--text-primary);
+  background: rgba(255,255,255,0.08);
 }
 
 /* ── Sub-Filter Bar ────────────────────────────────────────────────────── */
 .sub-filter-bar {
   display: flex;
   gap: 8px;
-  margin-bottom: 40px;
-  margin-top: -20px;
+  margin-bottom: 20px;
+  margin-top: -10px;
   flex-wrap: wrap;
 }
 
@@ -227,8 +234,8 @@ main {
   padding: 5px 14px;
   border-radius: 4px;
   border: 1px solid var(--border-subtle);
-  background: transparent;
-  color: var(--text-muted);
+  background: rgba(255,255,255,0.02);
+  color: #AAA;
   cursor: pointer;
   transition: all 0.2s;
 }
