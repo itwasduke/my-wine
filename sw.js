@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'cellar-shell-v25';
+const SHELL_CACHE = 'cellar-shell-v26';
 const FONT_CACHE  = 'cellar-fonts-v1';
 
 // App shell — everything needed to render the page offline
