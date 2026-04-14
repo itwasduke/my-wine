@@ -39,6 +39,8 @@ export function updateAuthUI(user) {
     }
     fab.style.display = '';
     if (menuBtn) menuBtn.style.display = 'flex';
+    // Load inventory on sign-in
+    import('./db.js').then(m => m.loadInventory());
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';
@@ -56,6 +58,12 @@ export function updateAuthUI(user) {
 
 export function renderInventory() {
   const main   = document.getElementById('main-content');
+  
+  if (!state.currentUser) {
+    renderWelcome();
+    return;
+  }
+
   const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
   const sortBy = document.getElementById('sortSelect')?.value || 'newest';
@@ -203,6 +211,55 @@ function cardHTML(w) {
   `;
 }
 
+function renderWelcome() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="welcome-container" style="max-width:800px; margin:0 auto; padding:40px 0; line-height:1.8;">
+      <div class="section-header">
+        <span class="section-title ready">Welcome to The Cellar</span>
+        <div class="section-line ready"></div>
+      </div>
+      
+      <p class="modal-text" style="font-size:1.1rem; margin-bottom:32px; color:var(--text-primary);">
+        The Cellar is your high-end, personal inventory for tracking fine wines and rare spirits. 
+        Designed for serious collectors, it combines a mobile-first experience with powerful AI label scanning.
+      </p>
+
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-bottom: 48px;">
+        <div>
+          <h3 style="font-family:'Cinzel',serif; color:var(--accent); font-size:0.9rem; letter-spacing:0.15em; margin-bottom:12px; text-transform:uppercase;">AI-Powered Scanning</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Using Gemini 2.0 Flash, instantly extract vintage, region, grape, and expert tasting notes from any label photo.</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Cinzel',serif; color:var(--accent); font-size:0.9rem; letter-spacing:0.15em; margin-bottom:12px; text-transform:uppercase;">Mobile Inventory</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">A lightning-fast PWA that lives on your home screen. Track your collection across "Ready," "Drink Soon," and "Consumed."</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Cinzel',serif; color:var(--accent); font-size:0.9rem; letter-spacing:0.15em; margin-bottom:12px; text-transform:uppercase;">Analytics & Insights</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Visualize your collection's distribution by region and type. Track your lifetime consumption and favorites.</p>
+        </div>
+        <div>
+          <h3 style="font-family:'Cinzel',serif; color:var(--accent); font-size:0.9rem; letter-spacing:0.15em; margin-bottom:12px; text-transform:uppercase;">Private & Secure</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Your data is your own. Securely backed by Google Firebase, ensuring your collection is always accessible but only to you.</p>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding-top:20px;">
+        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Sign in with your Google account to begin your collection.</p>
+        <button class="consume-btn" id="welcomeSignInBtn" style="max-width:300px; margin:0 auto;">Get Started — Sign In</button>
+      </div>
+    </div>
+  `;
+  
+  // Attach event listener to the welcome sign in button
+  const welcomeSignInBtn = document.getElementById('welcomeSignInBtn');
+  if (welcomeSignInBtn) {
+    welcomeSignInBtn.addEventListener('click', () => {
+      document.getElementById('signInBtn').click();
+    });
+  }
+}
+
 export function openModal(id) {
   const w = state.inventory[id];
   if (!w) return;
@@ -323,6 +380,12 @@ export function initUIListeners() {
 
   // Search input
   document.getElementById('searchInput').addEventListener('input', () => {
+    renderInventory();
+  });
+
+  // Home link (logo)
+  document.getElementById('homeLink').addEventListener('click', (e) => {
+    e.preventDefault();
     renderInventory();
   });
 

@@ -7,7 +7,15 @@ import { closeScanModal } from './ai.js';
 
 export async function loadInventory() {
   console.log('[Cellar] loadInventory() called');
+  const main = document.getElementById('main-content');
   const loadingEl = document.getElementById('cellar-loading');
+
+  if (!state.currentUser) {
+    console.log('[Cellar] No user signed in, skipping loadInventory');
+    renderInventory();
+    return;
+  }
+
   try {
     console.log('[Cellar] Fetching cellar collection from Firestore…');
     const snapshot = await getDocs(collection(db, 'cellar'));

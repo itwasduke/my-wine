@@ -31,6 +31,10 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.3 (April 13, 2026)**:
+    - Auth Fix: Switched to `signInWithRedirect` for reliable mobile sign-in (popups often blocked on mobile).
+    - UX Fix: Added "Welcome" landing page (Readme portion) for unauthenticated users.
+    - Performance: Deferred inventory loading until after authentication.
 - **v1.8.2 (April 13, 2026)**:
     - Data Fix: Ensured "Piggyback" and "Powers" are correctly identified as spirits, even in the Consumed tab.
 - **v1.8.1 (April 13, 2026)**:

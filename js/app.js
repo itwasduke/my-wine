@@ -5,7 +5,6 @@ import { initAIListeners, closeScanModal } from './ai.js';
 
 // Initialize
 initAuth();
-loadInventory();
 initUIListeners();
 initAIListeners();
 
