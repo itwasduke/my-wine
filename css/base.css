@@ -91,15 +91,6 @@ h1 {
   margin-bottom: 10px;
 }
 
-.subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-}
-
 .last-updated {
   font-size: 0.72rem;
   color: var(--text-muted);
