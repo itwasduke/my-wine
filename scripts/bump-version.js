@@ -46,9 +46,10 @@ console.log(`✓ package.json`);
 // 3. Update index.html (CSS, JS, and footer version)
 // ─────────────────────────────────────────────────────────────
 let html = fs.readFileSync(indexPath, 'utf8');
-const cssRegex = new RegExp(`css/(\\w+)\\.css\\?v=${currentVersion}`, 'g');
-const jsRegex = new RegExp(`js/(\\w+)\\.js\\?v=${currentVersion}`, 'g');
-const footerRegex = new RegExp(`v${currentVersion.replace(/\./g, '\\.')}`, 'g');
+const escapedVersion = currentVersion.replace(/\./g, '\\.');
+const cssRegex = new RegExp(`css/(\\w+)\\.css\\?v=${escapedVersion}`, 'g');
+const jsRegex = new RegExp(`js/(\\w+)\\.js\\?v=${escapedVersion}`, 'g');
+const footerRegex = new RegExp(`v${escapedVersion}`, 'g');
 
 html = html.replace(cssRegex, `css/$1.css?v=${newVersion}`);
 html = html.replace(jsRegex, `js/$1.js?v=${newVersion}`);
@@ -58,7 +59,30 @@ fs.writeFileSync(indexPath, html);
 console.log(`✓ index.html (CSS/JS queries, footer version)`);
 
 // ─────────────────────────────────────────────────────────────
-// 4. Update sw.js (SHELL_CACHE version and APP_SHELL queries)
+// 4. Update all JS files in the js/ directory
+// ─────────────────────────────────────────────────────────────
+const jsDir = path.join(projectRoot, 'js');
+const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith('.js'));
+
+jsFiles.forEach(file => {
+  const filePath = path.join(jsDir, file);
+  let content = fs.readFileSync(filePath, 'utf8');
+  
+  // Update ?v= query strings in both static and dynamic imports
+  const oldContent = content;
+  content = content.replace(
+    new RegExp(`\\?v=${currentVersion.replace(/\./g, '\\.')}`, 'g'),
+    `?v=${newVersion}`
+  );
+  
+  if (content !== oldContent) {
+    fs.writeFileSync(filePath, content);
+    console.log(`✓ js/${file} (updated internal imports)`);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 5. Update sw.js (SHELL_CACHE version and APP_SHELL queries)
 // ─────────────────────────────────────────────────────────────
 let sw = fs.readFileSync(swPath, 'utf8');
 
@@ -75,7 +99,7 @@ if (shellCacheMatch) {
 
 // Update ?v= query strings in APP_SHELL
 sw = sw.replace(
-  new RegExp(`\\?v=${currentVersion}`, 'g'),
+  new RegExp(`\\?v=${currentVersion.replace(/\./g, '\\.')}`, 'g'),
   `?v=${newVersion}`
 );
 
