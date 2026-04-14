@@ -31,6 +31,8 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.8 (April 14, 2026)**:
+    - Resolved Circular Dependency: Used dynamic imports in `bulkUpdateScores` and `bulkTagWineColor` and cleaned up `db.js`.
 - **v1.8.7 (April 14, 2026)**:
     - Fixed Initial Loading Stall: Added immediate `renderInventory()` call on app startup to show the Welcome screen instantly while Auth resolves.
 - **v1.8.6 (April 14, 2026)**:
