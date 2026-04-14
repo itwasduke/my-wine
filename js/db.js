@@ -41,8 +41,7 @@ export async function loadInventory() {
         }
       }
 
-      state.inventory[d.id] = item; 
-    ...
+      state.inventory[d.id] = item;
       if (data.updatedAt) {
         const ms = data.updatedAt.toMillis ? data.updatedAt.toMillis() : new Date(data.updatedAt).getTime();
         if (ms > latest) latest = ms;
@@ -278,7 +277,8 @@ export async function bulkUpdateScores(onProgress) {
 
   state.lastUpdated = new Date();
   onProgress(`Successfully updated ${total} wines.`);
-  renderInventory();
+  const { renderInventory: renderInv1 } = await import('./ui.js');
+  renderInv1();
 }
 
 export async function bulkTagWineColor(onProgress) {
@@ -311,7 +311,8 @@ export async function bulkTagWineColor(onProgress) {
 
   state.lastUpdated = new Date();
   onProgress(`Successfully tagged ${total} wines.`);
-  renderInventory();
+  const { renderInventory: renderInv2 } = await import('./ui.js');
+  renderInv2();
 }
 
 export function confirmDeleteBottle(id) {
