@@ -172,6 +172,26 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
   min-width: 20px;
   text-align: center;
 }
+.qty-input {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  width: 50px;
+  text-align: center;
+  margin-top: 4px;
+  padding: 2px;
+}
+.qty-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+/* Hide arrows in Chrome/Safari/Edge/Firefox */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-input { -moz-appearance: textfield; }
 
 .modal-status {
   display: inline-block;

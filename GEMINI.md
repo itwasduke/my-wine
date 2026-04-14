@@ -32,6 +32,9 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v1.9.2 (April 14, 2026)**:
+    - Feature: Made "Lifetime Consumed" count editable in the bottle details modal for easy historical corrections.
+    - Bug Fix: Ensured initial quantity and consumption count are correctly saved when adding a new bottle.
 - **v1.9.1 (April 14, 2026)**:
     - UX Fix: Made "Buy Again" button visible for all items (not just consumed) when signed in.
     - Robustness: Improved "Consumed" detection for older or manually edited records.

@@ -186,11 +186,14 @@ export async function confirmAddBottle() {
   if (!state.currentUser) return;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
+  const qty  = parseInt(document.getElementById('f-qty').value) || 1;
   const isSpirit   = document.getElementById('f-type').value === 'spirit';
   const status      = isSpirit ? 'spirits' : 'ready';
   const statusLabel = isSpirit ? 'Spirits'  : 'Ready to Drink';
   const data = {
     name,
+    quantity:    qty,
+    consumedCount: 0,
     year:        document.getElementById('f-year').value.trim()   || 'NV',
     region:      document.getElementById('f-region').value.trim() || '—',
     grape:       document.getElementById('f-grape').value.trim()  || '—',

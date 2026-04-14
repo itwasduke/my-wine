@@ -307,7 +307,7 @@ export function openModal(id) {
       </div>
       <div class="meta-item">
         <span class="meta-label">Lifetime Consumed</span>
-        <span class="meta-value" style="font-weight:500; font-size:1.1rem; margin-top:4px;">${w.consumedCount || 0}</span>
+        <input type="number" class="qty-input" id="edit-consumed-count" value="${w.consumedCount || 0}" min="0" data-id="${id}">
       </div>
     </div>
 
@@ -504,7 +504,16 @@ export function initUIListeners() {
     });
   }
 
-  // Modal internal actions (consume, rate, delete)
+  // Modal internal actions (consume, rate, delete, edit-consumed)
+  document.getElementById('modalContent').addEventListener('change', async e => {
+    if (e.target.id === 'edit-consumed-count') {
+      const { id, value } = e.target;
+      const bottleId = e.target.dataset.id;
+      const { updateConsumedCount } = await import('./db.js');
+      await updateConsumedCount(bottleId, value);
+    }
+  });
+
   document.getElementById('modalContent').addEventListener('click', async e => {
     const btn = e.target.closest('button');
     if (!btn) return;

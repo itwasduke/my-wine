@@ -248,6 +248,20 @@ export async function updateQuantity(id, newQty) {
   }
 }
 
+export async function updateConsumedCount(id, newCount) {
+  if (!state.currentUser) return;
+  const { updateLastUpdatedUI } = await import('./ui.js');
+  try {
+    const count = Math.max(0, parseInt(newCount) || 0);
+    await updateDoc(doc(db, 'cellar', id), { consumedCount: count, updatedAt: serverTimestamp() });
+    state.inventory[id].consumedCount = count;
+    state.lastUpdated = new Date();
+    updateLastUpdatedUI();
+  } catch (e) {
+    console.error('Failed to update consumed count:', e);
+  }
+}
+
 export async function saveProScores(id, scoreData) {
   const { openModal, updateLastUpdatedUI } = await import('./ui.js');
   try {
