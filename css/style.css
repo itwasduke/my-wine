@@ -247,6 +247,39 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 .rating-btn.liked-active    { background: var(--accent-dim);  border-color: var(--accent);  color: var(--accent); }
 .rating-btn.disliked-active { background: var(--danger-dim);  border-color: var(--danger);  color: var(--danger); }
 
+.buy-again-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.buy-again-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+.buy-again-btn.buy-again-active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.buy-again-btn span { font-size: 0.9rem; }
+
+.card-star {
+  font-size: 0.9rem;
+  line-height: 1;
+  margin-right: 4px;
+}
+
 /* ── Card liked indicator ─────────────────────────────────────────────────── */
 .card-liked-icon { position: absolute; top: 10px; right: 12px; font-size: 0.85rem; line-height: 1; }
 .card-footer {
@@ -603,12 +636,19 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
 /* ── Filter bar ───────────────────────────────────────────────────────────── */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; }
 .filter-btn {
+  position: relative;
   font-family: 'Cinzel', serif;
   font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
   padding: 7px 18px; border-radius: 4px;
   border: 1px solid var(--border);
   background: transparent; color: var(--text-secondary);
   cursor: pointer; transition: all 0.2s;
+}
+.tab-star {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 0.8rem;
 }
 .filter-btn.active            { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 .filter-btn:hover:not(.active) { border-color: #555; color: var(--text-primary); }

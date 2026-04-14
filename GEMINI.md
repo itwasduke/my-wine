@@ -29,8 +29,12 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `window`: Drinking window.
 - `status`: One of `ready`, `soon`, `spirits`, `consumed`.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
+- `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v1.9.0 (April 14, 2026)**:
+    - Implemented "Buy Again" feature: added a star to consumed bottles marked for repurchase.
+    - Added a visual star reminder to the "Consumed" filter tab when items are marked for repurchase.
 - **v1.8.9 (April 14, 2026)**:
     - Feature Removal: Removed the "For Cooking" section and associated `cook` status as requested.
 - **v1.8.8 (April 14, 2026)**:

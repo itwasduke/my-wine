@@ -139,6 +139,27 @@ export async function setRating(id, liked) {
   }
 }
 
+export async function toggleBuyAgain(id) {
+  if (!state.currentUser) return;
+  const { renderInventory, openModal } = await import('./ui.js');
+  try {
+    const current = state.inventory[id].buyAgain || false;
+    const newValue = !current;
+    const update = newValue ? { buyAgain: true, updatedAt: serverTimestamp() } : { buyAgain: deleteField(), updatedAt: serverTimestamp() };
+    await updateDoc(doc(db, 'cellar', id), update);
+    if (!newValue) {
+      delete state.inventory[id].buyAgain;
+    } else {
+      state.inventory[id].buyAgain = true;
+    }
+    state.lastUpdated = new Date();
+    openModal(id);
+    renderInventory();
+  } catch (e) {
+    console.error('Failed to toggle Buy Again:', e);
+  }
+}
+
 export async function saveNewBottle(data) {
   if (!state.currentUser) return;
   const { renderInventory, openModal } = await import('./ui.js');

@@ -76,6 +76,23 @@ export function renderInventory() {
     consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
   }
 
+  // Update tab star (Buy Again reminder)
+  const hasBuyAgain = Object.values(state.inventory).some(w => w.buyAgain);
+  const consumedBtn = document.querySelector('.filter-btn[data-filter="consumed"]');
+  if (consumedBtn) {
+    let star = consumedBtn.querySelector('.tab-star');
+    if (hasBuyAgain) {
+      if (!star) {
+        const span = document.createElement('span');
+        span.className = 'tab-star';
+        span.textContent = '⭐';
+        consumedBtn.appendChild(span);
+      }
+    } else if (star) {
+      star.remove();
+    }
+  }
+
   // 1. Convert to array and filter by Search + Type Filter + Color Filter
   let items = Object.values(state.inventory).filter(w => {
     // Main Filter logic
@@ -189,6 +206,7 @@ function cardHTML(w) {
   const qtyBadge = (parseInt(w.quantity) > 1) 
     ? `<span class="card-qty">×${w.quantity}</span>` 
     : '';
+  const starBadge = (w.buyAgain) ? '<span class="card-star">⭐</span>' : '';
   const badge = w.status === 'consumed'
     ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
     : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
@@ -203,7 +221,7 @@ function cardHTML(w) {
       <div class="card-region">${w.region}</div>
       <div class="card-footer">
         <div class="card-badges-left">${badge}</div>
-        <div class="card-badges-right">${qtyBadge}</div>
+        <div class="card-badges-right">${starBadge}${qtyBadge}</div>
       </div>
     </div>
   `;
@@ -323,7 +341,10 @@ export function openModal(id) {
         <button class="rating-btn${w.liked === false ? ' disliked-active' : ''}" data-action="rate" data-id="${id}" data-value="false">
           <span>👎</span> Didn't Like
         </button>
-      </div>` : ''}
+      </div>
+      <button class="buy-again-btn${w.buyAgain ? ' buy-again-active' : ''}" data-action="buy-again" data-id="${id}">
+        <span>⭐</span> Buy Again
+      </button>` : ''}
     ${state.currentUser ? `<button class="delete-btn" data-action="delete" data-id="${id}">Remove from Cellar</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
@@ -509,6 +530,9 @@ export function initUIListeners() {
     } else if (action === 'rate') {
       const { setRating } = await import('./db.js');
       setRating(id, value === 'true');
+    } else if (action === 'buy-again') {
+      const { toggleBuyAgain } = await import('./db.js');
+      toggleBuyAgain(id);
     } else if (action === 'delete') {
       const { confirmDeleteBottle } = await import('./db.js');
       confirmDeleteBottle(id);
