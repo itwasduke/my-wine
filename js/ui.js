@@ -76,6 +76,9 @@ export function renderInventory() {
     consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
   }
 
+  // Defensive: Clear any leftover stars from previous versions
+  document.querySelectorAll('.tab-star').forEach(el => el.remove());
+
   // 1. Convert to array and filter by Search + Type Filter + Color Filter
   let items = Object.values(state.inventory).filter(w => {
     // Main Filter logic
