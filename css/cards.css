@@ -69,6 +69,11 @@
 .card.soon,
 .card.spirits,
 .card.consumed {
+  background: rgba(22, 22, 22, 0.85);
+  border-color: rgba(51, 51, 51, 0.5);
+}
+
+.card.consumed {
   opacity: 0.6;
 }
 
