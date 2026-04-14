@@ -39,8 +39,6 @@ export function updateAuthUI(user) {
     }
     fab.style.display = '';
     if (menuBtn) menuBtn.style.display = 'flex';
-    // Load inventory on sign-in
-    import('./db.js').then(m => m.loadInventory());
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';

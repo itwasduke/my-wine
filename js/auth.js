@@ -1,14 +1,19 @@
 import { auth } from './firebase.js';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import { updateAuthUI } from './ui.js';
 
 export async function signIn() {
+  const provider = new GoogleAuthProvider();
   try {
-    const provider = new GoogleAuthProvider();
-    // On mobile, popups are often blocked. Redirect is more reliable.
-    await signInWithRedirect(auth, provider);
+    // Try popup first (best for desktop)
+    await signInWithPopup(auth, provider);
   } catch (e) {
-    console.error('[Cellar] Sign-in failed:', e);
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+      console.log('[Cellar] Popup blocked or closed, falling back to redirect…');
+      await signInWithRedirect(auth, provider);
+    } else {
+      console.error('[Cellar] Sign-in failed:', e);
+    }
   }
 }
 
@@ -32,7 +37,12 @@ export async function handleRedirectResult() {
 }
 
 export function initAuth() {
-  onAuthStateChanged(auth, user => updateAuthUI(user));
+  onAuthStateChanged(auth, user => {
+    updateAuthUI(user);
+    if (user) {
+      import('./db.js').then(m => m.loadInventory());
+    }
+  });
   handleRedirectResult();
   
   document.getElementById('signInBtn').addEventListener('click', signIn);

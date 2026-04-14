@@ -1,5 +1,4 @@
 import { initAuth } from './auth.js';
-import { loadInventory } from './db.js';
 import { initUIListeners, closeModalDirect } from './ui.js';
 import { initAIListeners, closeScanModal } from './ai.js';
 
