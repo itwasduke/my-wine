@@ -265,8 +265,13 @@ function renderWelcome() {
 export function openModal(id) {
   const w = state.inventory[id];
   if (!w) return;
-  const qty = parseInt(w.quantity) || 0;
-  const isConsumed = w.status === 'consumed' || qty <= 0 || w.statusLabel?.toLowerCase() === 'consumed';
+  
+  // A bottle is consumed if status is 'consumed'
+  const isConsumed = (w.status === 'consumed');
+  
+  // For UI: default to 1 if quantity is missing and it's not consumed
+  const displayQty = (w.quantity === undefined) ? (isConsumed ? 0 : 1) : parseInt(w.quantity);
+  
   const showConsumeBtn = state.currentUser && !isConsumed;
   const showRating     = state.currentUser && isConsumed;
   const el = document.getElementById('modalContent');
@@ -289,7 +294,7 @@ export function openModal(id) {
           <span class="meta-label">In Stock</span>
           <div class="qty-controls">
             ${state.currentUser ? `<button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>` : ''}
-            <span class="qty-value">${qty}</span>
+            <span class="qty-value">${displayQty}</span>
             ${state.currentUser ? `<button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>` : ''}
           </div>
         </div>
