@@ -280,7 +280,8 @@ export function openModal(id) {
   const w = state.inventory[id];
   if (!w) return;
   const showConsumeBtn = state.currentUser && w.status !== 'consumed';
-  const showRating     = state.currentUser && w.status === 'consumed';
+  const isConsumed     = w.status === 'consumed' || w.quantity === 0 || w.statusLabel?.toLowerCase() === 'consumed';
+  const showRating     = state.currentUser && isConsumed;
   const el = document.getElementById('modalContent');
   el.dataset.openId = id;
   el.innerHTML = `
@@ -333,6 +334,13 @@ export function openModal(id) {
 
     ${showConsumeBtn ? `<div class="modal-divider" style="margin-top:24px"></div>
       <button class="consume-btn" data-action="consume" data-id="${id}">Mark as Consumed</button>` : '<div class="modal-divider" style="margin-top:24px"></div>'}
+    
+    ${state.currentUser ? `
+      <button class="buy-again-btn${w.buyAgain ? ' buy-again-active' : ''}" data-action="buy-again" data-id="${id}">
+        <span>⭐</span> Buy Again
+      </button>
+    ` : ''}
+
     ${showRating ? `
       <div class="rating-row">
         <button class="rating-btn${w.liked === true ? ' liked-active' : ''}" data-action="rate" data-id="${id}" data-value="true">
@@ -341,10 +349,7 @@ export function openModal(id) {
         <button class="rating-btn${w.liked === false ? ' disliked-active' : ''}" data-action="rate" data-id="${id}" data-value="false">
           <span>👎</span> Didn't Like
         </button>
-      </div>
-      <button class="buy-again-btn${w.buyAgain ? ' buy-again-active' : ''}" data-action="buy-again" data-id="${id}">
-        <span>⭐</span> Buy Again
-      </button>` : ''}
+      </div>` : ''}
     ${state.currentUser ? `<button class="delete-btn" data-action="delete" data-id="${id}">Remove from Cellar</button>` : ''}
   `;
   document.getElementById('modalOverlay').classList.add('active');
