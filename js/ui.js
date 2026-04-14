@@ -76,23 +76,6 @@ export function renderInventory() {
     consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
   }
 
-  // Update tab star (Buy Again reminder)
-  const hasBuyAgain = Object.values(state.inventory).some(w => w.buyAgain);
-  const consumedBtn = document.querySelector('.filter-btn[data-filter="consumed"]');
-  if (consumedBtn) {
-    let star = consumedBtn.querySelector('.tab-star');
-    if (hasBuyAgain) {
-      if (!star) {
-        const span = document.createElement('span');
-        span.className = 'tab-star';
-        span.textContent = '⭐';
-        consumedBtn.appendChild(span);
-      }
-    } else if (star) {
-      star.remove();
-    }
-  }
-
   // 1. Convert to array and filter by Search + Type Filter + Color Filter
   let items = Object.values(state.inventory).filter(w => {
     // Main Filter logic

@@ -664,12 +664,6 @@ footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--bor
   background: transparent; color: var(--text-secondary);
   cursor: pointer; transition: all 0.2s;
 }
-.tab-star {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  font-size: 0.8rem;
-}
 .filter-btn.active            { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 .filter-btn:hover:not(.active) { border-color: #555; color: var(--text-primary); }
 
