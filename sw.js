@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'cellar-shell-v43';
+const SHELL_CACHE = 'cellar-shell-v44';
 const FONT_CACHE  = 'cellar-fonts-v1';
 
 // App shell — everything needed to render the page offline
@@ -8,11 +8,11 @@ const APP_SHELL = [
   './manifest.json',
   './icon.svg',
   './wine.jpg',
-  './css/base.css?v=2.0.17',
-  './css/cards.css?v=2.0.17',
-  './css/modal.css?v=2.0.17',
-  './css/style.css?v=2.0.17',
-  './js/app.js?v=2.0.17',
+  './css/base.css?v=2.0.18',
+  './css/cards.css?v=2.0.18',
+  './css/modal.css?v=2.0.18',
+  './css/style.css?v=2.0.18',
+  './js/app.js?v=2.0.18',
   './js/state.js',
   './js/ui.js',
   './js/render.js',
