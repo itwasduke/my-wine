@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.9 (April 14, 2026)**:
+    - UI Refinement: Extended thematic color-coding to sub-filter buttons (Red, White, etc.) and increased CSS specificity for more reliable styling. Slightly increased opacity for active tabs (0.15) for better visibility.
 - **v2.0.8 (April 14, 2026)**:
     - UI Refinement: Thematic color-coding for filter tabs. "Wine", "Spirits", and "Consumed" tabs now use their specific status colors (Emerald, Copper, and Grey) when active, with a consistent low-opacity background style.
 - **v2.0.7 (April 14, 2026)**:

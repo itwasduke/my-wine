@@ -211,20 +211,20 @@ main {
   color: var(--accent);
 }
 
-.filter-btn[data-filter="wine"].active {
-  background: rgba(var(--ready-rgb), 0.12);
+.filter-bar .filter-btn[data-filter="wine"].active {
+  background: rgba(var(--ready-rgb), 0.15);
   border-color: var(--ready);
   color: var(--ready);
 }
 
-.filter-btn[data-filter="spirits"].active {
-  background: rgba(var(--spirits-rgb), 0.12);
+.filter-bar .filter-btn[data-filter="spirits"].active {
+  background: rgba(var(--spirits-rgb), 0.15);
   border-color: var(--spirits);
   color: var(--spirits);
 }
 
-.filter-btn[data-filter="consumed"].active {
-  background: rgba(var(--consumed-rgb), 0.12);
+.filter-bar .filter-btn[data-filter="consumed"].active {
+  background: rgba(var(--consumed-rgb), 0.15);
   border-color: var(--consumed);
   color: var(--consumed);
 }
@@ -262,6 +262,19 @@ main {
   background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Specific sub-filter colors when active */
+#subFilterBar .sub-filter-btn.active {
+  background: rgba(var(--ready-rgb), 0.15);
+  border-color: var(--ready);
+  color: var(--ready);
+}
+
+#consumedFilterBar .sub-filter-btn.active {
+  background: rgba(var(--consumed-rgb), 0.15);
+  border-color: var(--consumed);
+  color: var(--consumed);
 }
 
 .sub-filter-btn:hover:not(.active) {
