@@ -14,9 +14,13 @@
   --danger-dim:     rgba(231,76,60,0.10);
   /* Section colours — all verified ≥4.5:1 on --bg */
   --ready:          #2ECC71;  /* emerald   6.9:1 */
+  --ready-rgb:      46, 204, 113;
   --soon:           #F39C12;  /* amber     7.0:1 */
+  --soon-rgb:       243, 156, 18;
   --spirits:        #CC9944;  /* copper    6.4:1 */
+  --spirits-rgb:    204, 153, 68;
   --consumed:       #9AA3AB;  /* gray      6.5:1 */
+  --consumed-rgb:   154, 163, 171;
 }
 
 * {

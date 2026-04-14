@@ -211,6 +211,24 @@ main {
   color: var(--accent);
 }
 
+.filter-btn[data-filter="wine"].active {
+  background: rgba(var(--ready-rgb), 0.12);
+  border-color: var(--ready);
+  color: var(--ready);
+}
+
+.filter-btn[data-filter="spirits"].active {
+  background: rgba(var(--spirits-rgb), 0.12);
+  border-color: var(--spirits);
+  color: var(--spirits);
+}
+
+.filter-btn[data-filter="consumed"].active {
+  background: rgba(var(--consumed-rgb), 0.12);
+  border-color: var(--consumed);
+  color: var(--consumed);
+}
+
 .filter-btn:hover:not(.active) {
   border-color: #777;
   color: var(--text-primary);
