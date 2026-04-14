@@ -267,9 +267,10 @@ function renderWelcome() {
   // Attach event listener to the welcome view button
   const welcomeViewBtn = document.getElementById('welcomeViewBtn');
   if (welcomeViewBtn) {
-    welcomeViewBtn.addEventListener('click', () => {
+    welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      renderInventory();
+      const { loadInventory } = await import('./db.js');
+      await loadInventory();
     });
   }
 }

@@ -39,9 +39,8 @@ export async function handleRedirectResult() {
 export function initAuth() {
   onAuthStateChanged(auth, user => {
     updateAuthUI(user);
-    if (user) {
-      import('./db.js').then(m => m.loadInventory());
-    }
+    // Always load inventory (if user is null, we fetch public docs)
+    import('./db.js').then(m => m.loadInventory());
   });
   handleRedirectResult();
   
