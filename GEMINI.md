@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.3 (April 14, 2026)**:
+    - Privacy Enhancement: Hidden the "Consumed" filter tab and associated "Lifetime Consumed" metrics for unauthorized users to maintain collection privacy during public browsing.
 - **v2.0.2 (April 14, 2026)**:
     - Refactor: Split monolithic `css/style.css` into modular `css/base.css`, `css/cards.css`, `css/modal.css`, and new `css/style.css` for improved maintainability.
 - **v2.0.1 (April 14, 2026)**:

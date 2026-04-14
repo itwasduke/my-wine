@@ -28,6 +28,8 @@ export function updateAuthUI(user) {
   const userInfo  = document.getElementById('userInfo');
   const fab       = document.getElementById('fab');
   const menuBtn   = document.getElementById('menuBtn');
+  const consumedBtn = document.querySelector('.filter-btn[data-filter="consumed"]');
+
   if (user) {
     signInBtn.style.display = 'none';
     userInfo.style.display  = 'flex';
@@ -39,11 +41,13 @@ export function updateAuthUI(user) {
     }
     fab.style.display = '';
     if (menuBtn) menuBtn.style.display = 'flex';
+    if (consumedBtn) consumedBtn.style.display = '';
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';
     fab.style.display       = 'none';
     if (menuBtn) menuBtn.style.display = 'none';
+    if (consumedBtn) consumedBtn.style.display = 'none';
   }
   // Re-render open modal if any
   const activeModal = document.getElementById('modalContent');
@@ -66,7 +70,20 @@ export function renderInventory() {
   
   if (controls) controls.style.display = 'block';
 
-  const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
+  let filter = document.getElementById('filterBar')?.dataset.filter || 'all';
+  
+  // Enforce: unauthorized users cannot see "Consumed"
+  if (!state.currentUser && filter === 'consumed') {
+    filter = 'all';
+    const filterBar = document.getElementById('filterBar');
+    if (filterBar) {
+      filterBar.dataset.filter = 'all';
+      filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === 'all');
+      });
+    }
+  }
+
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
   const sortBy = document.getElementById('sortSelect')?.value || 'newest';
 
@@ -319,10 +336,12 @@ export function openModal(id) {
           </div>
         </div>
       ` : ''}
-      <div class="meta-item">
-        <span class="meta-label">Lifetime Consumed</span>
-        <input type="number" class="qty-input" id="edit-consumed-count" value="${w.consumedCount || 0}" min="0" data-id="${id}">
-      </div>
+      ${state.currentUser ? `
+        <div class="meta-item">
+          <span class="meta-label">Lifetime Consumed</span>
+          <input type="number" class="qty-input" id="edit-consumed-count" value="${w.consumedCount || 0}" min="0" data-id="${id}">
+        </div>
+      ` : ''}
     </div>
 
     <div class="modal-section-label">Tasting Notes</div>
