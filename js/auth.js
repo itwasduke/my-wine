@@ -1,6 +1,7 @@
 import { auth } from './firebase.js';
 import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import { updateAuthUI } from './ui.js';
+import { startInventoryListener, stopInventoryListener } from './db.js';
 
 export async function signIn() {
   const provider = new GoogleAuthProvider();
@@ -38,9 +39,13 @@ export async function handleRedirectResult() {
 
 export function initAuth() {
   onAuthStateChanged(auth, user => {
-    updateAuthUI(user);
-    // Always load inventory (if user is null, we fetch public docs)
-    import('./db.js').then(m => m.loadInventory());
+    if (user) {
+      updateAuthUI(user);
+      startInventoryListener();
+    } else {
+      stopInventoryListener();
+      updateAuthUI(null);
+    }
   });
   handleRedirectResult();
   

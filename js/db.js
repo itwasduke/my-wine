@@ -1,74 +1,90 @@
 import { db } from './firebase.js';
-import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp } 
+import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp, onSnapshot }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { state } from './state.js';
 import { closeScanModal } from './ai.js';
 
-export async function loadInventory() {
-  console.log('[Cellar] loadInventory() called');
-  const { renderInventory, updateLastUpdatedUI } = await import('./ui.js');
-  const main = document.getElementById('main-content');
-  const loadingEl = document.getElementById('cellar-loading');
+let unsubscribeInventory = null;
 
-  if (!state.currentUser) {
-    console.log('[Cellar] No user signed in, fetching public inventory…');
+// Applies legacy data fixes to a raw Firestore doc
+function processDoc(d) {
+  const data = d.data();
+  const item = { id: d.id, ...data };
+  const name = (item.name || '').toLowerCase();
+  if (!item.type && (name.includes('piggyback') || name.includes('powers'))) {
+    item.type = 'spirit';
+  }
+  if (!item.status || item.status === 'cook') {
+    item.status = (item.type === 'spirit' || item.region === 'Japan') ? 'spirits' : 'ready';
+  }
+  return item;
+}
+
+function buildInventoryFromSnapshot(snapshot) {
+  state.inventory = {};
+  let latest = 0;
+  snapshot.forEach(d => {
+    const item = processDoc(d);
+    state.inventory[d.id] = item;
+    const ts = d.data().updatedAt;
+    if (ts) {
+      const ms = ts.toMillis ? ts.toMillis() : new Date(ts).getTime();
+      if (ms > latest) latest = ms;
+    }
+  });
+  if (latest > 0) state.lastUpdated = new Date(latest);
+}
+
+export function startInventoryListener() {
+  if (unsubscribeInventory) {
+    unsubscribeInventory();
+    unsubscribeInventory = null;
   }
 
-  try {
-    console.log('[Cellar] Fetching cellar collection from Firestore…');
-    const snapshot = await getDocs(collection(db, 'cellar'));
-    console.log('[Cellar] Snapshot received, docs:', snapshot.size);
-    state.inventory = {};
-    let latest = 0;
-    snapshot.forEach(d => { 
-      const data = d.data();
-      const item = { id: d.id, ...data };
-      const name = (item.name || '').toLowerCase();
-
-      // Data Fix: Specifically handle brands like Piggyback and Powers as spirits if type is missing
-      if (!item.type && (name.includes('piggyback') || name.includes('powers'))) {
-        item.type = 'spirit';
+  unsubscribeInventory = onSnapshot(
+    collection(db, 'cellar'),
+    async (snapshot) => {
+      if (snapshot.metadata.fromCache) {
+        console.log('[Cellar] Serving inventory from local cache');
       }
-
-      // Fallback for missing status (legacy data) or removed 'cook' status
-      if (!item.status || item.status === 'cook') {
-        if (item.type === 'spirit' || item.region === 'Japan') { 
-          item.status = 'spirits';
-        } else {
-          item.status = 'ready';
-        }
+      buildInventoryFromSnapshot(snapshot);
+      const { renderInventory } = await import('./ui.js');
+      renderInventory();
+    },
+    async (e) => {
+      console.error('[Cellar] onSnapshot error:', e);
+      const { showErrorToast, renderInventory } = await import('./ui.js');
+      showErrorToast('Real-time sync unavailable — loading snapshot');
+      try {
+        const snapshot = await getDocs(collection(db, 'cellar'));
+        buildInventoryFromSnapshot(snapshot);
+        renderInventory();
+      } catch (e2) {
+        console.error('[Cellar] Fallback getDocs failed:', e2);
       }
+    }
+  );
+}
 
-      state.inventory[d.id] = item;
-      if (data.updatedAt) {
-        const ms = data.updatedAt.toMillis ? data.updatedAt.toMillis() : new Date(data.updatedAt).getTime();
-        if (ms > latest) latest = ms;
-      }
-    });
-    if (latest > 0) state.lastUpdated = new Date(latest);
-    console.log('[Cellar] Inventory built, rendering…');
-    renderInventory();
-    console.log('[Cellar] Render complete');
-  } catch (e) {
-    console.error('[Cellar] loadInventory failed:', e);
-    const msg = e?.code
-      ? `Firestore error (${e.code}) — ${e.message}`
-      : `Could not load cellar: ${e?.message || e}`;
-    if (loadingEl) loadingEl.textContent = msg;
-    // If it fails (maybe a rule change), still render welcome
-    renderInventory();
+export function stopInventoryListener() {
+  if (unsubscribeInventory) {
+    unsubscribeInventory();
+    unsubscribeInventory = null;
   }
+}
+
+// Kept as alias for the welcome-screen "View Collection" path in ui.js
+export function loadInventory() {
+  startInventoryListener();
 }
 
 export async function deleteBottle(id) {
   if (!state.currentUser) return;
-  const { renderInventory, closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js');
+  const { closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     await deleteDoc(doc(db, 'cellar', id));
-    delete state.inventory[id];
     state.lastUpdated = new Date();
     closeModalDirect();
-    renderInventory();
     showSuccessToast('Bottle removed from cellar');
   } catch (e) {
     console.error('Failed to delete from Firestore:', e);
@@ -156,7 +172,7 @@ export async function setRating(id, liked) {
 
 export async function toggleBuyAgain(id) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
+  const { openModal, showErrorToast } = await import('./ui.js');
   try {
     const current = state.inventory[id].buyAgain || false;
     const newValue = !current;
@@ -169,7 +185,6 @@ export async function toggleBuyAgain(id) {
     }
     state.lastUpdated = new Date();
     openModal(id);
-    renderInventory();
   } catch (e) {
     console.error('Failed to toggle Buy Again:', e);
     showErrorToast('Could not update restock flag');
@@ -178,7 +193,7 @@ export async function toggleBuyAgain(id) {
 
 export async function saveNewBottle(data) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast, showSuccessToast } = await import('./ui.js');
+  const { openModal, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
@@ -196,7 +211,7 @@ export async function saveNewBottle(data) {
       if (confirm(`You already have "${w.name}" (${w.year}) in your cellar.\n\nRestock ${newQty} more to the existing entry?`)) {
         const update = {
           quantity: totalQty,
-          status: data.status, // Restock to Ready/Spirits
+          status: data.status,
           statusLabel: data.statusLabel,
           updatedAt: serverTimestamp()
         };
@@ -204,11 +219,8 @@ export async function saveNewBottle(data) {
           update.consumedDate = deleteField();
         }
         await updateDoc(doc(db, 'cellar', existingId), update);
-        state.inventory[existingId] = { ...state.inventory[existingId], ...update };
-        if (update.consumedDate) delete state.inventory[existingId].consumedDate;
         state.lastUpdated = new Date();
         closeScanModal();
-        renderInventory();
         openModal(existingId);
         showSuccessToast('Bottle restocked');
         return;
@@ -216,11 +228,9 @@ export async function saveNewBottle(data) {
     }
 
     const finalData = { ...data, updatedAt: serverTimestamp() };
-    const ref = await addDoc(collection(db, 'cellar'), finalData);
-    state.inventory[ref.id] = { id: ref.id, ...finalData };
+    await addDoc(collection(db, 'cellar'), finalData);
     state.lastUpdated = new Date();
     closeScanModal();
-    renderInventory();
     showSuccessToast('Bottle added to cellar');
   } catch (e) {
     console.error('Failed to save to Firestore:', e);

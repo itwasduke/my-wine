@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.16 (April 14, 2026)**:
+    - perf: Replace getDocs() one-time fetch with onSnapshot() real-time listener. Inventory updates automatically on any Firestore change without manual re-fetch. Listener starts on sign-in, stops on sign-out. Falls back to getDocs() if onSnapshot errors. Removed redundant renderInventory() calls from all write operations.
 - **v2.0.15 (April 14, 2026)**:
     - perf: Optimistic UI updates for markConsumed, setRating, and updateQuantity. State is updated and re-rendered immediately; Firestore write happens in background. On failure, state is reverted and an error toast is shown.
 - **v2.0.14 (April 14, 2026)**:
