@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.17 (April 14, 2026)**:
+    - refactor: Split monolithic `js/ui.js` into three focused modules for improved maintainability: `js/render.js` (all rendering functions), `js/events.js` (all event listeners), and `js/modal.js` (modal-specific functions). `js/ui.js` now serves as a thin coordinator that re-exports public functions and maintains `updateAuthUI()`. No logic changes—pure structural refactoring to improve code organization and ease future maintenance.
 - **v2.0.16 (April 14, 2026)**:
     - perf: Replace getDocs() one-time fetch with onSnapshot() real-time listener. Inventory updates automatically on any Firestore change without manual re-fetch. Listener starts on sign-in, stops on sign-out. Falls back to getDocs() if onSnapshot errors. Removed redundant renderInventory() calls from all write operations.
 - **v2.0.15 (April 14, 2026)**:
