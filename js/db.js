@@ -2,11 +2,11 @@ import { db } from './firebase.js';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp } 
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { state } from './state.js';
-import { renderInventory, closeModalDirect, openModal, updateLastUpdatedUI } from './ui.js';
 import { closeScanModal } from './ai.js';
 
 export async function loadInventory() {
   console.log('[Cellar] loadInventory() called');
+  const { renderInventory, updateLastUpdatedUI } = await import('./ui.js');
   const main = document.getElementById('main-content');
   const loadingEl = document.getElementById('cellar-loading');
 
@@ -63,6 +63,7 @@ export async function loadInventory() {
 
 export async function deleteBottle(id) {
   if (!state.currentUser) return;
+  const { renderInventory, closeModalDirect } = await import('./ui.js');
   try {
     await deleteDoc(doc(db, 'cellar', id));
     delete state.inventory[id];
@@ -77,6 +78,7 @@ export async function deleteBottle(id) {
 
 export async function markConsumed(id) {
   if (!state.currentUser) return;
+  const { renderInventory, closeModalDirect, openModal } = await import('./ui.js');
   try {
     const w = state.inventory[id];
     const currentQty = parseInt(w.quantity) || 1;
@@ -119,6 +121,7 @@ export async function markConsumed(id) {
 
 export async function setRating(id, liked) {
   if (!state.currentUser) return;
+  const { renderInventory, openModal } = await import('./ui.js');
   try {
     const current = state.inventory[id].liked;
     const newValue = (current === liked) ? null : liked;
@@ -139,6 +142,7 @@ export async function setRating(id, liked) {
 
 export async function saveNewBottle(data) {
   if (!state.currentUser) return;
+  const { renderInventory, openModal } = await import('./ui.js');
   try {
     // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
@@ -192,6 +196,7 @@ export async function saveNewBottle(data) {
 
 export async function updateQuantity(id, newQty) {
   if (!state.currentUser) return;
+  const { renderInventory, openModal } = await import('./ui.js');
   try {
     const qty = Math.max(0, newQty);
     let update = { quantity: qty, updatedAt: serverTimestamp() };
@@ -224,6 +229,7 @@ export async function updateQuantity(id, newQty) {
 }
 
 export async function saveProScores(id, scoreData) {
+  const { openModal, updateLastUpdatedUI } = await import('./ui.js');
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;

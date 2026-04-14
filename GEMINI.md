@@ -31,6 +31,8 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.6 (April 14, 2026)**:
+    - Resolved Circular Dependency: Removed all top-level UI imports from `db.js` in favor of dynamic `import()` calls, fixing a race condition that prevented the app from loading.
 - **v1.8.4 (April 13, 2026)**:
     - Fixed Circular Dependency: Resolved a module hang where `ui.js` and `db.js` were stuck in an import loop.
     - Improved Auth: Implemented a popup-first strategy with a redirect fallback for sign-in, maximizing compatibility across browsers.
