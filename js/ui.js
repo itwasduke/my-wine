@@ -56,11 +56,15 @@ export function updateAuthUI(user) {
 
 export function renderInventory() {
   const main   = document.getElementById('main-content');
+  const controls = document.querySelector('.controls-container');
   
   if (!state.currentUser && !state.showInventoryUnauth) {
+    if (controls) controls.style.display = 'none';
     renderWelcome();
     return;
   }
+  
+  if (controls) controls.style.display = 'block';
 
   const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
@@ -217,6 +221,12 @@ function renderWelcome() {
   const main = document.getElementById('main-content');
   main.innerHTML = `
     <div class="welcome-container" style="max-width:800px; margin:0 auto; padding:40px 0; line-height:1.8;">
+      
+      <div style="text-align:center; padding-bottom:40px;">
+        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Browse the collection in read-only mode.</p>
+        <button class="consume-btn" id="welcomeViewBtn" style="max-width:300px; margin:0 auto; border-color:var(--accent); color:var(--accent);">View the Collection</button>
+      </div>
+
       <div class="section-header">
         <span class="section-title ready">Welcome to The Cellar</span>
         <div class="section-line ready"></div>
@@ -248,10 +258,7 @@ function renderWelcome() {
 
       <div style="text-align:center; padding-top:20px;">
         <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Sign in with your Google account to begin your collection.</p>
-        <div style="display:flex; flex-direction:column; gap:12px; max-width:300px; margin:0 auto;">
-          <button class="consume-btn" id="welcomeSignInBtn">Get Started — Sign In</button>
-          <button class="consume-btn" id="welcomeViewBtn" style="border-color:var(--text-muted); color:var(--text-secondary);">View the Collection</button>
-        </div>
+        <button class="consume-btn" id="welcomeSignInBtn" style="max-width:300px; margin:0 auto;">Sign In — Manage Collection</button>
       </div>
     </div>
   `;
