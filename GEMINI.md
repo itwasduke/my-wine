@@ -10,12 +10,69 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - **AI**: Gemini 2.0 Flash via Firebase Vertex AI for automated label scanning and data extraction.
 - **PWA**: Service worker (`sw.js`) for offline caching and `manifest.json` for home-screen installation.
 
+## Local Development
+
+No build process. Serve the project root with any static file server:
+
+```bash
+npx serve .
+# or
+python3 -m http.server 8080
+```
+
+Deploy Firestore rules when changed:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+## Module Graph
+
+`index.html` loads only `js/app.js` as an ES module entry point. All other modules are imported from there or lazily via dynamic `import()`.
+
+```
+app.js
+├── auth.js      — Google sign-in (popup-first, redirect fallback), onAuthStateChanged
+├── ui.js        — renderInventory(), openModal(), updateAuthUI(), initUIListeners()
+│   └── analytics.js — renderAnalytics() (called from renderInventory)
+└── ai.js        — Gemini label scan, pro score lookup, color tagging, initAIListeners()
+    └── db.js    — all Firestore read/write (loadInventory, saveNewBottle, markConsumed, etc.)
+        └── state.js — shared singleton: state.inventory, state.currentUser, SECTIONS
+```
+
+**Circular dependency resolution:** `db.js` and `ui.js` would create a cycle if imported at the top level. All cross-references between them use dynamic `await import('./ui.js')` / `await import('./db.js')` inside async functions.
+
+## State & Rendering
+
+All runtime state lives in `js/state.js` — a single exported `state` object. Mutate it directly; there is no reactive framework. After any mutation, call `renderInventory()` to sync the DOM.
+
+`ui.js:renderInventory()` is the sole render function. It reads `state.inventory`, applies filters/search/sort, builds HTML strings, and sets `main.innerHTML`. There is no virtual DOM or diffing.
+
+## Auth & Data Access
+
+- Firestore rules allow **public read** of the `cellar` collection; writes are locked to a single hardcoded owner UID (`firestore.rules`).
+- `loadInventory()` is called for both authenticated and unauthenticated users. Unauthenticated browsing is gated by `state.showInventoryUnauth`.
+- On sign-in state change (`onAuthStateChanged`), `updateAuthUI()` re-renders and triggers `loadInventory()`.
+
+## AI Integration
+
+`js/ai.js` uses `gemini-2.0-flash` via Firebase Vertex AI SDK. It tries `firebase-vertexai.js` first and falls back to `firebase-ai.js` with `GoogleAIBackend`. Label scans pass a base64 inline image (client-side resized to max 1024px before sending). Pro score and color lookups are text-only.
+
+## PWA / Service Worker
+
+`sw.js` uses a two-cache strategy:
+- `cellar-shell-v{N}` — app shell (cache-first for static assets, network-first for HTML)
+- `cellar-fonts-v1` — Firebase SDK + Google Fonts (network-first, cached thereafter)
+
+**When adding a new JS or CSS file**, add it to the `APP_SHELL` array in `sw.js`. **When making any JS/CSS change**, bump the `SHELL_CACHE` version number to force clients to pick up the new files.
+
 ## Core Mandates & Conventions
-- **Modular Structure**: Logic in `js/`, styling in `css/`, structure in `index.html`.
 - **No Build Tools**: Avoid adding `npm`, `webpack`, or `vite`. Keep the project portable as a static site.
+- **No Frameworks**: All UI is vanilla JS + DOM string templating. CSS custom properties for theming.
 - **Mobile First**: Design specifically for iPhone/Android home-screen use.
 - **Accessibility**: Maintain WCAG AA contrast (4.5:1 or higher) for all text.
-- **Security**: All write operations must be gated by Firebase Auth and validated against the owner's UID in `firestore.rules`.
+- **Security**: All write operations must be gated by Firebase Auth (`state.currentUser` check) and validated against the owner's UID in `firestore.rules`.
+- **Version bump on every push**: Increment the footer version in `index.html` and add a corresponding entry at the top of the Version History below with every change.
 
 ## Data Schema (Firestore: `cellar` collection)
 - `name`: Full producer and wine/spirit name.
@@ -32,6 +89,8 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.2 (April 14, 2026)**:
+    - Refactor: Split monolithic `css/style.css` into modular `css/base.css`, `css/cards.css`, `css/modal.css`, and new `css/style.css` for improved maintainability.
 - **v2.0.1 (April 14, 2026)**:
     - UI Refinement: Moved "View the Collection" to the top of the welcome screen and hidden top-level filters until the inventory is viewed.
 - **v2.0.0 (April 14, 2026)**:

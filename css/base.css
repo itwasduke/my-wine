@@ -1,0 +1,104 @@
+/* ── CSS Variables & Reset ──────────────────────────────────────────────── */
+:root {
+  --bg:             #1A1A1A;
+  --surface:        #242424;
+  --surface-hover:  #2C2C2C;
+  --border:         #333333;
+  --border-subtle:  #2A2A2A;
+  --text-primary:   #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-muted:     #555555;
+  --accent:         #4ECDC4;
+  --accent-dim:     rgba(78,205,196,0.12);
+  --danger:         #E74C3C;
+  --danger-dim:     rgba(231,76,60,0.10);
+  /* Section colours — all verified ≥4.5:1 on --bg */
+  --ready:          #2ECC71;  /* emerald   6.9:1 */
+  --soon:           #F39C12;  /* amber     7.0:1 */
+  --spirits:        #CC9944;  /* copper    6.4:1 */
+  --consumed:       #9AA3AB;  /* gray      6.5:1 */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Typography & Body ──────────────────────────────────────────────────── */
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 60px 20px 40px;
+  position: relative;
+}
+
+.header-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.rule-line {
+  flex: 1;
+  max-width: 200px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+
+.rule-diamond {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.last-updated {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  margin-top: 8px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.footer-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+}

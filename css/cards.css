@@ -1,0 +1,171 @@
+/* ── Grid & Sections ────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.section {
+  margin-bottom: 60px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.section-title.ready    { color: var(--ready); }
+.section-title.soon     { color: var(--soon); }
+.section-title.spirits  { color: var(--spirits); }
+.section-title.consumed { color: var(--consumed); }
+
+.section-line {
+  flex: 1;
+  height: 1px;
+}
+
+.section-line.ready    { background: linear-gradient(to right, var(--ready),    transparent); }
+.section-line.soon     { background: linear-gradient(to right, var(--soon),     transparent); }
+.section-line.spirits  { background: linear-gradient(to right, var(--spirits),  transparent); }
+.section-line.consumed { background: linear-gradient(to right, var(--consumed), transparent); }
+
+/* ── Card Styles ────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 22px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.card.ready::before    { background: var(--ready); }
+.card.soon::before     { background: var(--soon); }
+.card.spirits::before  { background: var(--spirits); }
+.card.consumed::before { background: var(--consumed); }
+
+.card.consumed {
+  opacity: 0.6;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: #444;
+  background: var(--surface-hover);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+/* ── Card Content ──────────────────────────────────────────────────────── */
+.card-year {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 6px;
+}
+
+.card.ready .card-year    { color: var(--ready); }
+.card.soon .card-year     { color: var(--soon); }
+.card.spirits .card-year  { color: var(--spirits); }
+.card.consumed .card-year { color: var(--consumed); }
+
+.card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.98rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  line-height: 1.35;
+}
+
+.card-region {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ── Card Badge ────────────────────────────────────────────────────────── */
+.card-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.badge-3l      { background: rgba(46,204,113,0.12);  color: var(--ready);   border: 1px solid rgba(46,204,113,0.3); }
+.badge-japan   { background: rgba(204,153,68,0.12);   color: var(--spirits); border: 1px solid rgba(204,153,68,0.3); }
+.badge-limited { background: var(--accent-dim);        color: var(--accent);  border: 1px solid rgba(78,205,196,0.3); }
+.badge-consumed { background: rgba(154,163,171,0.1);  color: var(--consumed); border: 1px solid rgba(154,163,171,0.2); }
+
+/* ── Card Footer & Badges ──────────────────────────────────────────────── */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.card-badges-left {
+  display: flex;
+  gap: 6px;
+}
+
+.card-badges-right {
+  display: flex;
+}
+
+.card-qty {
+  display: inline-block;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.62rem;
+  font-family: 'Cinzel', serif;
+  padding: 2px 8px;
+  border-radius: 3px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-star {
+  font-size: 0.9rem;
+  line-height: 1;
+  margin-right: 4px;
+}
+
+/* ── Card Liked Indicator ──────────────────────────────────────────────── */
+.card-liked-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
