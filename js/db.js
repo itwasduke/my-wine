@@ -79,67 +79,78 @@ export async function deleteBottle(id) {
 export async function markConsumed(id) {
   if (!state.currentUser) return;
   const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./ui.js');
-  try {
-    const w = state.inventory[id];
-    const currentQty = parseInt(w.quantity) || 1;
-    const currentConsumed = parseInt(w.consumedCount) || 0;
 
-    let update = {
-      updatedAt: serverTimestamp(),
+  const previous = { ...state.inventory[id] };
+  const currentQty = parseInt(previous.quantity) || 1;
+  const currentConsumed = parseInt(previous.consumedCount) || 0;
+
+  let firestoreUpdate = { updatedAt: serverTimestamp(), consumedCount: currentConsumed + 1 };
+
+  if (currentQty > 1) {
+    // Optimistic: decrement quantity
+    state.inventory[id] = { ...previous, quantity: currentQty - 1, consumedCount: currentConsumed + 1 };
+    firestoreUpdate.quantity = currentQty - 1;
+    renderInventory();
+    openModal(id);
+  } else {
+    // Optimistic: move to consumed
+    const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    state.inventory[id] = {
+      ...previous,
+      quantity: 0,
+      status: 'consumed',
+      statusLabel: 'Consumed',
+      consumedDate,
       consumedCount: currentConsumed + 1
     };
-
-    if (currentQty > 1) {
-      // Just decrement
-      update.quantity = currentQty - 1;
-      state.inventory[id].quantity = update.quantity;
-      state.inventory[id].consumedCount = update.consumedCount;
-    } else {
-      // Last bottle: move to consumed
-      const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      update.quantity = 0;
-      update.status = 'consumed';
-      update.statusLabel = 'Consumed';
-      update.consumedDate = consumedDate;
-
-      state.inventory[id].quantity = 0;
-      state.inventory[id].status = 'consumed';
-      state.inventory[id].statusLabel = 'Consumed';
-      state.inventory[id].consumedDate = consumedDate;
-      state.inventory[id].consumedCount = update.consumedCount;
-      closeModalDirect();
-    }
-
-    await updateDoc(doc(db, 'cellar', id), update);
-    state.lastUpdated = new Date();
+    firestoreUpdate = { ...firestoreUpdate, quantity: 0, status: 'consumed', statusLabel: 'Consumed', consumedDate };
+    closeModalDirect();
     renderInventory();
+  }
+
+  try {
+    await updateDoc(doc(db, 'cellar', id), firestoreUpdate);
+    state.lastUpdated = new Date();
     showSuccessToast('Bottle marked as consumed');
-    if (currentQty > 1) openModal(id); // Keep modal open if more left
   } catch (e) {
     console.error('Failed to update Firestore:', e);
-    showErrorToast('Could not mark bottle as consumed');
+    state.inventory[id] = previous;
+    renderInventory();
+    showErrorToast('Could not mark bottle as consumed — changes reverted');
   }
 }
 
 export async function setRating(id, liked) {
   if (!state.currentUser) return;
   const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
+
+  const previous = { ...state.inventory[id] };
+  const newValue = (previous.liked === liked) ? null : liked;
+
+  // Optimistic update
+  if (newValue === null) {
+    const optimistic = { ...previous };
+    delete optimistic.liked;
+    state.inventory[id] = optimistic;
+  } else {
+    state.inventory[id] = { ...previous, liked: newValue };
+  }
+  openModal(id);
+  renderInventory();
+
+  const firestoreUpdate = newValue === null
+    ? { liked: deleteField(), updatedAt: serverTimestamp() }
+    : { liked: newValue, updatedAt: serverTimestamp() };
+
   try {
-    const current = state.inventory[id].liked;
-    const newValue = (current === liked) ? null : liked;
-    const update = newValue === null ? { liked: deleteField(), updatedAt: serverTimestamp() } : { liked: newValue, updatedAt: serverTimestamp() };
-    await updateDoc(doc(db, 'cellar', id), update);
-    if (newValue === null) {
-      delete state.inventory[id].liked;
-    } else {
-      state.inventory[id].liked = newValue;
-    }
+    await updateDoc(doc(db, 'cellar', id), firestoreUpdate);
     state.lastUpdated = new Date();
-    openModal(id);
-    renderInventory();
   } catch (e) {
     console.error('Failed to set rating:', e);
-    showErrorToast('Could not save rating');
+    state.inventory[id] = previous;
+    openModal(id);
+    renderInventory();
+    showErrorToast('Could not save rating — changes reverted');
   }
 }
 
@@ -225,35 +236,36 @@ export async function saveNewBottle(data) {
 export async function updateQuantity(id, newQty) {
   if (!state.currentUser) return;
   const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
-  try {
-    const qty = Math.max(0, newQty);
-    let update = { quantity: qty, updatedAt: serverTimestamp() };
-    if (qty === 0) {
-      const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      update.status = 'consumed';
-      update.statusLabel = 'Consumed';
-      update.consumedDate = consumedDate;
-      state.inventory[id].status = 'consumed';
-      state.inventory[id].statusLabel = 'Consumed';
-      state.inventory[id].consumedDate = consumedDate;
-    } else if (state.inventory[id].status === 'consumed') {
-      // Manual restock
-      update.status = 'ready';
-      update.statusLabel = 'Ready to Drink';
-      update.consumedDate = deleteField();
-      state.inventory[id].status = 'ready';
-      state.inventory[id].statusLabel = 'Ready to Drink';
-      delete state.inventory[id].consumedDate;
-    }
 
-    await updateDoc(doc(db, 'cellar', id), update);
-    state.inventory[id].quantity = qty;
+  const previous = { ...state.inventory[id] };
+  const qty = Math.max(0, newQty);
+  let optimistic = { ...previous, quantity: qty };
+  let firestoreUpdate = { quantity: qty, updatedAt: serverTimestamp() };
+
+  if (qty === 0) {
+    const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    optimistic = { ...optimistic, status: 'consumed', statusLabel: 'Consumed', consumedDate };
+    firestoreUpdate = { ...firestoreUpdate, status: 'consumed', statusLabel: 'Consumed', consumedDate };
+  } else if (previous.status === 'consumed') {
+    const { consumedDate: _removed, ...restOptimistic } = optimistic;
+    optimistic = { ...restOptimistic, status: 'ready', statusLabel: 'Ready to Drink' };
+    firestoreUpdate = { ...firestoreUpdate, status: 'ready', statusLabel: 'Ready to Drink', consumedDate: deleteField() };
+  }
+
+  // Optimistic update
+  state.inventory[id] = optimistic;
+  openModal(id);
+  renderInventory();
+
+  try {
+    await updateDoc(doc(db, 'cellar', id), firestoreUpdate);
     state.lastUpdated = new Date();
-    openModal(id);
-    renderInventory();
   } catch (e) {
     console.error('Failed to update quantity:', e);
-    showErrorToast('Could not update quantity');
+    state.inventory[id] = previous;
+    openModal(id);
+    renderInventory();
+    showErrorToast('Could not update quantity — changes reverted');
   }
 }
 
