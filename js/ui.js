@@ -283,14 +283,16 @@ export function openModal(id) {
     </div>
 
     <div class="qty-row">
-      <div class="meta-item">
-        <span class="meta-label">In Stock</span>
-        <div class="qty-controls">
-          ${state.currentUser ? `<button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>` : ''}
-          <span class="qty-value">${w.quantity || 1}</span>
-          ${state.currentUser ? `<button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>` : ''}
+      ${!isConsumed ? `
+        <div class="meta-item">
+          <span class="meta-label">In Stock</span>
+          <div class="qty-controls">
+            ${state.currentUser ? `<button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>` : ''}
+            <span class="qty-value">${w.quantity || 1}</span>
+            ${state.currentUser ? `<button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>` : ''}
+          </div>
         </div>
-      </div>
+      ` : ''}
       <div class="meta-item">
         <span class="meta-label">Lifetime Consumed</span>
         <input type="number" class="qty-input" id="edit-consumed-count" value="${w.consumedCount || 0}" min="0" data-id="${id}">
