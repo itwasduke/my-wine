@@ -391,52 +391,163 @@ export function closeModalDirect() {
   document.getElementById('modalOverlay').classList.remove('active');
 }
 
+// ── Toast Notifications ────────────────────────────────────────────────────
+function createToastContainer() {
+  let container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      max-width: 400px;
+      z-index: 10000;
+    `;
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+export function showErrorToast(message) {
+  const container = createToastContainer();
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background: #c41e3a;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    animation: slideInUp 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'slideOutDown 0.3s ease-in forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+export function showSuccessToast(message) {
+  const container = createToastContainer();
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background: #2ecc71;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    animation: slideInUp 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'slideOutDown 0.3s ease-in forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Inject toast animations if not already present
+if (!document.querySelector('style[data-toasts]')) {
+  const style = document.createElement('style');
+  style.setAttribute('data-toasts', 'true');
+  style.textContent = `
+    @keyframes slideInUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideOutDown {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(100%); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 export function initUIListeners() {
+  // Restore preferences from localStorage
+  const savedFilter = localStorage.getItem('cellar_filter') || 'all';
+  const savedWineColor = localStorage.getItem('cellar_subfilter_wine') || 'all';
+  const savedConsumedLiked = localStorage.getItem('cellar_subfilter_consumed') || 'all';
+  const savedSort = localStorage.getItem('cellar_sort') || 'newest';
+
+  const filterBar = document.getElementById('filterBar');
+  const subFilterBar = document.getElementById('subFilterBar');
+  const consumedFilterBar = document.getElementById('consumedFilterBar');
+  const sortSelect = document.getElementById('sortSelect');
+
+  filterBar.dataset.filter = savedFilter;
+  state.wineColorFilter = savedWineColor;
+  state.consumedLikedFilter = savedConsumedLiked;
+  sortSelect.value = savedSort;
+
+  // Update UI to match
+  filterBar.querySelectorAll('.filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.filter === savedFilter)
+  );
+  document.querySelectorAll('.sub-filter-btn').forEach(b => {
+    const isActive = (b.dataset.color === savedWineColor) || (b.dataset.liked === savedConsumedLiked);
+    b.classList.toggle('active', isActive);
+  });
+
   // Filter bar clicks
-  document.getElementById('filterBar').addEventListener('click', e => {
+  filterBar.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
     const filter = btn.dataset.filter;
-    const bar = document.getElementById('filterBar');
-    bar.dataset.filter = filter;
-    bar.querySelectorAll('.filter-btn').forEach(b =>
+    filterBar.dataset.filter = filter;
+    filterBar.querySelectorAll('.filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.filter === filter)
     );
     state.wineColorFilter = 'all'; // Reset sub-filters on main change
-    state.consumedLikedFilter = 'all'; 
+    state.consumedLikedFilter = 'all';
     document.querySelectorAll('.sub-filter-btn').forEach(b => {
       const isWineAll = b.dataset.color === 'all';
       const isConsumedAll = b.dataset.liked === 'all';
       b.classList.toggle('active', isWineAll || isConsumedAll);
     });
+    localStorage.setItem('cellar_filter', filter);
+    localStorage.setItem('cellar_subfilter_wine', 'all');
+    localStorage.setItem('cellar_subfilter_consumed', 'all');
     renderInventory();
   });
 
   // Sub-filter clicks (Wine Color)
-  document.getElementById('subFilterBar').addEventListener('click', e => {
+  subFilterBar.addEventListener('click', e => {
     const btn = e.target.closest('.sub-filter-btn');
     if (!btn) return;
     state.wineColorFilter = btn.dataset.color;
     document.querySelectorAll('.sub-filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.color === state.wineColorFilter)
     );
+    localStorage.setItem('cellar_subfilter_wine', state.wineColorFilter);
     renderInventory();
   });
 
   // Sub-filter clicks (Consumed)
-  document.getElementById('consumedFilterBar').addEventListener('click', e => {
+  consumedFilterBar.addEventListener('click', e => {
     const btn = e.target.closest('.sub-filter-btn');
     if (!btn) return;
     state.consumedLikedFilter = btn.dataset.liked;
     document.querySelectorAll('#consumedFilterBar .sub-filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.liked === state.consumedLikedFilter)
     );
+    localStorage.setItem('cellar_subfilter_consumed', state.consumedLikedFilter);
     renderInventory();
   });
 
-  // Search input
+  // Search input with debounce
+  let searchTimeout;
   document.getElementById('searchInput').addEventListener('input', () => {
-    renderInventory();
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      renderInventory();
+    }, 150);
   });
 
   // Home link (logo)
@@ -446,9 +557,14 @@ export function initUIListeners() {
   });
 
   // Sort select
-  const sortSelect = document.getElementById('sortSelect');
-  sortSelect.addEventListener('change', () => renderInventory());
-  sortSelect.addEventListener('input', () => renderInventory());
+  sortSelect.addEventListener('change', () => {
+    localStorage.setItem('cellar_sort', sortSelect.value);
+    renderInventory();
+  });
+  sortSelect.addEventListener('input', () => {
+    localStorage.setItem('cellar_sort', sortSelect.value);
+    renderInventory();
+  });
 
   // Main content clicks (Event Delegation for cards)
   document.getElementById('main-content').addEventListener('click', e => {

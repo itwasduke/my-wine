@@ -89,6 +89,10 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.14 (April 14, 2026)**:
+    - feat: Search debouncing (150ms) to reduce rapid re-renders on every keystroke.
+    - feat: Filter/sub-filter/sort persistence via localStorage with graceful defaults.
+    - feat: Global error and success toast notifications with auto-dismiss. All Firestore write operations now show toasts on success or failure.
 - **v2.0.13 (April 14, 2026)**:
     - Maintenance: Remove ineffective background/border-color overrides on card status classes; rely solely on ::before accent border for status indication. Consumed opacity retained.
 - **v2.0.12 (April 14, 2026)**:

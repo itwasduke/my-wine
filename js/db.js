@@ -62,28 +62,29 @@ export async function loadInventory() {
 
 export async function deleteBottle(id) {
   if (!state.currentUser) return;
-  const { renderInventory, closeModalDirect } = await import('./ui.js');
+  const { renderInventory, closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     await deleteDoc(doc(db, 'cellar', id));
     delete state.inventory[id];
     state.lastUpdated = new Date();
     closeModalDirect();
     renderInventory();
+    showSuccessToast('Bottle removed from cellar');
   } catch (e) {
     console.error('Failed to delete from Firestore:', e);
-    alert('Could not remove bottle — check your connection and try again.');
+    showErrorToast('Could not remove bottle — check your connection');
   }
 }
 
 export async function markConsumed(id) {
   if (!state.currentUser) return;
-  const { renderInventory, closeModalDirect, openModal } = await import('./ui.js');
+  const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     const w = state.inventory[id];
     const currentQty = parseInt(w.quantity) || 1;
     const currentConsumed = parseInt(w.consumedCount) || 0;
-    
-    let update = { 
+
+    let update = {
       updatedAt: serverTimestamp(),
       consumedCount: currentConsumed + 1
     };
@@ -100,7 +101,7 @@ export async function markConsumed(id) {
       update.status = 'consumed';
       update.statusLabel = 'Consumed';
       update.consumedDate = consumedDate;
-      
+
       state.inventory[id].quantity = 0;
       state.inventory[id].status = 'consumed';
       state.inventory[id].statusLabel = 'Consumed';
@@ -112,15 +113,17 @@ export async function markConsumed(id) {
     await updateDoc(doc(db, 'cellar', id), update);
     state.lastUpdated = new Date();
     renderInventory();
+    showSuccessToast('Bottle marked as consumed');
     if (currentQty > 1) openModal(id); // Keep modal open if more left
   } catch (e) {
     console.error('Failed to update Firestore:', e);
+    showErrorToast('Could not mark bottle as consumed');
   }
 }
 
 export async function setRating(id, liked) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal } = await import('./ui.js');
+  const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
   try {
     const current = state.inventory[id].liked;
     const newValue = (current === liked) ? null : liked;
@@ -136,12 +139,13 @@ export async function setRating(id, liked) {
     renderInventory();
   } catch (e) {
     console.error('Failed to set rating:', e);
+    showErrorToast('Could not save rating');
   }
 }
 
 export async function toggleBuyAgain(id) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal } = await import('./ui.js');
+  const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
   try {
     const current = state.inventory[id].buyAgain || false;
     const newValue = !current;
@@ -157,12 +161,13 @@ export async function toggleBuyAgain(id) {
     renderInventory();
   } catch (e) {
     console.error('Failed to toggle Buy Again:', e);
+    showErrorToast('Could not update restock flag');
   }
 }
 
 export async function saveNewBottle(data) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal } = await import('./ui.js');
+  const { renderInventory, openModal, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
@@ -176,9 +181,9 @@ export async function saveNewBottle(data) {
       const w = state.inventory[existingId];
       const newQty = parseInt(data.quantity) || 1;
       const totalQty = (parseInt(w.quantity) || 0) + newQty;
-      
+
       if (confirm(`You already have "${w.name}" (${w.year}) in your cellar.\n\nRestock ${newQty} more to the existing entry?`)) {
-        const update = { 
+        const update = {
           quantity: totalQty,
           status: data.status, // Restock to Ready/Spirits
           statusLabel: data.statusLabel,
@@ -194,6 +199,7 @@ export async function saveNewBottle(data) {
         closeScanModal();
         renderInventory();
         openModal(existingId);
+        showSuccessToast('Bottle restocked');
         return;
       }
     }
@@ -204,6 +210,7 @@ export async function saveNewBottle(data) {
     state.lastUpdated = new Date();
     closeScanModal();
     renderInventory();
+    showSuccessToast('Bottle added to cellar');
   } catch (e) {
     console.error('Failed to save to Firestore:', e);
     document.getElementById('scanOverlay').classList.add('active');
@@ -211,12 +218,13 @@ export async function saveNewBottle(data) {
     status.className = 'scan-status error';
     document.getElementById('scanStatusText').textContent = 'Save failed — check Firestore rules';
     document.getElementById('scanSpinner').style.display = 'none';
+    showErrorToast('Could not save bottle');
   }
 }
 
 export async function updateQuantity(id, newQty) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal } = await import('./ui.js');
+  const { renderInventory, openModal, showErrorToast } = await import('./ui.js');
   try {
     const qty = Math.max(0, newQty);
     let update = { quantity: qty, updatedAt: serverTimestamp() };
@@ -237,7 +245,7 @@ export async function updateQuantity(id, newQty) {
       state.inventory[id].statusLabel = 'Ready to Drink';
       delete state.inventory[id].consumedDate;
     }
-    
+
     await updateDoc(doc(db, 'cellar', id), update);
     state.inventory[id].quantity = qty;
     state.lastUpdated = new Date();
@@ -245,12 +253,13 @@ export async function updateQuantity(id, newQty) {
     renderInventory();
   } catch (e) {
     console.error('Failed to update quantity:', e);
+    showErrorToast('Could not update quantity');
   }
 }
 
 export async function updateConsumedCount(id, newCount) {
   if (!state.currentUser) return;
-  const { updateLastUpdatedUI } = await import('./ui.js');
+  const { updateLastUpdatedUI, showErrorToast } = await import('./ui.js');
   try {
     const count = Math.max(0, parseInt(newCount) || 0);
     await updateDoc(doc(db, 'cellar', id), { consumedCount: count, updatedAt: serverTimestamp() });
@@ -259,11 +268,12 @@ export async function updateConsumedCount(id, newCount) {
     updateLastUpdatedUI();
   } catch (e) {
     console.error('Failed to update consumed count:', e);
+    showErrorToast('Could not update consumed count');
   }
 }
 
 export async function saveProScores(id, scoreData) {
-  const { openModal, updateLastUpdatedUI } = await import('./ui.js');
+  const { openModal, updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./ui.js');
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;
@@ -273,8 +283,10 @@ export async function saveProScores(id, scoreData) {
       openModal(id); // Refresh modal if it's currently open
     }
     updateLastUpdatedUI(); // Immediate UI update
+    showSuccessToast('Professional scores saved');
   } catch (e) {
     console.error('Failed to update scores in Firestore:', e);
+    showErrorToast('Could not save scores');
   }
 }
 
