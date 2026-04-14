@@ -32,6 +32,8 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v1.9.8 (April 14, 2026)**:
+    - Feature: Added "View the Collection" button to the Welcome screen, allowing unauthenticated users to browse the inventory in read-only mode.
 - **v1.9.7 (April 14, 2026)**:
     - Bug Fix: Restored the "In Stock" section for active inventory by refining the detection for consumed items.
 - **v1.9.6 (April 14, 2026)**:

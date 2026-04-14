@@ -57,7 +57,7 @@ export function updateAuthUI(user) {
 export function renderInventory() {
   const main   = document.getElementById('main-content');
   
-  if (!state.currentUser) {
+  if (!state.currentUser && !state.showInventoryUnauth) {
     renderWelcome();
     return;
   }
@@ -248,7 +248,10 @@ function renderWelcome() {
 
       <div style="text-align:center; padding-top:20px;">
         <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px; letter-spacing:0.05em;">Sign in with your Google account to begin your collection.</p>
-        <button class="consume-btn" id="welcomeSignInBtn" style="max-width:300px; margin:0 auto;">Get Started — Sign In</button>
+        <div style="display:flex; flex-direction:column; gap:12px; max-width:300px; margin:0 auto;">
+          <button class="consume-btn" id="welcomeSignInBtn">Get Started — Sign In</button>
+          <button class="consume-btn" id="welcomeViewBtn" style="border-color:var(--text-muted); color:var(--text-secondary);">View the Collection</button>
+        </div>
       </div>
     </div>
   `;
@@ -258,6 +261,15 @@ function renderWelcome() {
   if (welcomeSignInBtn) {
     welcomeSignInBtn.addEventListener('click', () => {
       document.getElementById('signInBtn').click();
+    });
+  }
+
+  // Attach event listener to the welcome view button
+  const welcomeViewBtn = document.getElementById('welcomeViewBtn');
+  if (welcomeViewBtn) {
+    welcomeViewBtn.addEventListener('click', () => {
+      state.showInventoryUnauth = true;
+      renderInventory();
     });
   }
 }

@@ -3,6 +3,7 @@ export const state = {
   currentUser: null,
   consumedLikedFilter: 'all',
   wineColorFilter: 'all',
+  showInventoryUnauth: false,
   lastUpdated: null
 };
 

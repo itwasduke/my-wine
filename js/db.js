@@ -11,9 +11,7 @@ export async function loadInventory() {
   const loadingEl = document.getElementById('cellar-loading');
 
   if (!state.currentUser) {
-    console.log('[Cellar] No user signed in, skipping loadInventory');
-    renderInventory();
-    return;
+    console.log('[Cellar] No user signed in, fetching public inventory…');
   }
 
   try {
@@ -57,6 +55,8 @@ export async function loadInventory() {
       ? `Firestore error (${e.code}) — ${e.message}`
       : `Could not load cellar: ${e?.message || e}`;
     if (loadingEl) loadingEl.textContent = msg;
+    // If it fails (maybe a rule change), still render welcome
+    renderInventory();
   }
 }
 
