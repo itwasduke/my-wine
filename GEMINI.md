@@ -89,6 +89,10 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.19 (April 14, 2026)**:
+    - fix: Complete aggressive cache-breaking for all JS module imports and sync Service Worker `APP_SHELL`. Updated all internal JS imports to use versioned query strings (`?v=2.0.19`) to ensure browsers always load the latest logic and the Service Worker pre-caches the correct URLs.
+- **v2.0.18 (April 14, 2026)**:
+    - UI: Applied `opacity: 0.6` to all card types (ready, soon, spirits, consumed) to match the dark aesthetic. Bumped cache version and updated query strings to force reload of CSS.
 - **v2.0.17 (April 14, 2026)**:
     - refactor: Split monolithic `js/ui.js` into three focused modules for improved maintainability: `js/render.js` (all rendering functions), `js/events.js` (all event listeners), and `js/modal.js` (modal-specific functions). `js/ui.js` now serves as a thin coordinator that re-exports public functions and maintains `updateAuthUI()`. No logic changes—pure structural refactoring to improve code organization and ease future maintenance.
 - **v2.0.16 (April 14, 2026)**:

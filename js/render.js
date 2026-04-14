@@ -1,5 +1,6 @@
-import { SECTIONS, state } from './state.js';
-import { renderAnalytics } from './analytics.js';
+import { SECTIONS, state } from './state.js?v=2.0.19';
+
+let lastRenderedHTML = '';
 
 function formatRelativeTime(date) {
   if (!date) return 'Never';
@@ -105,7 +106,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js');
+      const { loadInventory } = await import('./db.js?v=2.0.19');
       await loadInventory();
     });
   }
@@ -234,7 +235,7 @@ export function renderInventory() {
         return sec.status !== 'consumed';
       });
 
-  main.innerHTML = visibleSections
+  const newHTML = visibleSections
     .filter(sec => byStatus[sec.status]?.length)
     .map(sec => {
       let sectionItems = byStatus[sec.status];
@@ -251,15 +252,19 @@ export function renderInventory() {
       `;
     }).join('');
 
-  if (main.innerHTML === '') {
+  const finalHTML = newHTML || (() => {
     const emptyMsg = searchQuery
       ? `No bottles match "${searchQuery}"`
       : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.");
-    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${emptyMsg}</div>`;
+    return `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${emptyMsg}</div>`;
+  })();
+
+  if (finalHTML !== lastRenderedHTML) {
+    main.innerHTML = finalHTML;
+    lastRenderedHTML = finalHTML;
   }
 
   updateLastUpdatedUI();
-  renderAnalytics();
 }
 
 // ── Toast Notifications ────────────────────────────────────────────────────
