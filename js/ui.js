@@ -265,8 +265,9 @@ function renderWelcome() {
 export function openModal(id) {
   const w = state.inventory[id];
   if (!w) return;
-  const showConsumeBtn = state.currentUser && w.status !== 'consumed';
-  const isConsumed     = w.status === 'consumed' || w.quantity === 0 || w.statusLabel?.toLowerCase() === 'consumed';
+  const qty = parseInt(w.quantity) || 0;
+  const isConsumed = w.status === 'consumed' || qty <= 0 || w.statusLabel?.toLowerCase() === 'consumed';
+  const showConsumeBtn = state.currentUser && !isConsumed;
   const showRating     = state.currentUser && isConsumed;
   const el = document.getElementById('modalContent');
   el.dataset.openId = id;
@@ -288,7 +289,7 @@ export function openModal(id) {
           <span class="meta-label">In Stock</span>
           <div class="qty-controls">
             ${state.currentUser ? `<button class="qty-btn" data-action="qty-dec" data-id="${id}">–</button>` : ''}
-            <span class="qty-value">${w.quantity || 1}</span>
+            <span class="qty-value">${qty}</span>
             ${state.currentUser ? `<button class="qty-btn" data-action="qty-inc" data-id="${id}">+</button>` : ''}
           </div>
         </div>
