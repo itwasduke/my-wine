@@ -9,7 +9,6 @@ export const state = {
 export const SECTIONS = [
   { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },
   { status: 'soon',     label: 'Drink Soon',               cls: 'soon' },
-  { status: 'cook',     label: 'For Cooking',              cls: 'cook' },
   { status: 'spirits',  label: 'Spirits',                  cls: 'spirits' },
   { status: 'consumed', label: 'Consumed',                 cls: 'consumed' },
 ];

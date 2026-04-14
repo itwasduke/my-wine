@@ -14,7 +14,6 @@
   /* Section colours — all verified ≥4.5:1 on --bg */
   --ready:          #2ECC71;  /* emerald   6.9:1 */
   --soon:           #F39C12;  /* amber     7.0:1 */
-  --cook:           #7AAFC8;  /* slate     7.1:1 */
   --spirits:        #CC9944;  /* copper    6.4:1 */
   --consumed:       #9AA3AB;  /* gray      6.5:1 */
 }
@@ -41,13 +40,11 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 .section-title { font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 0.25em; text-transform: uppercase; white-space: nowrap; }
 .section-title.ready    { color: var(--ready); }
 .section-title.soon     { color: var(--soon); }
-.section-title.cook     { color: var(--cook); }
 .section-title.spirits  { color: var(--spirits); }
 .section-title.consumed { color: var(--consumed); }
 .section-line { flex: 1; height: 1px; }
 .section-line.ready    { background: linear-gradient(to right, var(--ready),    transparent); }
 .section-line.soon     { background: linear-gradient(to right, var(--soon),     transparent); }
-.section-line.cook     { background: linear-gradient(to right, var(--cook),     transparent); }
 .section-line.spirits  { background: linear-gradient(to right, var(--spirits),  transparent); }
 .section-line.consumed { background: linear-gradient(to right, var(--consumed), transparent); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
@@ -69,7 +66,6 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 }
 .card.ready::before    { background: var(--ready); }
 .card.soon::before     { background: var(--soon); }
-.card.cook::before     { background: var(--cook); }
 .card.spirits::before  { background: var(--spirits); }
 .card.consumed::before { background: var(--consumed); }
 .card.consumed { opacity: 0.6; }
@@ -77,7 +73,6 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 .card-year { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em; margin-bottom: 6px; }
 .card.ready .card-year    { color: var(--ready); }
 .card.soon .card-year     { color: var(--soon); }
-.card.cook .card-year     { color: var(--cook); }
 .card.spirits .card-year  { color: var(--spirits); }
 .card.consumed .card-year { color: var(--consumed); }
 .card-name { font-family: 'Cinzel', serif; font-size: 0.98rem; font-weight: 400; color: var(--text-primary); margin-bottom: 5px; line-height: 1.35; }
@@ -190,7 +185,6 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 40px 80px; }
 }
 .status-ready    { background: rgba(46,204,113,0.12);  color: var(--ready);    border: 1px solid rgba(46,204,113,0.3); }
 .status-soon     { background: rgba(243,156,18,0.12);  color: var(--soon);     border: 1px solid rgba(243,156,18,0.3); }
-.status-cook     { background: rgba(122,175,200,0.12); color: var(--cook);     border: 1px solid rgba(122,175,200,0.3); }
 .status-spirits  { background: rgba(204,153,68,0.12);  color: var(--spirits);  border: 1px solid rgba(204,153,68,0.3); }
 .status-consumed { background: rgba(154,163,171,0.1);  color: var(--consumed); border: 1px solid rgba(154,163,171,0.25); }
 .badge-consumed  { background: rgba(154,163,171,0.1);  color: var(--consumed); border: 1px solid rgba(154,163,171,0.2); }

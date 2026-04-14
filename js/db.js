@@ -32,8 +32,8 @@ export async function loadInventory() {
         item.type = 'spirit';
       }
 
-      // Fallback for missing status (legacy data)
-      if (!item.status) {
+      // Fallback for missing status (legacy data) or removed 'cook' status
+      if (!item.status || item.status === 'cook') {
         if (item.type === 'spirit' || item.region === 'Japan') { 
           item.status = 'spirits';
         } else {

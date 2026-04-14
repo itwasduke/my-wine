@@ -261,7 +261,7 @@ function renderWelcome() {
 export function openModal(id) {
   const w = state.inventory[id];
   if (!w) return;
-  const showConsumeBtn = state.currentUser && w.status !== 'consumed' && w.status !== 'cook';
+  const showConsumeBtn = state.currentUser && w.status !== 'consumed';
   const showRating     = state.currentUser && w.status === 'consumed';
   const el = document.getElementById('modalContent');
   el.dataset.openId = id;

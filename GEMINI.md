@@ -27,10 +27,12 @@ Personal wine & spirits inventory tracker built as a high-end, mobile-first PWA.
 - `notes`: AI-generated or user-provided tasting notes.
 - `decant`: Decanting recommendation.
 - `window`: Drinking window.
-- `status`: One of `ready`, `soon`, `cook`, `spirits`, `consumed`.
+- `status`: One of `ready`, `soon`, `spirits`, `consumed`.
 - `rating`: (Optional) `up` or `down` for consumed bottles.
 
 ## Version History
+- **v1.8.9 (April 14, 2026)**:
+    - Feature Removal: Removed the "For Cooking" section and associated `cook` status as requested.
 - **v1.8.8 (April 14, 2026)**:
     - Resolved Circular Dependency: Used dynamic imports in `bulkUpdateScores` and `bulkTagWineColor` and cleaned up `db.js`.
 - **v1.8.7 (April 14, 2026)**:
