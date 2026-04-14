@@ -65,6 +65,9 @@
 .card.spirits::before  { background: var(--spirits); }
 .card.consumed::before { background: var(--consumed); }
 
+.card.ready,
+.card.soon,
+.card.spirits,
 .card.consumed {
   opacity: 0.6;
 }

@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.11 (April 14, 2026)**:
+    - UI: Applied opacity: 0.6 to all card types (ready, soon, spirits) to match consumed card styling.
 - **v2.0.10 (April 14, 2026)**:
     - Maintenance: Implemented aggressive cache-breaking by appending version query strings to CSS and JS imports. This ensures that UI readability improvements and thematic styling are immediately visible to all users, bypassing stubborn Service Worker or browser caches.
 - **v2.0.9 (April 14, 2026)**:
