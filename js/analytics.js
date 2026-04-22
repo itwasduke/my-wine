@@ -1,10 +1,8 @@
-import { state } from './state.js?v=2.0.22';
-
-export function renderAnalytics() {
+export function renderAnalytics(inventory) {
   const container = document.getElementById('analytics-dashboard');
   if (!container) return;
 
-  const allBottles = Object.values(state.inventory);
+  const allBottles = Object.values(inventory);
   const activeBottles = allBottles.filter(w => w.status !== 'consumed');
   const consumedBottles = allBottles.filter(w => w.status === 'consumed');
   

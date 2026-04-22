@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.22';
+import { SECTIONS, state } from './state.js?v=2.0.23';
 
 let lastRenderedHTML = '';
 
@@ -106,7 +106,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.22');
+      const { loadInventory } = await import('./db.js?v=2.0.23');
       await loadInventory();
     });
   }
@@ -262,12 +262,6 @@ export function renderInventory() {
   if (finalHTML !== lastRenderedHTML) {
     main.innerHTML = finalHTML;
     lastRenderedHTML = finalHTML;
-  }
-
-  // If analytics modal is open, refresh it
-  const analyticsOverlay = document.getElementById('analyticsOverlay');
-  if (analyticsOverlay && analyticsOverlay.classList.contains('active')) {
-    import('./analytics.js?v=2.0.22').then(m => m.renderAnalytics());
   }
 
   updateLastUpdatedUI();
