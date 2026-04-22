@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/fireba
 import { initializeFirestore, persistentLocalCache } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
+// Note: cellar.jaihimself.com must be added to Firebase Console > Authentication > Authorized domains
 const firebaseConfig = {
   apiKey: "AIzaSyDSI59xpcHzwk6mwHA9ocQZePfjoGpholw",
   authDomain: "my-wine-616a8.firebaseapp.com",

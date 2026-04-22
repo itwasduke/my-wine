@@ -89,6 +89,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.20 (April 22, 2026)**:
+    - deploy: Migrated hosting from GitHub Pages to Cloudflare Pages at cellar.jaihimself.com. No code changes—production URL is now cellar.jaihimself.com instead of jaihimself.github.io. Firebase Auth authorized domains updated to include the new production domain.
 - **v2.0.19 (April 14, 2026)**:
     - fix: Complete aggressive cache-breaking for all JS module imports and sync Service Worker `APP_SHELL`. Updated all internal JS imports to use versioned query strings (`?v=2.0.19`) to ensure browsers always load the latest logic and the Service Worker pre-caches the correct URLs.
 - **v2.0.18 (April 14, 2026)**:

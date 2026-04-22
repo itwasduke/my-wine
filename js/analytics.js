@@ -1,4 +1,4 @@
-import { state } from './state.js?v=2.0.19';
+import { state } from './state.js?v=2.0.20';
 
 export function renderAnalytics() {
   const container = document.getElementById('analytics-dashboard');
