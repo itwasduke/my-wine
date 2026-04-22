@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.28';
+import { SECTIONS, state } from './state.js?v=2.0.29';
 
 let lastRenderedHTML = '';
 
@@ -193,7 +193,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.28');
+      const { loadInventory } = await import('./db.js?v=2.0.29');
       await loadInventory();
     });
   }

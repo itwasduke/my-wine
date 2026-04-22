@@ -67,13 +67,13 @@
 
 .gallery-card {
   position: absolute;
-  width: 85%;
-  height: 90%;
-  max-width: 400px;
-  max-height: 600px;
+  width: 70%;
+  height: 80%;
+  max-width: 340px;
+  max-height: 520px;
   background: #242424;
   border-radius: 20px;
-  padding: 32px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -98,9 +98,9 @@
 
 .gallery-card-year {
   font-family: 'Cinzel', serif;
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   line-height: 1;
 }
 
@@ -111,10 +111,10 @@
 
 .gallery-card-name {
   font-family: 'Cinzel', serif;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 400;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -125,7 +125,7 @@
 .gallery-card-meta {
   font-family: 'Raleway', sans-serif;
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.85rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -136,7 +136,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .gallery-card-footer {
@@ -146,9 +146,9 @@
 }
 
 .gallery-badge {
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -158,12 +158,12 @@
 
 .gallery-qty {
   font-family: 'Cinzel', serif;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--accent);
 }
 
 .gallery-star {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 /* Pagination */
@@ -214,10 +214,10 @@
 
 /* Position states for windowing - 3D Effect */
 .card-prev { 
-  transform: translateX(-55%) translateZ(-300px) rotateY(25deg); 
-  opacity: 0.35; 
+  transform: translateX(-62%) translateZ(-400px) rotateY(35deg); 
+  opacity: 0.5; 
   z-index: 1; 
-  filter: blur(2px);
+  filter: blur(1.5px);
   pointer-events: none;
 }
 
@@ -229,10 +229,10 @@
 }
 
 .card-next { 
-  transform: translateX(55%) translateZ(-300px) rotateY(-25deg); 
-  opacity: 0.35; 
+  transform: translateX(62%) translateZ(-400px) rotateY(-35deg); 
+  opacity: 0.5; 
   z-index: 1; 
-  filter: blur(2px);
+  filter: blur(1.5px);
   pointer-events: none;
 }
 
