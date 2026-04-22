@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.26';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.26';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.26';
+import { state } from './state.js?v=2.0.27';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.27';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.27';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -32,6 +32,7 @@ export function initUIListeners() {
   filterBar.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
+    state.galleryIndex = 0;
     const filter = btn.dataset.filter;
     filterBar.dataset.filter = filter;
     filterBar.querySelectorAll('.filter-btn').forEach(b =>
@@ -54,6 +55,7 @@ export function initUIListeners() {
   subFilterBar.addEventListener('click', e => {
     const btn = e.target.closest('.sub-filter-btn');
     if (!btn) return;
+    state.galleryIndex = 0;
     state.wineColorFilter = btn.dataset.color;
     document.querySelectorAll('.sub-filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.color === state.wineColorFilter)
@@ -66,6 +68,7 @@ export function initUIListeners() {
   consumedFilterBar.addEventListener('click', e => {
     const btn = e.target.closest('.sub-filter-btn');
     if (!btn) return;
+    state.galleryIndex = 0;
     state.consumedLikedFilter = btn.dataset.liked;
     document.querySelectorAll('#consumedFilterBar .sub-filter-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.liked === state.consumedLikedFilter)
@@ -77,6 +80,7 @@ export function initUIListeners() {
   // Search input with debounce
   let searchTimeout;
   document.getElementById('searchInput').addEventListener('input', () => {
+    state.galleryIndex = 0;
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
       renderInventory();
@@ -91,17 +95,117 @@ export function initUIListeners() {
 
   // Sort select
   sortSelect.addEventListener('change', () => {
+    state.galleryIndex = 0;
     localStorage.setItem('cellar_sort', sortSelect.value);
     renderInventory();
   });
   sortSelect.addEventListener('input', () => {
+    state.galleryIndex = 0;
     localStorage.setItem('cellar_sort', sortSelect.value);
     renderInventory();
   });
 
+  // View Toggle clicks
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.viewMode = btn.dataset.view;
+      state.galleryIndex = 0;
+      localStorage.setItem('cellar_view_mode', state.viewMode);
+      renderInventory();
+    });
+  });
+
+  // ── Gallery Swipe & Navigation ──────────────────────────────────────────
+  let touchStartX = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    if (state.viewMode !== 'gallery') return;
+    const container = e.target.closest('#galleryContainer');
+    if (!container) return;
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (state.viewMode !== 'gallery') return;
+    const container = e.target.closest('#galleryContainer');
+    if (!container) return;
+
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndTime = Date.now();
+    const distance = touchEndX - touchStartX;
+    const duration = touchEndTime - touchStartTime;
+    const velocity = Math.abs(distance) / duration;
+
+    // Minimum swipe distance of 50px or fast flick
+    if (Math.abs(distance) > 50 || (Math.abs(distance) > 20 && velocity > 0.5)) {
+      const pagination = document.querySelector('.gallery-pagination');
+      if (!pagination) return;
+      const total = parseInt(pagination.textContent.split(' of ')[1]);
+
+      if (distance > 0) {
+        // Swipe Right -> Previous
+        if (state.galleryIndex > 0) {
+          state.galleryIndex--;
+        } else {
+          // Bounce
+          const stage = document.getElementById('galleryStage');
+          stage.classList.remove('bounce-left');
+          void stage.offsetWidth; // Trigger reflow
+          stage.classList.add('bounce-left');
+          return;
+        }
+      } else {
+        // Swipe Left -> Next
+        if (state.galleryIndex < total - 1) {
+          state.galleryIndex++;
+        } else {
+          // Bounce
+          const stage = document.getElementById('galleryStage');
+          stage.classList.remove('bounce-right');
+          void stage.offsetWidth; // Trigger reflow
+          stage.classList.add('bounce-right');
+          return;
+        }
+      }
+      renderInventory();
+    }
+  }, { passive: true });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (state.viewMode !== 'gallery') return;
+    const pagination = document.querySelector('.gallery-pagination');
+    if (!pagination) return;
+    const total = parseInt(pagination.textContent.split(' of ')[1]);
+
+    if (e.key === 'ArrowLeft') {
+      if (state.galleryIndex > 0) {
+        state.galleryIndex--;
+        renderInventory();
+      } else {
+        const stage = document.getElementById('galleryStage');
+        stage.classList.remove('bounce-left');
+        void stage.offsetWidth;
+        stage.classList.add('bounce-left');
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (state.galleryIndex < total - 1) {
+        state.galleryIndex++;
+        renderInventory();
+      } else {
+        const stage = document.getElementById('galleryStage');
+        stage.classList.remove('bounce-right');
+        void stage.offsetWidth;
+        stage.classList.add('bounce-right');
+      }
+    }
+  });
+
   // Main content clicks (Event Delegation for cards)
   document.getElementById('main-content').addEventListener('click', e => {
-    const card = e.target.closest('.card');
+    const card = e.target.closest('.card, .gallery-card');
     if (card) {
       openModal(card.dataset.id);
       return;
@@ -139,7 +243,7 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.26');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.27');
     renderAnalytics(state.inventory);
   });
 
@@ -166,7 +270,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.26');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.27');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -178,7 +282,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.26');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.27');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -191,7 +295,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.26');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.27');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -202,10 +306,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.26');
+      const { markConsumed } = await import('./db.js?v=2.0.27');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.26');
+      const { updateQuantity } = await import('./db.js?v=2.0.27');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -213,8 +317,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.26');
-      const { saveProScores }   = await import('./db.js?v=2.0.26');
+      const { lookupProScores } = await import('./ai.js?v=2.0.27');
+      const { saveProScores }   = await import('./db.js?v=2.0.27');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -224,13 +328,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.26');
+      const { setRating } = await import('./db.js?v=2.0.27');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.26');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.27');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.26');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.27');
       confirmDeleteBottle(id);
     }
   });

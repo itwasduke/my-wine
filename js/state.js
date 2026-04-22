@@ -3,6 +3,8 @@ export const state = {
   currentUser: null,
   consumedLikedFilter: 'all',
   wineColorFilter: 'all',
+  viewMode: localStorage.getItem('cellar_view_mode') || 'grid',
+  galleryIndex: 0,
   showInventoryUnauth: false,
   lastUpdated: null
 };

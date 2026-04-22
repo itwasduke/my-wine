@@ -105,6 +105,13 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.27 (April 22, 2026)**:
+    - feat: Added Gallery Mode — a horizontal swipe view for browsing bottles on mobile.
+    - feat: Added Grid/Gallery view toggle with persistent preference in localStorage.
+    - feat: Implemented native touch swipe navigation with rubber band effects and keyboard support.
+    - UI: Enhanced card design for Gallery mode with large typography and thematic gradients.
+    - Performance: Optimized rendering to only keep 3 cards in the DOM at a time.
+    - Accessibility: Added screen reader announcements and a first-use swipe hint.
 - **v2.0.26 (April 22, 2026)**:
     - feat: Added "Added Date" to inventory cards. New bottles now track and display the date they were added to the cellar.
 - **v2.0.25 (April 22, 2026)**:

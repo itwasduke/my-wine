@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.26';
+import { SECTIONS, state } from './state.js?v=2.0.27';
 
 let lastRenderedHTML = '';
 
@@ -48,6 +48,87 @@ function cardHTML(w) {
       </div>
     </div>
   `;
+}
+
+function galleryCardHTML(w, position) {
+  if (!w) return '';
+  const qtyBadge = (parseInt(w.quantity) > 1) ? `<span class="gallery-qty">×${w.quantity}</span>` : '';
+  const starBadge = (w.buyAgain) ? '<span class="gallery-star">⭐</span>' : '';
+  
+  const section = SECTIONS.find(s => s.status === w.status);
+  const badgeLabel = w.status === 'consumed' 
+    ? `Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}`
+    : (w.badge || (section ? section.label : w.status));
+  
+  return `
+    <div class="gallery-card ${w.status} card-${position}" data-id="${w.id}">
+      <div class="gallery-card-header">
+        <div class="gallery-card-year">${w.year}</div>
+        <div class="gallery-card-name">${w.name}</div>
+        <div class="gallery-card-meta">${w.region}${w.grape ? ` · ${w.grape}` : ''}</div>
+      </div>
+      <div class="gallery-card-body">
+        <!-- Center space for potential image or just spacing -->
+      </div>
+      <div class="gallery-card-footer">
+        <div class="gallery-badge">${badgeLabel}</div>
+        <div class="gallery-badges-right">${starBadge}${qtyBadge}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGallery(items) {
+  const main = document.getElementById('main-content');
+  if (items.length === 0) {
+    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match your filters.</div>`;
+    return;
+  }
+
+  // Ensure index is within bounds
+  if (state.galleryIndex >= items.length) state.galleryIndex = items.length - 1;
+  if (state.galleryIndex < 0) state.galleryIndex = 0;
+
+  const prev = items[state.galleryIndex - 1];
+  const curr = items[state.galleryIndex];
+  const next = items[state.galleryIndex + 1];
+
+  const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
+  const hintHtml = showHint ? '<div class="gallery-hint">Swipe to browse</div>' : '';
+
+  main.innerHTML = `
+    <div class="gallery-container" id="galleryContainer">
+      ${hintHtml}
+      <div class="gallery-stage" id="galleryStage">
+        ${galleryCardHTML(prev, 'prev')}
+        ${galleryCardHTML(curr, 'curr')}
+        ${galleryCardHTML(next, 'next')}
+      </div>
+    </div>
+    <div class="gallery-pagination">
+      ${state.galleryIndex + 1} of ${items.length}
+    </div>
+  `;
+
+  // Announce to screen readers
+  const announcement = `Bottle ${state.galleryIndex + 1} of ${items.length}: ${curr.year} ${curr.name}`;
+  let liveRegion = document.getElementById('gallery-live-region');
+  if (!liveRegion) {
+    liveRegion = document.createElement('div');
+    liveRegion.id = 'gallery-live-region';
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.style.cssText = 'position:absolute; width:1px; height:1px; overflow:hidden;';
+    document.body.appendChild(liveRegion);
+  }
+  liveRegion.textContent = announcement;
+
+  if (showHint) {
+    setTimeout(() => {
+      localStorage.setItem('cellar_gallery_hint_seen', 'true');
+      const hint = document.querySelector('.gallery-hint');
+      if (hint) hint.remove();
+    }, 3000);
+  }
 }
 
 function renderWelcome() {
@@ -108,7 +189,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.26');
+      const { loadInventory } = await import('./db.js?v=2.0.27');
       await loadInventory();
     });
   }
@@ -125,6 +206,11 @@ export function renderInventory() {
   }
 
   if (controls) controls.style.display = 'block';
+
+  // Update View Toggle UI
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === state.viewMode);
+  });
 
   let filter = document.getElementById('filterBar')?.dataset.filter || 'all';
 
@@ -212,6 +298,12 @@ export function renderInventory() {
         return b.id.localeCompare(a.id);
     }
   });
+
+  if (state.viewMode === 'gallery') {
+    renderGallery(items);
+    lastRenderedHTML = ''; // Reset cache for gallery mode
+    return;
+  }
 
   // 3. Group by Status
   const byStatus = {};
