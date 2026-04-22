@@ -1,6 +1,6 @@
-import { app } from './firebase.js?v=2.0.24';
-import { state } from './state.js?v=2.0.24';
-import { saveNewBottle } from './db.js?v=2.0.24';
+import { app } from './firebase.js?v=2.0.25';
+import { state } from './state.js?v=2.0.25';
+import { saveNewBottle } from './db.js?v=2.0.25';
 
 export async function handleImageSelected(event) {
   const file = event.target.files[0];
@@ -35,12 +35,12 @@ export async function handleImageSelected(event) {
     try {
       const { getVertexAI, getGenerativeModel } =
         await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-1.5-flash' });
+      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
     } catch (e1) {
       try {
         const { getAI, getGenerativeModel, GoogleAIBackend } =
           await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-        geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-1.5-flash' });
+        geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
       } catch (e2) {
         sdkLoadError = e2;
       }
@@ -154,11 +154,11 @@ export async function guessWineColor(bottle) {
   try {
     const { getVertexAI, getGenerativeModel } =
       await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-1.5-flash' });
+    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
   } catch (e) {
     const { getAI, getGenerativeModel, GoogleAIBackend } =
       await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-1.5-flash' });
+    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
   }
 
   const prompt = `Identify the color/style of this wine based on its name and grape:
@@ -218,11 +218,11 @@ export async function lookupProScores(bottle) {
   try {
     const { getVertexAI, getGenerativeModel } =
       await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-1.5-flash' });
+    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
   } catch (e) {
     const { getAI, getGenerativeModel, GoogleAIBackend } =
       await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-1.5-flash' });
+    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
   }
 
   const prompt = `You are an expert wine critic. Find professional scores and ratings for this bottle:
