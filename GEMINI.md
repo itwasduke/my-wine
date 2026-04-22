@@ -105,6 +105,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.28 (April 22, 2026)**:
+    - (Add your changes here)
 - **v2.0.27 (April 22, 2026)**:
     - feat: Added Gallery Mode — a horizontal swipe view for browsing bottles on mobile.
     - feat: Added Grid/Gallery view toggle with persistent preference in localStorage.

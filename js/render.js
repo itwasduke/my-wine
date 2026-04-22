@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.27';
+import { SECTIONS, state } from './state.js?v=2.0.28';
 
 let lastRenderedHTML = '';
 
@@ -89,9 +89,13 @@ function renderGallery(items) {
   if (state.galleryIndex >= items.length) state.galleryIndex = items.length - 1;
   if (state.galleryIndex < 0) state.galleryIndex = 0;
 
-  const prev = items[state.galleryIndex - 1];
+  // Looping indices for background cards (prev/next)
+  const prevIdx = (state.galleryIndex - 1 + items.length) % items.length;
+  const nextIdx = (state.galleryIndex + 1) % items.length;
+
+  const prev = items[prevIdx];
   const curr = items[state.galleryIndex];
-  const next = items[state.galleryIndex + 1];
+  const next = items[nextIdx];
 
   const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
   const hintHtml = showHint ? '<div class="gallery-hint">Swipe to browse</div>' : '';
@@ -100,9 +104,9 @@ function renderGallery(items) {
     <div class="gallery-container" id="galleryContainer">
       ${hintHtml}
       <div class="gallery-stage" id="galleryStage">
-        ${galleryCardHTML(prev, 'prev')}
+        ${items.length > 1 ? galleryCardHTML(prev, 'prev') : ''}
         ${galleryCardHTML(curr, 'curr')}
-        ${galleryCardHTML(next, 'next')}
+        ${items.length > 2 ? galleryCardHTML(next, 'next') : ''}
       </div>
     </div>
     <div class="gallery-pagination">
@@ -189,7 +193,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.27');
+      const { loadInventory } = await import('./db.js?v=2.0.28');
       await loadInventory();
     });
   }
