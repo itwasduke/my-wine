@@ -630,6 +630,10 @@ select.form-input option {
   font-size: 1.1rem;
   color: var(--accent);
   margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
 }
 
 .analytics-dashboard-modal .analytics-label {

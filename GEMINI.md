@@ -105,6 +105,9 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.22 (April 22, 2026)**:
+    - fix: Fixed Analytics Dashboard in the hamburger menu. Dashboard no longer hides when active bottles are 0, added "Lifetime Finished" stat, implemented real-time refresh when modal is open, and added a placeholder for empty collections.
+    - UI: Improved dashboard layout with ellipsis for long region names.
 - **v2.0.21 (April 22, 2026)**:
     - fix: Synchronized all internal JS module imports and Service Worker `APP_SHELL` to `v2.0.21` to resolve a PWA cache mismatch.
     - UI: Updated hardcoded "Last updated" date in header to reflect the current release.
