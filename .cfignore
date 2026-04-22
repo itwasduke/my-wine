@@ -1,0 +1,9 @@
+node_modules/
+scripts/
+GEMINI.md
+BACKUP.md
+firestore.rules
+.git/
+*.md
+package.json
+package-lock.json
