@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.25';
+import { SECTIONS, state } from './state.js?v=2.0.26';
 
 let lastRenderedHTML = '';
 
@@ -34,12 +34,14 @@ function cardHTML(w) {
   const likedIcon = (w.status === 'consumed' && w.liked === true)
     ? `<span class="card-liked-icon" title="Liked" style="color:var(--accent)">👍</span>`
     : '';
+  const addedDateHtml = w.addedDate ? `<div class="card-added-date">Added ${w.addedDate}</div>` : '';
   return `
     <div class="card ${w.status}" data-id="${w.id}">
       ${likedIcon}
       <div class="card-year">${w.year}</div>
       <div class="card-name">${w.name}</div>
       <div class="card-region">${w.region}</div>
+      ${addedDateHtml}
       <div class="card-footer">
         <div class="card-badges-left">${badge}</div>
         <div class="card-badges-right">${starBadge}${qtyBadge}</div>
@@ -106,7 +108,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.25');
+      const { loadInventory } = await import('./db.js?v=2.0.26');
       await loadInventory();
     });
   }

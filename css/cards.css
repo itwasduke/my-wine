@@ -106,6 +106,14 @@
   color: var(--text-secondary);
 }
 
+.card-added-date {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* ── Card Badge ────────────────────────────────────────────────────────── */
 .card-badge {
   display: inline-block;
