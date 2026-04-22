@@ -26,6 +26,22 @@ Deploy Firestore rules when changed:
 firebase deploy --only firestore:rules
 ```
 
+## Deployment
+
+**Production URL:** `cellar.jaihimself.com`
+
+**Hosting:** Cloudflare Pages (auto-deploys from GitHub main branch)
+
+The app is automatically deployed to Cloudflare Pages whenever you push to the `main` branch on GitHub. There is no manual deployment step required — `git push` triggers the deployment automatically.
+
+**GitHub's role:** Source control only. GitHub is not used for hosting; it is solely the source repository. Cloudflare Pages watches the GitHub main branch, clones it, and serves the static files from `cellar.jaihimself.com`.
+
+**Firestore rules:** Deploy separately when updated:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
 ## Module Graph
 
 `index.html` loads only `js/app.js` as an ES module entry point. All other modules are imported from there or lazily via dynamic `import()`.
@@ -89,6 +105,10 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.21 (April 22, 2026)**:
+    - fix: Synchronized all internal JS module imports and Service Worker `APP_SHELL` to `v2.0.21` to resolve a PWA cache mismatch.
+    - UI: Updated hardcoded "Last updated" date in header to reflect the current release.
+    - Maintenance: Bumped Service Worker `SHELL_CACHE` to `v47` to force clients to pick up versioned asset changes.
 - **v2.0.20 (April 22, 2026)**:
     - deploy: Migrated hosting from GitHub Pages to Cloudflare Pages at cellar.jaihimself.com. No code changes—production URL is now cellar.jaihimself.com instead of jaihimself.github.io. Firebase Auth authorized domains updated to include the new production domain.
 - **v2.0.19 (April 14, 2026)**:
