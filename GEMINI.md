@@ -106,11 +106,11 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 
 ## Version History
 - **v2.0.26 (April 22, 2026)**:
-    - (Add your changes here)
+    - feat: Added "Added Date" to inventory cards. New bottles now track and display the date they were added to the cellar.
 - **v2.0.25 (April 22, 2026)**:
-    - (Add your changes here)
+    - feat: Upgrade AI model to `gemini-2.5-flash` for improved reasoning and label OCR.
 - **v2.0.24 (April 22, 2026)**:
-    - fix: Switched AI model to `gemini-1.5-flash` to resolve 404 errors with the previous 2.0-flash endpoint.
+    - fix: Switched AI model to `gemini-1.5-flash` as an intermediate fix for 404 errors with the previous 2.0-flash endpoint.
 - **v2.0.23 (April 22, 2026)**:
     - fix: Resolved a loading issue that prevented the database from initializing.
     - refactor: Decoupled `analytics.js` from `state.js` to prevent circular dependencies.
