@@ -105,6 +105,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.24 (April 22, 2026)**:
+    - fix: Switched AI model to `gemini-1.5-flash` to resolve 404 errors with the previous 2.0-flash endpoint.
 - **v2.0.23 (April 22, 2026)**:
     - fix: Resolved a loading issue that prevented the database from initializing.
     - refactor: Decoupled `analytics.js` from `state.js` to prevent circular dependencies.
