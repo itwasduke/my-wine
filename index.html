@@ -16,11 +16,11 @@
 <link rel="apple-touch-icon" href="icon.svg">
 
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css?v=2.0.41">
-<link rel="stylesheet" href="css/cards.css?v=2.0.41">
-<link rel="stylesheet" href="css/modal.css?v=2.0.41">
-<link rel="stylesheet" href="css/gallery.css?v=2.0.41">
-<link rel="stylesheet" href="css/style.css?v=2.0.41">
+<link rel="stylesheet" href="css/base.css?v=2.0.42">
+<link rel="stylesheet" href="css/cards.css?v=2.0.42">
+<link rel="stylesheet" href="css/modal.css?v=2.0.42">
+<link rel="stylesheet" href="css/gallery.css?v=2.0.42">
+<link rel="stylesheet" href="css/style.css?v=2.0.42">
 </head>
 <body>
 
@@ -30,6 +30,7 @@
   <div class="drawer-header">The Cellar</div>
   <div class="drawer-menu">
     <button class="drawer-item" id="navAnalytics">📊 Analytics Dashboard</button>
+    <button class="drawer-item" id="navChangelog">📜 Changelog</button>
     <button class="drawer-item" id="navSettings">⚙️ Inventory Settings</button>
   </div>
 </div>
@@ -108,7 +109,7 @@
 </main>
 
 <footer>
-  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v2.0.41</p>
+  <p class="footer-text">The Cellar &nbsp;·&nbsp; Personal Inventory &nbsp;·&nbsp; v2.0.42</p>
 </footer>
 
 <!-- Camera / photo file input (hidden) -->
@@ -246,6 +247,16 @@
   </div>
 </div>
 
-<script type="module" src="js/app.js?v=2.0.41"></script>
+<!-- Changelog Modal -->
+<div class="modal-overlay" id="changelogOverlay">
+  <div class="modal">
+    <button class="modal-close" id="closeChangelogBtn">×</button>
+    <div class="modal-name">Version History</div>
+    <div class="modal-divider"></div>
+    <div id="changelog-content" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js?v=2.0.42"></script>
 </body>
 </html>

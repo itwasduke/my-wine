@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.41';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.41';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.41';
+import { state } from './state.js?v=2.0.42';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.42';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.42';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -143,10 +143,13 @@ export function initUIListeners() {
   const menuOverlay     = document.getElementById('menuOverlay');
   const closeDrawerBtn  = document.getElementById('closeDrawerBtn');
   const navAnalytics    = document.getElementById('navAnalytics');
+  const navChangelog    = document.getElementById('navChangelog');
   const navSettings     = document.getElementById('navSettings');
 
   const analyticsOverlay = document.getElementById('analyticsOverlay');
   const closeAnalyticsBtn = document.getElementById('closeAnalyticsBtn');
+  const changelogOverlay = document.getElementById('changelogOverlay');
+  const closeChangelogBtn = document.getElementById('closeChangelogBtn');
   const settingsOverlay  = document.getElementById('settingsOverlay');
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
@@ -162,8 +165,15 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.41');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.42');
     renderAnalytics(state.inventory);
+  });
+
+  navChangelog.addEventListener('click', async () => {
+    toggleDrawer(false);
+    changelogOverlay.classList.add('active');
+    const { renderChangelog } = await import('./renderChangelog.js?v=2.0.42');
+    renderChangelog('changelog-content');
   });
 
   navSettings.addEventListener('click', () => {
@@ -174,6 +184,11 @@ export function initUIListeners() {
   closeAnalyticsBtn.addEventListener('click', () => analyticsOverlay.classList.remove('active'));
   analyticsOverlay.addEventListener('click', (e) => {
     if (e.target === analyticsOverlay) analyticsOverlay.classList.remove('active');
+  });
+
+  closeChangelogBtn.addEventListener('click', () => changelogOverlay.classList.remove('active'));
+  changelogOverlay.addEventListener('click', (e) => {
+    if (e.target === changelogOverlay) changelogOverlay.classList.remove('active');
   });
 
   closeSettingsBtn.addEventListener('click', () => settingsOverlay.classList.remove('active'));
@@ -189,7 +204,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.41');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.42');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -201,7 +216,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.41');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.42');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -214,7 +229,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.41');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.42');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -225,10 +240,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.41');
+      const { markConsumed } = await import('./db.js?v=2.0.42');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.41');
+      const { updateQuantity } = await import('./db.js?v=2.0.42');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -236,8 +251,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.41');
-      const { saveProScores }   = await import('./db.js?v=2.0.41');
+      const { lookupProScores } = await import('./ai.js?v=2.0.42');
+      const { saveProScores }   = await import('./db.js?v=2.0.42');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -247,13 +262,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.41');
+      const { setRating } = await import('./db.js?v=2.0.42');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.41');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.42');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.41');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.42');
       confirmDeleteBottle(id);
     }
   });

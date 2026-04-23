@@ -105,6 +105,10 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.42 (April 23, 2026)**:
+    - feat: Added a dedicated Changelog (Version History) modal to the hamburger menu.
+    - feat: Structured version history data into `js/changelog.js` for easy maintenance.
+    - UI: Improved navigation by adding a "📜 Changelog" option to the drawer.
 - **v2.0.41 (April 23, 2026)**:
     - perf: Optimized Gallery Mode with O(1) active card detection using scroll position math.
     - perf: Implemented DOM caching in `renderInventory` to skip redundant filtering, sorting, and rendering when data hasn't changed.
