@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.52';
+import { SECTIONS, state } from './state.js?v=2.0.53';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -218,36 +218,26 @@ function renderGallery(items) {
     }
   };
 
-  // IntersectionObserver for smoother active state tracking
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-        const nodeIdx = parseInt(entry.target.dataset.nodeIndex);
-        // We only setActive here if not currently doing a silent jump
-        // For simplicity, detectActive handles the logic, observer just helps feel snappy
-      }
-    });
-  }, { root: container, threshold: 0.5 });
-  
-  allCards.forEach((card, i) => {
-    card.dataset.nodeIndex = i;
-    observer.observe(card);
-  });
-
   if (galleryScrollListener) container.removeEventListener('scroll', galleryScrollListener);
-  
-  let scrollTimer;
-  galleryScrollListener = () => {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(detectActive, 100); // Debounce for silent jumps
-  };
-  container.addEventListener('scroll', galleryScrollListener, { passive: true });
+
+  if ('onscrollend' in window) {
+    galleryScrollListener = detectActive;
+    container.addEventListener('scrollend', galleryScrollListener, { passive: true });
+  } else {
+    let scrollTimer;
+    galleryScrollListener = () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(detectActive, 50);
+    };
+    container.addEventListener('scroll', galleryScrollListener, { passive: true });
+  }
 
   const navigate = (dir) => {
     const curNode = state.galleryIndex + REAL_START;
     const target = dir < 0 ? curNode - 1 : curNode + 1;
+    const isBoundary = target < REAL_START || target > REAL_END;
     setActiveNode(target);
-    scrollToNode(target);
+    scrollToNode(target, !isBoundary);
   };
 
   state.galleryNavigate = navigate;
@@ -351,8 +341,7 @@ function renderVertical(items) {
   };
 
   const detectActive = () => {
-    const center = container.scrollTop + container.clientHeight / 2;
-    // O(1) calculation: each wrapper is exactly 100vh
+    // O(1): each wrapper is exactly 100vh = container.clientHeight
     const nodeIdx = Math.round(container.scrollTop / container.clientHeight);
     const clampedNode = Math.max(0, Math.min(wrappers.length - 1, nodeIdx));
 
@@ -381,8 +370,9 @@ function renderVertical(items) {
     const curNode = state.galleryIndex + REAL_START;
     const target = dir < 0 ? curNode - 1 : curNode + 1;
     if (wrappers[target]) {
+      const isBoundary = target < REAL_START || target > REAL_END;
       setActive(target);
-      container.scrollTo({ top: wrappers[target].offsetTop, behavior: 'smooth' });
+      container.scrollTo({ top: wrappers[target].offsetTop, behavior: isBoundary ? 'instant' : 'smooth' });
     }
   };
 
@@ -451,7 +441,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.52');
+      const { loadInventory } = await import('./db.js?v=2.0.53');
       await loadInventory();
     });
   }
