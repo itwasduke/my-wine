@@ -1,5 +1,15 @@
 export const CHANGELOG = [
   {
+    version: "2.0.47",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Redesigned Gallery mode as a full-screen immersive overlay, matching Vertical mode.",
+      "feat: Added a 'Back' button to Gallery mode for consistent navigation.",
+      "UI: Enhanced Gallery card animations and depth effects.",
+      "UI: Unified immersive mode z-indexing and background handling."
+    ]
+  },
+  {
     version: "2.0.46",
     date: "April 23, 2026",
     changes: [

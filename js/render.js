@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.46';
+import { SECTIONS, state } from './state.js?v=2.0.47';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -133,6 +133,10 @@ function renderGallery(items) {
 
   main.innerHTML = `
     <div class="gallery-container" id="galleryContainer">
+      <button class="vertical-close" id="galleryBackBtn" aria-label="Back to inventory">
+        <span>←</span>
+        <span>Back</span>
+      </button>
       <div class="gc-chevron gc-chevron-left" id="galChevronLeft">&#x2039;</div>
       <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
         <div class="gallery-spacer"></div>
@@ -408,7 +412,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.46');
+      const { loadInventory } = await import('./db.js?v=2.0.47');
       await loadInventory();
     });
   }

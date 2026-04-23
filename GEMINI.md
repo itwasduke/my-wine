@@ -105,6 +105,9 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.47 (April 23, 2026)**:
+    - feat: Redesigned Gallery mode as an immersive full-screen overlay with a "Back" button, mirroring Vertical mode.
+    - UI: Unified depth effects and background handling across all immersive views.
 - **v2.0.46 (April 23, 2026)**:
     - feat: Redesigned Vertical mode as an immersive full-screen overlay with a "Back" button.
     - UI: Enhanced animations and depth effects for vertical cards.

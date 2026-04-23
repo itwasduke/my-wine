@@ -1,6 +1,6 @@
 {
   "name": "the-cellar",
-  "version": "2.0.46",
+  "version": "2.0.47",
   "scripts": {
     "bump": "node scripts/bump-version.js"
   }

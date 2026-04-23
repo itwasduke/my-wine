@@ -43,10 +43,11 @@
 
 /* ── Gallery Container ───────────────────────────────────────────────────── */
 .gallery-container {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 62vh;
-  margin-top: 20px;
+  height: 100vh;
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;
@@ -54,6 +55,25 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  z-index: 2500; /* Over everything */
+  background: var(--bg);
+}
+
+/* Ensure the wine background is still visible behind the gallery container */
+.gallery-container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../wine.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .gallery-container::-webkit-scrollbar {
@@ -81,8 +101,8 @@
   position: relative;
   flex: 0 0 var(--card-w);
   width: var(--card-w);
-  height: 88%;
-  max-height: 520px;
+  height: 75vh; /* Match vertical height */
+  max-height: 650px;
   border-radius: 20px;
   padding: 0;
   display: flex;
@@ -93,10 +113,13 @@
   border: 2px solid transparent;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
-  transform: scale(0.82) translateZ(0);
-  opacity: 0.35;
-  filter: blur(1.5px);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.5s ease, 
+              filter 0.5s ease, 
+              box-shadow 0.3s ease;
+  transform: scale(0.9) translateZ(0);
+  opacity: 0.4;
+  filter: blur(4px);
 }
 
 .gallery-card.active {
