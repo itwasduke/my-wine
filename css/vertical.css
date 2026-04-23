@@ -117,18 +117,17 @@
 .immersive-header-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.immersive-type-row {
   justify-content: center;
+  width: 100%;
+  position: relative;
 }
 
 .immersive-header > * { pointer-events: auto; }
 .immersive-header-row > * { pointer-events: auto; }
 
 .vertical-close {
+  position: absolute;
+  left: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -144,6 +143,7 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .vertical-close:hover {

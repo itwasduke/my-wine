@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.58",
+    date: "April 23, 2026",
+    changes: [
+      "UI: Centered the Horizontal/Vertical mode toggle in the immersive gallery header.",
+      "UI: Improved header layout by positioning the 'Back' button absolutely on the left for perfect centering of toggles.",
+      "UI: Enhanced control alignment across all immersive views."
+    ]
+  },
+  {
     version: "2.0.57",
     date: "April 23, 2026",
     changes: [
