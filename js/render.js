@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.49';
+import { SECTIONS, state } from './state.js?v=2.0.50';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -296,17 +296,21 @@ function renderVertical(items) {
   }
 
   const N = items.length;
-  state.galleryIndex = Math.min(state.galleryIndex, N - 1);
+  // Clones for infinite scroll
+  const startClone = galleryCardHTML(items[N - 1], N - 1, N, 'start');
+  const endClone   = galleryCardHTML(items[0],     0,     N, 'end');
 
   main.innerHTML = `
     <div class="vertical-container" id="verticalContainer">
       ${immersiveHeaderHTML('vertical')}
       <div class="vertical-wrapper" id="verticalWrapper">
+        <div class="vertical-card-wrapper" data-clone="start">${startClone}</div>
         ${items.map((item, idx) => `
           <div class="vertical-card-wrapper" data-index="${idx}">
             ${galleryCardHTML(item, idx, N)}
           </div>
         `).join('')}
+        <div class="vertical-card-wrapper" data-clone="end">${endClone}</div>
       </div>
       <div class="vertical-indicators">
         ${items.map((_, i) => `<div class="vi-dot ${i === state.galleryIndex ? 'active' : ''}" data-index="${i}"></div>`).join('')}
@@ -323,22 +327,39 @@ function renderVertical(items) {
   const wrappers  = container.querySelectorAll('.vertical-card-wrapper');
   const dots      = container.querySelectorAll('.vi-dot');
   const pagination = container.querySelector('.gallery-pagination');
+  const REAL_START = 1;
+  const REAL_END   = N;
 
-  const setActive = (idx) => {
-    state.galleryIndex = idx;
-    wrappers.forEach((w, i) => w.classList.toggle('active', i === idx));
-    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-    pagination.textContent = `${idx + 1} of ${N}`;
+  const setActive = (nodeIdx) => {
+    wrappers.forEach((w, i) => w.classList.toggle('active', i === nodeIdx));
+    
+    let logicalIdx = nodeIdx - REAL_START;
+    if (logicalIdx < 0) logicalIdx = N - 1;
+    if (logicalIdx >= N) logicalIdx = 0;
+    
+    state.galleryIndex = logicalIdx;
+    dots.forEach((d, i) => d.classList.toggle('active', i === logicalIdx));
+    pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
 
   const detectActive = () => {
     const center = container.scrollTop + container.clientHeight / 2;
-    let bestIdx = 0, bestDist = Infinity;
+    let bestNode = REAL_START, bestDist = Infinity;
     wrappers.forEach((w, i) => {
       const dist = Math.abs((w.offsetTop + w.offsetHeight / 2) - center);
-      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+      if (dist < bestDist) { bestDist = dist; bestNode = i; }
     });
-    if (bestIdx !== state.galleryIndex) setActive(bestIdx);
+
+    const landed = wrappers[bestNode];
+    if (landed?.dataset.clone === 'start') {
+      setActive(REAL_END);
+      container.scrollTo({ top: wrappers[REAL_END].offsetTop, behavior: 'instant' });
+    } else if (landed?.dataset.clone === 'end') {
+      setActive(REAL_START);
+      container.scrollTo({ top: wrappers[REAL_START].offsetTop, behavior: 'instant' });
+    } else {
+      setActive(bestNode);
+    }
   };
 
   if (verticalScrollListener) container.removeEventListener('scroll', verticalScrollListener);
@@ -349,20 +370,20 @@ function renderVertical(items) {
     scrollTimer = setTimeout(detectActive, 50);
   };
   container.addEventListener('scroll', verticalScrollListener, { passive: true });
+state.verticalNavigate = (dir) => {
+  const curNode = state.galleryIndex + REAL_START;
+  const target = dir < 0 ? curNode - 1 : curNode + 1;
+  if (wrappers[target]) {
+    setActive(target);
+    container.scrollTo({ top: wrappers[target].offsetTop, behavior: 'smooth' });
+  }
+};
 
-  state.verticalNavigate = (dir) => {
-    const targetIdx = Math.max(0, Math.min(N - 1, state.galleryIndex + dir));
-    const target = wrappers[targetIdx];
-    if (target) {
-      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-    }
-  };
-
-  setTimeout(() => {
-    const startNode = wrappers[state.galleryIndex];
-    if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
-    setActive(state.galleryIndex);
-  }, 50);
+setTimeout(() => {
+  const startNode = wrappers[state.galleryIndex + REAL_START];
+  if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
+  setActive(state.galleryIndex + REAL_START);
+}, 50);
 }
 
 function renderWelcome() {
@@ -423,7 +444,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.49');
+      const { loadInventory } = await import('./db.js?v=2.0.50');
       await loadInventory();
     });
   }

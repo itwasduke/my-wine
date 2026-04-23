@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.50",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Implemented infinite scrolling for Vertical mode, matching the Horizontal gallery experience.",
+      "fix: Added silent jump logic to Vertical mode to ensure smooth looping between first and last cards.",
+      "UI: Standardized active card detection and clone mapping across all immersive modes."
+    ]
+  },
+  {
     version: "2.0.49",
     date: "April 23, 2026",
     changes: [
