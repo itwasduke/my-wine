@@ -95,18 +95,40 @@ function renderGallery(items) {
         <div class="gallery-spacer"></div>
       </div>
     </div>
-    <div class="gallery-pagination" id="galleryPagination">
-      ${state.galleryIndex + 1} of ${items.length}
+    <div class="gallery-controls">
+      <button class="gallery-nav-btn gallery-prev" id="galleryPrevBtn" aria-label="Previous bottle">←</button>
+      <div class="gallery-pagination" id="galleryPagination">
+        ${state.galleryIndex + 1} of ${items.length}
+      </div>
+      <button class="gallery-nav-btn gallery-next" id="galleryNextBtn" aria-label="Next bottle">→</button>
     </div>
   `;
 
   const container = document.getElementById('galleryContainer');
   const cards = container.querySelectorAll('.gallery-card');
   const pagination = document.getElementById('galleryPagination');
+  const prevBtn = document.getElementById('galleryPrevBtn');
+  const nextBtn = document.getElementById('galleryNextBtn');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (state.galleryIndex > 0) {
+        cards[state.galleryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (state.galleryIndex < cards.length - 1) {
+        cards[state.galleryIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+  }
 
   const observerOptions = {
     root: container,
-    threshold: 0.8
+    threshold: 0.5
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -135,11 +157,15 @@ function renderGallery(items) {
 
   cards.forEach(card => observer.observe(card));
 
-  if (state.galleryIndex > 0 && cards[state.galleryIndex]) {
-    setTimeout(() => {
+  setTimeout(() => {
+    if (cards[state.galleryIndex]) {
       cards[state.galleryIndex].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-    }, 50);
-  }
+      cards[state.galleryIndex].classList.add('active');
+    } else if (cards[0]) {
+      cards[0].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+      cards[0].classList.add('active');
+    }
+  }, 50);
 
   if (showHint) {
     setTimeout(() => {

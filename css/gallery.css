@@ -44,18 +44,15 @@
 /* Gallery Mode Container */
 .gallery-container {
   position: relative;
-  width: 100vw;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  height: 70vh;
+  width: 100%;
+  height: 60vh;
   margin-top: 20px;
   margin-bottom: 20px;
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;
   align-items: center;
+  justify-content: center;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -73,10 +70,12 @@
   height: 100%;
   padding: 0;
   transform-style: preserve-3d;
+  width: 100%;
 }
 
 .gallery-spacer {
-  flex: 0 0 calc(50vw - 160px); /* 160px is half of max-width 320px */
+  flex: 0 0 calc((100% - 80vw) / 2);
+  min-width: 20px;
 }
 
 .gallery-card {
@@ -93,7 +92,7 @@
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
   user-select: none;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -101,8 +100,9 @@
   backface-visibility: hidden;
   scroll-snap-align: center;
   scroll-snap-stop: always;
+  scroll-snap-type: none;
   transform-style: preserve-3d;
-  
+
   /* Initial state for cards not in focus */
   transform: scale(0.85) translateZ(-200px);
   opacity: 0.4;
@@ -207,14 +207,48 @@
   gap: 8px;
 }
 
+/* Gallery Controls */
+.gallery-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.gallery-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(78, 205, 196, 0.2);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-nav-btn:hover {
+  background: rgba(78, 205, 196, 0.35);
+  transform: scale(1.1);
+}
+
+.gallery-nav-btn:active {
+  transform: scale(0.95);
+}
+
 /* Pagination */
 .gallery-pagination {
   text-align: center;
   font-family: 'Raleway', sans-serif;
   color: var(--text-muted);
   font-size: 0.9rem;
-  margin-top: 10px;
   letter-spacing: 0.1em;
+  min-width: 80px;
 }
 
 /* Swipe Hint */
@@ -243,21 +277,21 @@
 /* Desktop Responsive */
 @media (min-width: 768px) {
   .gallery-container {
-    height: 60vh;
+    height: 65vh;
     margin-top: 40px;
-    margin-bottom: 40px;
+    margin-bottom: 0;
   }
 
   .gallery-card {
-    flex: 0 0 50vw;
-    width: 50vw;
-    max-width: 400px;
+    flex: 0 0 45vw;
+    width: 45vw;
+    max-width: 380px;
     height: 80%;
     max-height: 550px;
   }
 
   .gallery-spacer {
-    flex: 0 0 calc(50vw - 200px);
+    flex: 0 0 calc((100% - 45vw) / 2);
   }
 
   .gallery-card-year {
@@ -267,6 +301,10 @@
   .gallery-card-name {
     font-size: 1.4rem;
   }
+
+  .gallery-controls {
+    margin-top: 30px;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -275,14 +313,14 @@
   }
 
   .gallery-card {
-    flex: 0 0 40vw;
-    width: 40vw;
-    max-width: 450px;
+    flex: 0 0 35vw;
+    width: 35vw;
+    max-width: 420px;
     height: 75%;
   }
 
   .gallery-spacer {
-    flex: 0 0 calc(50vw - 225px);
+    flex: 0 0 calc((100% - 35vw) / 2);
   }
 }
 
