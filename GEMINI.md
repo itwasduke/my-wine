@@ -105,6 +105,10 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.43 (April 23, 2026)**:
+    - feat: Added Vertical Scroll mode with native CSS snap scrolling and full-screen cards.
+    - feat: Three-way View Toggle (Grid, Gallery, Vertical) with localStorage persistence.
+    - UX: Added vertical dot indicators and keyboard ArrowUp/Down support.
 - **v2.0.42 (April 23, 2026)**:
     - feat: Added a dedicated Changelog (Version History) modal to the hamburger menu.
     - feat: Structured version history data into `js/changelog.js` for easy maintenance.

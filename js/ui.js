@@ -1,7 +1,7 @@
-import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.42';
-import { initUIListeners } from './events.js?v=2.0.42';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.42';
-import { state } from './state.js?v=2.0.42';
+import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.43';
+import { initUIListeners } from './events.js?v=2.0.43';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.43';
+import { state } from './state.js?v=2.0.43';
 
 // Coordinator module: re-exports all public functions from sub-modules
 // for backward compatibility with existing import contracts.

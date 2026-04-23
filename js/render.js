@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.42';
+import { SECTIONS, state } from './state.js?v=2.0.43';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -261,6 +261,91 @@ function renderGallery(items) {
   if (showHint) hintTimeout = setTimeout(hideChevrons, 3000);
 }
 
+let verticalScrollListener = null;
+
+function renderVertical(items) {
+  const main = document.getElementById('main-content');
+  const itemsHash = items.map(i => i.id).join(',');
+  
+  if (main.querySelector('.vertical-container') && main.dataset.verticalHash === itemsHash) {
+    return;
+  }
+  main.dataset.verticalHash = itemsHash;
+
+  if (items.length === 0) {
+    main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match your filters.</div>`;
+    return;
+  }
+
+  const N = items.length;
+  state.galleryIndex = Math.min(state.galleryIndex, N - 1);
+
+  main.innerHTML = `
+    <div class="vertical-container" id="verticalContainer">
+      <div class="vertical-wrapper" id="verticalWrapper">
+        ${items.map((item, idx) => `
+          <div class="vertical-card-wrapper" data-index="${idx}">
+            ${galleryCardHTML(item, idx, N)}
+          </div>
+        `).join('')}
+      </div>
+      <div class="vertical-indicators">
+        ${items.map((_, i) => `<div class="vi-dot ${i === state.galleryIndex ? 'active' : ''}" data-index="${i}"></div>`).join('')}
+      </div>
+      <div class="gallery-controls" style="position:fixed; bottom:20px; left:0; right:0; z-index:100; margin:0; pointer-events:none;">
+        <div class="gallery-pagination" style="background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:8px 16px; border-radius:20px; display:inline-block; pointer-events:auto; margin:0 auto; border:1px solid rgba(255,255,255,0.1);">
+          ${state.galleryIndex + 1} of ${N}
+        </div>
+      </div>
+    </div>
+  `;
+
+  const container = document.getElementById('verticalContainer');
+  const wrappers  = container.querySelectorAll('.vertical-card-wrapper');
+  const dots      = container.querySelectorAll('.vi-dot');
+  const pagination = container.querySelector('.gallery-pagination');
+
+  const setActive = (idx) => {
+    state.galleryIndex = idx;
+    wrappers.forEach((w, i) => w.classList.toggle('active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    pagination.textContent = `${idx + 1} of ${N}`;
+  };
+
+  const detectActive = () => {
+    const center = container.scrollTop + container.clientHeight / 2;
+    let bestIdx = 0, bestDist = Infinity;
+    wrappers.forEach((w, i) => {
+      const dist = Math.abs((w.offsetTop + w.offsetHeight / 2) - center);
+      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+    });
+    if (bestIdx !== state.galleryIndex) setActive(bestIdx);
+  };
+
+  if (verticalScrollListener) container.removeEventListener('scroll', verticalScrollListener);
+  
+  let scrollTimer;
+  verticalScrollListener = () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(detectActive, 50);
+  };
+  container.addEventListener('scroll', verticalScrollListener, { passive: true });
+
+  state.verticalNavigate = (dir) => {
+    const targetIdx = Math.max(0, Math.min(N - 1, state.galleryIndex + dir));
+    const target = wrappers[targetIdx];
+    if (target) {
+      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    }
+  };
+
+  setTimeout(() => {
+    const startNode = wrappers[state.galleryIndex];
+    if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
+    setActive(state.galleryIndex);
+  }, 50);
+}
+
 function renderWelcome() {
   const main = document.getElementById('main-content');
   main.innerHTML = `
@@ -319,7 +404,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.42');
+      const { loadInventory } = await import('./db.js?v=2.0.43');
       await loadInventory();
     });
   }
@@ -404,6 +489,12 @@ export function renderInventory() {
 
   if (state.viewMode === 'gallery') {
     renderGallery(items);
+    lastRenderedHTML = '';
+    return;
+  }
+
+  if (state.viewMode === 'vertical') {
+    renderVertical(items);
     lastRenderedHTML = '';
     return;
   }

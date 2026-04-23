@@ -1,0 +1,121 @@
+/* ── Vertical Scroll Mode ────────────────────────────────────────────────── */
+.vertical-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  z-index: 50; /* Above regular header if needed, but we'll handle layout */
+  background: var(--bg);
+}
+
+.vertical-container::-webkit-scrollbar {
+  display: none;
+}
+
+.vertical-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.vertical-card-wrapper {
+  flex: 0 0 100vh;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  padding: 20px;
+}
+
+/* Reuse Gallery Card styles but override scale/opacity for vertical context */
+.vertical-card-wrapper .gallery-card {
+  transform: scale(0.9);
+  opacity: 0.5;
+  filter: blur(2px);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.4s ease, 
+              filter 0.4s ease;
+  width: clamp(280px, 85vw, 420px);
+  height: 80vh;
+  max-height: 650px;
+  margin: 0 auto;
+}
+
+.vertical-card-wrapper.active .gallery-card {
+  transform: scale(1);
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Vertical Side Dots */
+.vertical-indicators {
+  position: fixed;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.vi-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.vi-dot.active {
+  height: 20px;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+/* Close/Back button for full-screen modes */
+.vertical-close {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 110;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Animations */
+@keyframes cardSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.vertical-card-wrapper.active .gallery-card {
+  animation: cardSlideUp 0.5s ease-out;
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .vertical-indicators {
+    right: 30px;
+  }
+}

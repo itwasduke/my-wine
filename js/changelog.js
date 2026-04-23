@@ -1,6 +1,18 @@
 export const CHANGELOG = [
   {
-    version: "2.0.41",
+    version: "2.0.43",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Added Vertical Scroll mode with native CSS snap scrolling.",
+      "feat: Full-screen vertical card layout with one bottle centered at a time.",
+      "feat: Vertical position indicators (dots) on the right side.",
+      "UI: Three-way View Toggle (Grid, Gallery, Vertical) with persistence.",
+      "UX: Support for keyboard Up/Down arrows and vertical swipe navigation."
+    ]
+  },
+  {
+    version: "2.0.42",
+
     date: "April 23, 2026",
     changes: [
       "perf: Optimized Gallery Mode with O(1) active card detection using scroll position math.",
