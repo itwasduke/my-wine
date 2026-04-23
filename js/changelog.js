@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.51",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Resolved a critical bug where caching logic prevented Gallery mode from initializing correctly.",
+      "fix: Corrected Vertical mode initial scroll positioning and card activation.",
+      "UI: Improved code structure and scoping for more reliable view transitions."
+    ]
+  },
+  {
     version: "2.0.50",
     date: "April 23, 2026",
     changes: [

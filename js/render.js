@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.50';
+import { SECTIONS, state } from './state.js?v=2.0.51';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -370,22 +370,23 @@ function renderVertical(items) {
     scrollTimer = setTimeout(detectActive, 50);
   };
   container.addEventListener('scroll', verticalScrollListener, { passive: true });
-state.verticalNavigate = (dir) => {
-  const curNode = state.galleryIndex + REAL_START;
-  const target = dir < 0 ? curNode - 1 : curNode + 1;
-  if (wrappers[target]) {
-    setActive(target);
-    container.scrollTo({ top: wrappers[target].offsetTop, behavior: 'smooth' });
-  }
-};
 
-setTimeout(() => {
-  const startNode = wrappers[state.galleryIndex + REAL_START];
+  state.verticalNavigate = (dir) => {
+    const curNode = state.galleryIndex + REAL_START;
+    const target = dir < 0 ? curNode - 1 : curNode + 1;
+    if (wrappers[target]) {
+      setActive(target);
+      container.scrollTo({ top: wrappers[target].offsetTop, behavior: 'smooth' });
+    }
+  };
+
+  setTimeout(() => {
+  const startNodeIdx = state.galleryIndex + REAL_START;
+  const startNode = wrappers[startNodeIdx];
   if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
-  setActive(state.galleryIndex + REAL_START);
+  setActive(startNodeIdx);
 }, 50);
 }
-
 function renderWelcome() {
   const main = document.getElementById('main-content');
   main.innerHTML = `
@@ -444,7 +445,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.50');
+      const { loadInventory } = await import('./db.js?v=2.0.51');
       await loadInventory();
     });
   }
@@ -480,8 +481,10 @@ export function renderInventory() {
   const filterState = `${filter}|${searchQuery}|${sortBy}|${state.consumedLikedFilter}|${state.wineColorFilter}|${state.viewMode}`;
   const inventoryData = JSON.stringify(Object.keys(state.inventory)); // simple check for structural changes
 
-  if (lastInventoryData === inventoryData && lastFilterState === filterState && state.viewMode !== 'gallery') {
-    // We only skip if NOT in gallery mode, as gallery mode handles its own internal re-renders
+  const isImmersive = (state.viewMode === 'gallery' || state.viewMode === 'vertical');
+  
+  if (lastInventoryData === inventoryData && lastFilterState === filterState && !isImmersive) {
+    // We only skip if NOT in an immersive mode
     return;
   }
 
