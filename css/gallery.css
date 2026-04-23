@@ -113,11 +113,12 @@
   border: 2px solid transparent;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              opacity 0.5s ease, 
-              filter 0.5s ease, 
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.35s ease, 
+              filter 0.35s ease, 
               box-shadow 0.3s ease;
   transform: scale(0.9) translateZ(0);
+  will-change: transform, opacity, filter;
   opacity: 0.4;
   filter: blur(4px);
 }

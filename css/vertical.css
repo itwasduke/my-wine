@@ -58,9 +58,10 @@
   transform: scale(0.9);
   opacity: 0.4;
   filter: blur(4px);
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              opacity 0.5s ease, 
-              filter 0.5s ease;
+  will-change: transform, opacity, filter;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.35s ease, 
+              filter 0.35s ease;
   width: clamp(280px, 85vw, 420px);
   height: 75vh;
   max-height: 650px;

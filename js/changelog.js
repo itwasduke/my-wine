@@ -1,5 +1,15 @@
 export const CHANGELOG = [
   {
+    version: "2.0.52",
+    date: "April 23, 2026",
+    changes: [
+      "perf: Optimized immersive scroll performance with GPU-accelerated CSS properties (will-change).",
+      "perf: Implemented O(1) mathematical card detection for Vertical mode to reduce CPU usage.",
+      "fix: Refined Horizontal scroll logic for smoother infinite looping and reduced jank.",
+      "UI: Snappier transitions (350ms) for a more responsive feel across all gallery modes."
+    ]
+  },
+  {
     version: "2.0.51",
     date: "April 23, 2026",
     changes: [

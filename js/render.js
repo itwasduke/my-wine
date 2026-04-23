@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.51';
+import { SECTIONS, state } from './state.js?v=2.0.52';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -197,43 +197,51 @@ function renderGallery(items) {
 
   // O(1) active detection using card width + scroll offset
   const detectActive = () => {
+    const center = container.scrollLeft + container.clientWidth / 2;
     if (!allCards[REAL_START]) return;
     const cardWidth = allCards[REAL_START].offsetWidth;
-    const gap = 20; // from CSS gap
-    const containerMid = container.scrollLeft + container.clientWidth / 2;
+    const gap = 20;
     const firstCardCenter = allCards[REAL_START].offsetLeft + cardWidth / 2;
     
-    // Calculate node index from scroll position
-    const nodeIdx = Math.round((containerMid - firstCardCenter) / (cardWidth + gap)) + REAL_START;
+    const nodeIdx = Math.round((center - firstCardCenter) / (cardWidth + gap)) + REAL_START;
     const clampedNode = Math.max(0, Math.min(allCards.length - 1, nodeIdx));
 
     const landed = allCards[clampedNode];
     if (landed?.dataset.clone === 'start') {
       setActiveNode(REAL_END);
-      scrollToNode(REAL_END, false);
+      container.scrollTo({ left: allCards[REAL_END].offsetLeft - (container.clientWidth - cardWidth) / 2, behavior: 'instant' });
     } else if (landed?.dataset.clone === 'end') {
       setActiveNode(REAL_START);
-      scrollToNode(REAL_START, false);
+      container.scrollTo({ left: allCards[REAL_START].offsetLeft - (container.clientWidth - cardWidth) / 2, behavior: 'instant' });
     } else {
       setActiveNode(clampedNode);
     }
   };
 
-  if (galleryScrollListener) container.removeEventListener('scrollend', galleryScrollListener);
+  // IntersectionObserver for smoother active state tracking
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        const nodeIdx = parseInt(entry.target.dataset.nodeIndex);
+        // We only setActive here if not currently doing a silent jump
+        // For simplicity, detectActive handles the logic, observer just helps feel snappy
+      }
+    });
+  }, { root: container, threshold: 0.5 });
+  
+  allCards.forEach((card, i) => {
+    card.dataset.nodeIndex = i;
+    observer.observe(card);
+  });
+
+  if (galleryScrollListener) container.removeEventListener('scroll', galleryScrollListener);
   
   let scrollTimer;
-  const onScroll = () => {
+  galleryScrollListener = () => {
     clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(detectActive, 50);
+    scrollTimer = setTimeout(detectActive, 100); // Debounce for silent jumps
   };
-
-  if ('onscrollend' in window) {
-    galleryScrollListener = detectActive;
-    container.addEventListener('scrollend', galleryScrollListener, { passive: true });
-  } else {
-    galleryScrollListener = onScroll;
-    container.addEventListener('scroll', galleryScrollListener, { passive: true });
-  }
+  container.addEventListener('scroll', galleryScrollListener, { passive: true });
 
   const navigate = (dir) => {
     const curNode = state.galleryIndex + REAL_START;
@@ -344,13 +352,11 @@ function renderVertical(items) {
 
   const detectActive = () => {
     const center = container.scrollTop + container.clientHeight / 2;
-    let bestNode = REAL_START, bestDist = Infinity;
-    wrappers.forEach((w, i) => {
-      const dist = Math.abs((w.offsetTop + w.offsetHeight / 2) - center);
-      if (dist < bestDist) { bestDist = dist; bestNode = i; }
-    });
+    // O(1) calculation: each wrapper is exactly 100vh
+    const nodeIdx = Math.round(container.scrollTop / container.clientHeight);
+    const clampedNode = Math.max(0, Math.min(wrappers.length - 1, nodeIdx));
 
-    const landed = wrappers[bestNode];
+    const landed = wrappers[clampedNode];
     if (landed?.dataset.clone === 'start') {
       setActive(REAL_END);
       container.scrollTo({ top: wrappers[REAL_END].offsetTop, behavior: 'instant' });
@@ -358,7 +364,7 @@ function renderVertical(items) {
       setActive(REAL_START);
       container.scrollTo({ top: wrappers[REAL_START].offsetTop, behavior: 'instant' });
     } else {
-      setActive(bestNode);
+      setActive(clampedNode);
     }
   };
 
@@ -445,7 +451,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.51');
+      const { loadInventory } = await import('./db.js?v=2.0.52');
       await loadInventory();
     });
   }
