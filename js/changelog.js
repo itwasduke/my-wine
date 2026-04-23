@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "2.0.54",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Increased modal and scan overlay z-index to ensure they appear above immersive gallery views.",
+      "UI: Improved modal visibility by adjusting backdrop blur and overlay opacity."
+    ]
+  },
+  {
     version: "2.0.53",
     date: "April 23, 2026",
     changes: [
