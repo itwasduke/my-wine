@@ -66,20 +66,22 @@
   gap: 20px;
   height: 100%;
   width: 100%;
+  /* --card-w is overridden in media queries so spacer & card always match */
+  --card-w: clamp(260px, 80vw, 320px);
 }
 
 .gallery-spacer {
-  flex: 0 0 calc((100% - 80vw) / 2);
-  min-width: 16px;
+  flex: 0 0 calc((100% - var(--card-w)) / 2);
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 /* ── Gallery Card — Base ─────────────────────────────────────────────────── */
 .gallery-card {
   position: relative;
-  flex: 0 0 80vw;
-  width: 80vw;
+  flex: 0 0 var(--card-w);
+  width: var(--card-w);
   height: 88%;
-  max-width: 320px;
   max-height: 520px;
   border-radius: 20px;
   padding: 0;
@@ -385,37 +387,26 @@
     margin-top: 36px;
   }
 
+  .gallery-scroll-wrapper { --card-w: clamp(300px, 44vw, 380px); }
+
   .gallery-card {
-    flex: 0 0 44vw;
-    width: 44vw;
-    max-width: 380px;
     height: 85%;
     max-height: 560px;
   }
 
-  .gallery-spacer {
-    flex: 0 0 calc((100% - 44vw) / 2);
-  }
-
   .gc-year { font-size: 4.5rem; }
   .gc-name { font-size: 1.6rem; }
-
   .gallery-controls { margin-top: 24px; }
 }
 
 @media (min-width: 1200px) {
   .gallery-container { height: 68vh; }
 
+  .gallery-scroll-wrapper { --card-w: clamp(320px, 34vw, 420px); }
+
   .gallery-card {
-    flex: 0 0 34vw;
-    width: 34vw;
-    max-width: 420px;
     height: 82%;
     max-height: 580px;
-  }
-
-  .gallery-spacer {
-    flex: 0 0 calc((100% - 34vw) / 2);
   }
 
   .gc-year { font-size: 5rem; }

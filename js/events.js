@@ -121,12 +121,17 @@ export function initUIListeners() {
     const container = document.getElementById('galleryContainer');
     if (!container) return;
     const cards = container.querySelectorAll('.gallery-card');
-    
-    if (e.key === 'ArrowLeft' && state.galleryIndex > 0) {
-      cards[state.galleryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    } else if (e.key === 'ArrowRight' && state.galleryIndex < cards.length - 1) {
-      cards[state.galleryIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    let target = -1;
+    if (e.key === 'ArrowLeft' && state.galleryIndex > 0) target = state.galleryIndex - 1;
+    else if (e.key === 'ArrowRight' && state.galleryIndex < cards.length - 1) target = state.galleryIndex + 1;
+    if (target < 0) return;
+    e.preventDefault();
+    const card = cards[target];
+    state.galleryIndex = target;
+    container.querySelectorAll('.gallery-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    const targetLeft = card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
+    container.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
   });
 
   // Main content clicks (Event Delegation for cards)

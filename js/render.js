@@ -133,61 +133,64 @@ function renderGallery(items) {
   const prevBtn = document.getElementById('galleryPrevBtn');
   const nextBtn = document.getElementById('galleryNextBtn');
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (state.galleryIndex > 0) {
-        cards[state.galleryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      if (state.galleryIndex < cards.length - 1) {
-        cards[state.galleryIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    });
-  }
-
-  const observerOptions = {
-    root: container,
-    threshold: 0.5
+  // Scroll the container so card[idx] is centered
+  const scrollToIndex = (idx, smooth = true) => {
+    const card = cards[idx];
+    if (!card) return;
+    const targetLeft = card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
+    container.scrollTo({ left: Math.max(0, targetLeft), behavior: smooth ? 'smooth' : 'instant' });
   };
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        cards.forEach(c => c.classList.remove('active'));
-        entry.target.classList.add('active');
-        const idx = parseInt(entry.target.dataset.index);
-        state.galleryIndex = idx;
-        pagination.textContent = `${idx + 1} of ${items.length}`;
-        
-        const curr = items[idx];
-        const announcement = `Bottle ${idx + 1} of ${items.length}: ${curr.year} ${curr.name}`;
-        let liveRegion = document.getElementById('gallery-live-region');
-        if (!liveRegion) {
-          liveRegion = document.createElement('div');
-          liveRegion.id = 'gallery-live-region';
-          liveRegion.setAttribute('aria-live', 'polite');
-          liveRegion.style.cssText = 'position:absolute; width:1px; height:1px; overflow:hidden;';
-          document.body.appendChild(liveRegion);
-        }
-        liveRegion.textContent = announcement;
-      }
+  // Mark a card active and update state + pagination
+  const setActive = (idx) => {
+    cards.forEach(c => c.classList.remove('active'));
+    if (cards[idx]) cards[idx].classList.add('active');
+    state.galleryIndex = idx;
+    pagination.textContent = `${idx + 1} of ${items.length}`;
+  };
+
+  // After scroll settles, find the card closest to center and activate it
+  const detectActive = () => {
+    const center = container.scrollLeft + container.clientWidth / 2;
+    let best = state.galleryIndex, bestDist = Infinity;
+    cards.forEach((card, i) => {
+      const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - center);
+      if (dist < bestDist) { bestDist = dist; best = i; }
     });
-  }, observerOptions);
+    if (best !== state.galleryIndex) setActive(best);
+  };
 
-  cards.forEach(card => observer.observe(card));
+  // Use scrollend if available; fallback to scroll + timeout
+  let scrollTimer;
+  if ('onscrollend' in window) {
+    container.addEventListener('scrollend', detectActive, { passive: true });
+  } else {
+    container.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(detectActive, 80);
+    }, { passive: true });
+  }
 
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      const target = Math.max(0, state.galleryIndex - 1);
+      setActive(target);
+      scrollToIndex(target);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const target = Math.min(cards.length - 1, state.galleryIndex + 1);
+      setActive(target);
+      scrollToIndex(target);
+    });
+  }
+
+  // Initial position — instant, no animation
   setTimeout(() => {
-    if (cards[state.galleryIndex]) {
-      cards[state.galleryIndex].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-      cards[state.galleryIndex].classList.add('active');
-    } else if (cards[0]) {
-      cards[0].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-      cards[0].classList.add('active');
-    }
+    const startIdx = cards[state.galleryIndex] ? state.galleryIndex : 0;
+    scrollToIndex(startIdx, false);
+    setActive(startIdx);
   }, 50);
 
   // Hide chevrons + hint on first scroll or after 3s
