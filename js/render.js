@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.30';
+import { SECTIONS, state } from './state.js?v=2.0.31';
 
 let lastRenderedHTML = '';
 
@@ -50,7 +50,7 @@ function cardHTML(w) {
   `;
 }
 
-function galleryCardHTML(w, position) {
+function galleryCardHTML(w, index) {
   if (!w) return '';
   const qtyBadge = (parseInt(w.quantity) > 1) ? `<span class="gallery-qty">×${w.quantity}</span>` : '';
   const starBadge = (w.buyAgain) ? '<span class="gallery-star">⭐</span>' : '';
@@ -61,15 +61,13 @@ function galleryCardHTML(w, position) {
     : (w.badge || (section ? section.label : w.status));
   
   return `
-    <div class="gallery-card ${w.status} card-${position}" data-id="${w.id}">
+    <div class="gallery-card ${w.status}" data-id="${w.id}" data-index="${index}">
       <div class="gallery-card-header">
         <div class="gallery-card-year">${w.year}</div>
         <div class="gallery-card-name">${w.name}</div>
         <div class="gallery-card-meta">${w.region}${w.grape ? ` · ${w.grape}` : ''}</div>
       </div>
-      <div class="gallery-card-body">
-        <!-- Center space for potential image or just spacing -->
-      </div>
+      <div class="gallery-card-body"></div>
       <div class="gallery-card-footer">
         <div class="gallery-badge">${badgeLabel}</div>
         <div class="gallery-badges-right">${starBadge}${qtyBadge}</div>
@@ -85,46 +83,61 @@ function renderGallery(items) {
     return;
   }
 
-  // Ensure index is within bounds
-  if (state.galleryIndex >= items.length) state.galleryIndex = items.length - 1;
-  if (state.galleryIndex < 0) state.galleryIndex = 0;
-
-  // Looping indices for background cards (prev/next)
-  const prevIdx = (state.galleryIndex - 1 + items.length) % items.length;
-  const nextIdx = (state.galleryIndex + 1) % items.length;
-
-  const prev = items[prevIdx];
-  const curr = items[state.galleryIndex];
-  const next = items[nextIdx];
-
   const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
-  const hintHtml = showHint ? '<div class="gallery-hint">Swipe to browse</div>' : '';
+  const hintHtml = showHint ? '<div class="gallery-hint">Scroll to browse</div>' : '';
 
   main.innerHTML = `
     <div class="gallery-container" id="galleryContainer">
       ${hintHtml}
-      <div class="gallery-stage" id="galleryStage">
-        ${items.length > 1 ? galleryCardHTML(prev, 'prev') : ''}
-        ${galleryCardHTML(curr, 'curr')}
-        ${items.length > 2 ? galleryCardHTML(next, 'next') : ''}
+      <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
+        ${items.map((item, idx) => galleryCardHTML(item, idx)).join('')}
       </div>
     </div>
-    <div class="gallery-pagination">
+    <div class="gallery-pagination" id="galleryPagination">
       ${state.galleryIndex + 1} of ${items.length}
     </div>
   `;
 
-  // Announce to screen readers
-  const announcement = `Bottle ${state.galleryIndex + 1} of ${items.length}: ${curr.year} ${curr.name}`;
-  let liveRegion = document.getElementById('gallery-live-region');
-  if (!liveRegion) {
-    liveRegion = document.createElement('div');
-    liveRegion.id = 'gallery-live-region';
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.style.cssText = 'position:absolute; width:1px; height:1px; overflow:hidden;';
-    document.body.appendChild(liveRegion);
+  const container = document.getElementById('galleryContainer');
+  const cards = container.querySelectorAll('.gallery-card');
+  const pagination = document.getElementById('galleryPagination');
+
+  const observerOptions = {
+    root: container,
+    threshold: 0.6
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        cards.forEach(c => c.classList.remove('active'));
+        entry.target.classList.add('active');
+        const idx = parseInt(entry.target.dataset.index);
+        state.galleryIndex = idx;
+        pagination.textContent = `${idx + 1} of ${items.length}`;
+        
+        const curr = items[idx];
+        const announcement = `Bottle ${idx + 1} of ${items.length}: ${curr.year} ${curr.name}`;
+        let liveRegion = document.getElementById('gallery-live-region');
+        if (!liveRegion) {
+          liveRegion = document.createElement('div');
+          liveRegion.id = 'gallery-live-region';
+          liveRegion.setAttribute('aria-live', 'polite');
+          liveRegion.style.cssText = 'position:absolute; width:1px; height:1px; overflow:hidden;';
+          document.body.appendChild(liveRegion);
+        }
+        liveRegion.textContent = announcement;
+      }
+    });
+  }, observerOptions);
+
+  cards.forEach(card => observer.observe(card));
+
+  if (state.galleryIndex > 0 && cards[state.galleryIndex]) {
+    setTimeout(() => {
+      cards[state.galleryIndex].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+    }, 50);
   }
-  liveRegion.textContent = announcement;
 
   if (showHint) {
     setTimeout(() => {
@@ -193,7 +206,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.30');
+      const { loadInventory } = await import('./db.js?v=2.0.31');
       await loadInventory();
     });
   }

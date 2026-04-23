@@ -47,30 +47,37 @@
   width: 100%;
   height: 70vh;
   margin: 20px 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   display: flex;
   align-items: center;
-  justify-content: center;
-  touch-action: pan-y;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  perspective: 1200px;
+  padding: 0 15%; /* Allow first and last cards to center */
 }
 
-.gallery-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.gallery-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.gallery-scroll-wrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  perspective: 1200px;
+  gap: 20px;
+  height: 100%;
+  padding: 0 20px;
   transform-style: preserve-3d;
 }
 
 .gallery-card {
-  position: absolute;
-  width: 70%;
+  position: relative;
+  flex: 0 0 75vw;
+  width: 75vw;
   height: 80%;
-  max-width: 340px;
-  max-height: 520px;
+  max-width: 320px;
+  max-height: 500px;
   background: #242424;
   border-radius: 20px;
   padding: 24px;
@@ -78,164 +85,31 @@
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease, filter 0.6s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
   user-select: none;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   backface-visibility: hidden;
-  touch-action: pan-y;
+  scroll-snap-align: center;
+  transform-style: preserve-3d;
+  
+  /* Initial state for cards not in focus */
+  transform: scale(0.85) translateZ(-200px);
+  opacity: 0.4;
+  filter: blur(2px);
 }
 
-/* Section-based subtle gradients for Gallery */
-.gallery-card.ready { border-top: 4px solid #2ecc71; background: linear-gradient(135deg, #242424 0%, #1a2a1f 100%); }
-.gallery-card.soon { border-top: 4px solid #f1c40f; background: linear-gradient(135deg, #242424 0%, #2a281a 100%); }
-.gallery-card.spirits { border-top: 4px solid #e67e22; background: linear-gradient(135deg, #242424 0%, #2a221a 100%); }
-.gallery-card.consumed { border-top: 4px solid #95a5a6; background: linear-gradient(135deg, #242424 0%, #242424 100%); opacity: 0.8; }
-
-.gallery-card-header {
-  text-align: center;
-}
-
-.gallery-card-year {
-  font-family: 'Cinzel', serif;
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-  line-height: 1;
-}
-
-.ready .gallery-card-year { color: #2ecc71; }
-.soon .gallery-card-year { color: #f1c40f; }
-.spirits .gallery-card-year { color: #e67e22; }
-.consumed .gallery-card-year { color: #95a5a6; }
-
-.gallery-card-name {
-  font-family: 'Cinzel', serif;
-  font-size: 1.3rem;
-  font-weight: 400;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.2;
-}
-
-.gallery-card-meta {
-  font-family: 'Raleway', sans-serif;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.gallery-card-body {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.gallery-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.gallery-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
-}
-
-.gallery-qty {
-  font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
-  color: var(--accent);
-}
-
-.gallery-star {
-  font-size: 1.2rem;
-}
-
-/* Pagination */
-.gallery-pagination {
-  text-align: center;
-  font-family: 'Raleway', sans-serif;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-top: 10px;
-  letter-spacing: 0.1em;
-}
-
-/* Swipe Hint */
-.gallery-hint {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
-  padding: 12px 24px;
-  border-radius: 30px;
-  color: #fff;
-  font-size: 0.9rem;
-  pointer-events: none;
-  z-index: 100;
-  animation: fadeOut 3s forwards;
-  border: 1px solid var(--accent);
-}
-
-@keyframes fadeOut {
-  0% { opacity: 0; }
-  10%, 80% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes bounce-left {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(30px); }
-}
-
-@keyframes bounce-right {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-30px); }
-}
-
-.bounce-left { animation: bounce-left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.bounce-right { animation: bounce-right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-
-/* Position states for windowing - 3D Effect */
-.card-prev { 
-  transform: translateX(-62%) translateZ(-400px) rotateY(35deg); 
-  opacity: 0.5; 
-  z-index: 1; 
-  filter: blur(1.5px);
-  pointer-events: none;
-}
-
-.card-curr { 
-  transform: translateX(0) translateZ(0) rotateY(0deg); 
-  opacity: 1; 
-  z-index: 2; 
+.gallery-card.active {
+  transform: scale(1) translateZ(0);
+  opacity: 1;
   filter: blur(0);
+  z-index: 10;
 }
 
-.card-next { 
-  transform: translateX(62%) translateZ(-400px) rotateY(-35deg); 
-  opacity: 0.5; 
-  z-index: 1; 
-  filter: blur(1.5px);
-  pointer-events: none;
-}
+/* Remove the old prev/curr/next fixed classes since we are scrolling now */
+.card-prev, .card-curr, .card-next { transform: none; opacity: inherit; filter: inherit; }
+
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {

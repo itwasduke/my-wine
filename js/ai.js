@@ -1,6 +1,6 @@
-import { app } from './firebase.js?v=2.0.30';
-import { state } from './state.js?v=2.0.30';
-import { saveNewBottle } from './db.js?v=2.0.30';
+import { app } from './firebase.js?v=2.0.31';
+import { state } from './state.js?v=2.0.31';
+import { saveNewBottle } from './db.js?v=2.0.31';
 
 export async function handleImageSelected(event) {
   const file = event.target.files[0];

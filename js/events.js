@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.30';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.30';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.30';
+import { state } from './state.js?v=2.0.31';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.31';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.31';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -115,89 +115,17 @@ export function initUIListeners() {
     });
   });
 
-  // ── Gallery Swipe & Navigation ──────────────────────────────────────────
-  let touchStartX = 0;
-  let touchStartTime = 0;
-
-  document.addEventListener('touchstart', e => {
-    if (state.viewMode !== 'gallery') return;
-    touchStartX = e.changedTouches[0].clientX;
-    touchStartTime = Date.now();
-  }, { passive: true });
-
-  document.addEventListener('touchend', e => {
-    if (state.viewMode !== 'gallery') return;
-    const container = document.getElementById('galleryContainer');
-    if (!container) return;
-
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndTime = Date.now();
-    const distance = touchEndX - touchStartX;
-    const duration = touchEndTime - touchStartTime;
-    const velocity = Math.abs(distance) / duration;
-
-    // Minimum swipe distance of 50px or fast flick
-    if (Math.abs(distance) > 50 || (Math.abs(distance) > 20 && velocity > 0.5)) {
-      const pagination = document.querySelector('.gallery-pagination');
-      if (!pagination) return;
-      const total = parseInt(pagination.textContent.split(' of ')[1]);
-
-      if (distance > 0) {
-        // Swipe Right -> Previous
-        if (state.galleryIndex > 0) {
-          state.galleryIndex--;
-        } else {
-          // Bounce
-          const stage = document.getElementById('galleryStage');
-          stage.classList.remove('bounce-left');
-          void stage.offsetWidth; // Trigger reflow
-          stage.classList.add('bounce-left');
-          return;
-        }
-      } else {
-        // Swipe Left -> Next
-        if (state.galleryIndex < total - 1) {
-          state.galleryIndex++;
-        } else {
-          // Bounce
-          const stage = document.getElementById('galleryStage');
-          stage.classList.remove('bounce-right');
-          void stage.offsetWidth; // Trigger reflow
-          stage.classList.add('bounce-right');
-          return;
-        }
-      }
-      renderInventory();
-    }
-  }, { passive: true });
-
   // Keyboard navigation
   document.addEventListener('keydown', e => {
     if (state.viewMode !== 'gallery') return;
-    const pagination = document.querySelector('.gallery-pagination');
-    if (!pagination) return;
-    const total = parseInt(pagination.textContent.split(' of ')[1]);
-
-    if (e.key === 'ArrowLeft') {
-      if (state.galleryIndex > 0) {
-        state.galleryIndex--;
-        renderInventory();
-      } else {
-        const stage = document.getElementById('galleryStage');
-        stage.classList.remove('bounce-left');
-        void stage.offsetWidth;
-        stage.classList.add('bounce-left');
-      }
-    } else if (e.key === 'ArrowRight') {
-      if (state.galleryIndex < total - 1) {
-        state.galleryIndex++;
-        renderInventory();
-      } else {
-        const stage = document.getElementById('galleryStage');
-        stage.classList.remove('bounce-right');
-        void stage.offsetWidth;
-        stage.classList.add('bounce-right');
-      }
+    const container = document.getElementById('galleryContainer');
+    if (!container) return;
+    const cards = container.querySelectorAll('.gallery-card');
+    
+    if (e.key === 'ArrowLeft' && state.galleryIndex > 0) {
+      cards[state.galleryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    } else if (e.key === 'ArrowRight' && state.galleryIndex < cards.length - 1) {
+      cards[state.galleryIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   });
 
@@ -241,7 +169,7 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.30');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.31');
     renderAnalytics(state.inventory);
   });
 
@@ -268,7 +196,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.30');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.31');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -280,7 +208,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.30');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.31');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -293,7 +221,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.30');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.31');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -304,10 +232,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.30');
+      const { markConsumed } = await import('./db.js?v=2.0.31');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.30');
+      const { updateQuantity } = await import('./db.js?v=2.0.31');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -315,8 +243,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.30');
-      const { saveProScores }   = await import('./db.js?v=2.0.30');
+      const { lookupProScores } = await import('./ai.js?v=2.0.31');
+      const { saveProScores }   = await import('./db.js?v=2.0.31');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -326,13 +254,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.30');
+      const { setRating } = await import('./db.js?v=2.0.31');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.30');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.31');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.30');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.31');
       confirmDeleteBottle(id);
     }
   });
