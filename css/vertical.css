@@ -10,7 +10,7 @@
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  z-index: 50; /* Above regular header if needed, but we'll handle layout */
+  z-index: 10;
   background: var(--bg);
 }
 
@@ -33,7 +33,7 @@
   justify-content: center;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  padding: 20px;
+  padding: 180px 20px 40px; /* Leave space for sticky header/controls */
 }
 
 /* Reuse Gallery Card styles but override scale/opacity for vertical context */

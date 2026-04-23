@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.43';
+import { SECTIONS, state } from './state.js?v=2.0.44';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -404,7 +404,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.43');
+      const { loadInventory } = await import('./db.js?v=2.0.44');
       await loadInventory();
     });
   }

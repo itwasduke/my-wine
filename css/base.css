@@ -67,6 +67,7 @@ header {
   text-align: center;
   padding: 60px 20px 40px;
   position: relative;
+  z-index: 100;
 }
 
 .header-rule {

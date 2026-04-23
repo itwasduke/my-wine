@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.44",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Restored access to View Toggle while in Vertical Mode by adjusting z-indices.",
+      "UI: Enhanced header and controls legibility with increased blur and darker background during immersive scrolling.",
+      "fix: Centered vertical cards properly to avoid overlap with sticky navigation."
+    ]
+  },
+  {
     version: "2.0.43",
     date: "April 23, 2026",
     changes: [

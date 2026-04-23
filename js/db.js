@@ -1,8 +1,8 @@
-import { db } from './firebase.js?v=2.0.43';
+import { db } from './firebase.js?v=2.0.44';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp, onSnapshot }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { state } from './state.js?v=2.0.43';
-import { closeScanModal } from './ai.js?v=2.0.43';
+import { state } from './state.js?v=2.0.44';
+import { closeScanModal } from './ai.js?v=2.0.44';
 
 let unsubscribeInventory = null;
 let renderTimeout = null;
@@ -52,13 +52,13 @@ export function startInventoryListener() {
       
       clearTimeout(renderTimeout);
       renderTimeout = setTimeout(async () => {
-        const { renderInventory } = await import('./ui.js?v=2.0.43');
+        const { renderInventory } = await import('./ui.js?v=2.0.44');
         renderInventory();
       }, 50);
     },
     async (e) => {
       console.error('[Cellar] onSnapshot error:', e);
-      const { showErrorToast, renderInventory } = await import('./ui.js?v=2.0.43');
+      const { showErrorToast, renderInventory } = await import('./ui.js?v=2.0.44');
       showErrorToast('Real-time sync unavailable — loading snapshot');
       try {
         const snapshot = await getDocs(collection(db, 'cellar'));
@@ -85,7 +85,7 @@ export function loadInventory() {
 
 export async function deleteBottle(id) {
   if (!state.currentUser) return;
-  const { closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.43');
+  const { closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.44');
   try {
     await deleteDoc(doc(db, 'cellar', id));
     state.lastUpdated = new Date();
@@ -99,7 +99,7 @@ export async function deleteBottle(id) {
 
 export async function markConsumed(id) {
   if (!state.currentUser) return;
-  const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.43');
+  const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.44');
 
   const previous = { ...state.inventory[id] };
   const currentQty = parseInt(previous.quantity) || 1;
@@ -143,7 +143,7 @@ export async function markConsumed(id) {
 
 export async function setRating(id, liked) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.43');
+  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.44');
 
   const previous = { ...state.inventory[id] };
   const newValue = (previous.liked === liked) ? null : liked;
@@ -177,7 +177,7 @@ export async function setRating(id, liked) {
 
 export async function toggleBuyAgain(id) {
   if (!state.currentUser) return;
-  const { openModal, showErrorToast } = await import('./ui.js?v=2.0.43');
+  const { openModal, showErrorToast } = await import('./ui.js?v=2.0.44');
   try {
     const current = state.inventory[id].buyAgain || false;
     const newValue = !current;
@@ -198,7 +198,7 @@ export async function toggleBuyAgain(id) {
 
 export async function saveNewBottle(data) {
   if (!state.currentUser) return;
-  const { openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.43');
+  const { openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.44');
   try {
     // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
@@ -251,7 +251,7 @@ export async function saveNewBottle(data) {
 
 export async function updateQuantity(id, newQty) {
   if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.43');
+  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.44');
 
   const previous = { ...state.inventory[id] };
   const qty = Math.max(0, newQty);
@@ -287,7 +287,7 @@ export async function updateQuantity(id, newQty) {
 
 export async function updateConsumedCount(id, newCount) {
   if (!state.currentUser) return;
-  const { updateLastUpdatedUI, showErrorToast } = await import('./ui.js?v=2.0.43');
+  const { updateLastUpdatedUI, showErrorToast } = await import('./ui.js?v=2.0.44');
   try {
     const count = Math.max(0, parseInt(newCount) || 0);
     await updateDoc(doc(db, 'cellar', id), { consumedCount: count, updatedAt: serverTimestamp() });
@@ -301,7 +301,7 @@ export async function updateConsumedCount(id, newCount) {
 }
 
 export async function saveProScores(id, scoreData) {
-  const { openModal, updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.43');
+  const { openModal, updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.44');
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;
@@ -332,7 +332,7 @@ export async function bulkUpdateScores(onProgress) {
     return;
   }
 
-  const { lookupProScores } = await import('./ai.js?v=2.0.43');
+  const { lookupProScores } = await import('./ai.js?v=2.0.44');
 
   for (let i = 0; i < total; i++) {
     const w = winesToUpdate[i];
@@ -352,7 +352,7 @@ export async function bulkUpdateScores(onProgress) {
 
   state.lastUpdated = new Date();
   onProgress(`Successfully updated ${total} wines.`);
-  const { renderInventory: renderInv1 } = await import('./ui.js?v=2.0.43');
+  const { renderInventory: renderInv1 } = await import('./ui.js?v=2.0.44');
   renderInv1();
 }
 
@@ -367,7 +367,7 @@ export async function bulkTagWineColor(onProgress) {
     return;
   }
 
-  const { guessWineColor } = await import('./ai.js?v=2.0.43');
+  const { guessWineColor } = await import('./ai.js?v=2.0.44');
 
   for (let i = 0; i < total; i++) {
     const w = winesToTag[i];
@@ -386,7 +386,7 @@ export async function bulkTagWineColor(onProgress) {
 
   state.lastUpdated = new Date();
   onProgress(`Successfully tagged ${total} wines.`);
-  const { renderInventory: renderInv2 } = await import('./ui.js?v=2.0.43');
+  const { renderInventory: renderInv2 } = await import('./ui.js?v=2.0.44');
   renderInv2();
 }
 
