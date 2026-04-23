@@ -50,27 +50,49 @@ function cardHTML(w) {
   `;
 }
 
-function galleryCardHTML(w, index) {
+function galleryCardHTML(w, index, totalCount) {
   if (!w) return '';
-  const qtyBadge = (parseInt(w.quantity) > 1) ? `<span class="gallery-qty">×${w.quantity}</span>` : '';
-  const starBadge = (w.buyAgain) ? '<span class="gallery-star">⭐</span>' : '';
-  
+  const qty = parseInt(w.quantity) || 1;
+  const qtyHtml  = qty > 1 ? `<span class="gc-qty">×${qty}</span>` : '';
+  const starHtml = w.buyAgain ? `<span class="gc-star">⭐</span>` : '';
+
   const section = SECTIONS.find(s => s.status === w.status);
-  const badgeLabel = w.status === 'consumed' 
+  const badgeLabel = w.status === 'consumed'
     ? `Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}`
     : (w.badge || (section ? section.label : w.status));
-  
+
+  const rawNotes = w.notes || '';
+  const notesPreview = rawNotes.length > 0
+    ? `"${rawNotes.slice(0, 80)}${rawNotes.length > 80 ? '…' : ''}"`
+    : '';
+
+  let dotsHtml = '';
+  if (totalCount <= 12) {
+    dotsHtml = Array.from({ length: totalCount }, (_, i) =>
+      `<span class="gc-dot${i === index ? ' gc-dot-active' : ''}"></span>`
+    ).join('');
+  } else {
+    const pct = totalCount > 1 ? Math.round((index / (totalCount - 1)) * 100) : 0;
+    dotsHtml = `<div class="gc-progress"><div class="gc-progress-fill" style="width:${pct}%"></div></div>`;
+  }
+
   return `
     <div class="gallery-card ${w.status}" data-id="${w.id}" data-index="${index}">
-      <div class="gallery-card-header">
-        <div class="gallery-card-year">${w.year}</div>
-        <div class="gallery-card-name">${w.name}</div>
-        <div class="gallery-card-meta">${w.region}${w.grape ? ` · ${w.grape}` : ''}</div>
+      <div class="gc-top">
+        <div class="gc-year">${w.year || '—'}</div>
+        <div class="gc-year-fade"></div>
       </div>
-      <div class="gallery-card-body"></div>
-      <div class="gallery-card-footer">
-        <div class="gallery-badge">${badgeLabel}</div>
-        <div class="gallery-badges-right">${starBadge}${qtyBadge}</div>
+      <div class="gc-middle">
+        <div class="gc-name">${w.name}</div>
+        <div class="gc-region">${w.region || ''}</div>
+        ${w.grape ? `<div class="gc-grape">${w.grape}</div>` : ''}
+        <div class="gc-divider"></div>
+      </div>
+      <div class="gc-bottom">
+        <span class="gc-status-badge">${badgeLabel}</span>
+        ${notesPreview ? `<p class="gc-notes">${notesPreview}</p>` : ''}
+        ${(starHtml || qtyHtml) ? `<div class="gc-bottom-meta">${starHtml}${qtyHtml}</div>` : ''}
+        <div class="gc-dots">${dotsHtml}</div>
       </div>
     </div>
   `;
@@ -84,17 +106,18 @@ function renderGallery(items) {
   }
 
   const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
-  const hintHtml = showHint ? '<div class="gallery-hint">Scroll to browse</div>' : '';
 
   main.innerHTML = `
     <div class="gallery-container" id="galleryContainer">
-      ${hintHtml}
+      <div class="gc-chevron gc-chevron-left" id="galChevronLeft">&#x2039;</div>
       <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
         <div class="gallery-spacer"></div>
-        ${items.map((item, idx) => galleryCardHTML(item, idx)).join('')}
+        ${items.map((item, idx) => galleryCardHTML(item, idx, items.length)).join('')}
         <div class="gallery-spacer"></div>
       </div>
+      <div class="gc-chevron gc-chevron-right" id="galChevronRight">&#x203A;</div>
     </div>
+    ${showHint ? '<div class="gallery-hint" id="galleryHint">Swipe to browse</div>' : ''}
     <div class="gallery-controls">
       <button class="gallery-nav-btn gallery-prev" id="galleryPrevBtn" aria-label="Previous bottle">←</button>
       <div class="gallery-pagination" id="galleryPagination">
@@ -167,13 +190,18 @@ function renderGallery(items) {
     }
   }, 50);
 
-  if (showHint) {
-    setTimeout(() => {
+  // Hide chevrons + hint on first scroll or after 3s
+  const hideChevrons = () => {
+    document.getElementById('galChevronLeft')?.classList.add('hidden');
+    document.getElementById('galChevronRight')?.classList.add('hidden');
+    if (showHint) {
       localStorage.setItem('cellar_gallery_hint_seen', 'true');
-      const hint = document.querySelector('.gallery-hint');
-      if (hint) hint.remove();
-    }, 3000);
-  }
+      const hint = document.getElementById('galleryHint');
+      if (hint) hint.classList.add('faded');
+    }
+  };
+  container.addEventListener('scroll', hideChevrons, { once: true, passive: true });
+  if (showHint) setTimeout(hideChevrons, 3000);
 }
 
 function renderWelcome() {
