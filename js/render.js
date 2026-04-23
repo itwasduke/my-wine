@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.33';
+import { SECTIONS, state } from './state.js?v=2.0.38';
 
 let lastRenderedHTML = '';
 
@@ -76,20 +76,22 @@ function galleryCardHTML(w, index, totalCount) {
     dotsHtml = `<div class="gc-progress"><div class="gc-progress-fill" style="width:${pct}%"></div></div>`;
   }
 
+  const abvHtml = w.abv ? `<span class="gc-abv-pill">${w.abv}</span>` : '';
+
   return `
     <div class="gallery-card ${w.status}" data-id="${w.id}" data-index="${index}">
-      <div class="gc-top">
-        <div class="gc-year">${w.year || '—'}</div>
-        <div class="gc-year-fade"></div>
-      </div>
-      <div class="gc-middle">
+      <div class="gc-hero">
         <div class="gc-name">${w.name}</div>
+        <div class="gc-year">${w.year || '—'}</div>
         <div class="gc-region">${w.region || ''}</div>
         ${w.grape ? `<div class="gc-grape">${w.grape}</div>` : ''}
-        <div class="gc-divider"></div>
       </div>
+      <div class="gc-divider"></div>
       <div class="gc-bottom">
-        <span class="gc-status-badge">${badgeLabel}</span>
+        <div class="gc-badges-row">
+          <span class="gc-status-badge">${badgeLabel}</span>
+          ${abvHtml}
+        </div>
         ${notesPreview ? `<p class="gc-notes">${notesPreview}</p>` : ''}
         ${(starHtml || qtyHtml) ? `<div class="gc-bottom-meta">${starHtml}${qtyHtml}</div>` : ''}
         <div class="gc-dots">${dotsHtml}</div>
@@ -265,7 +267,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.33');
+      const { loadInventory } = await import('./db.js?v=2.0.38');
       await loadInventory();
     });
   }

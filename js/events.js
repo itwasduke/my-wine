@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.33';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.33';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.33';
+import { state } from './state.js?v=2.0.38';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.38';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.38';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -174,7 +174,7 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.33');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.38');
     renderAnalytics(state.inventory);
   });
 
@@ -201,7 +201,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.33');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.38');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -213,7 +213,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.33');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.38');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -226,7 +226,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.33');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.38');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -237,10 +237,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.33');
+      const { markConsumed } = await import('./db.js?v=2.0.38');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.33');
+      const { updateQuantity } = await import('./db.js?v=2.0.38');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -248,8 +248,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.33');
-      const { saveProScores }   = await import('./db.js?v=2.0.33');
+      const { lookupProScores } = await import('./ai.js?v=2.0.38');
+      const { saveProScores }   = await import('./db.js?v=2.0.38');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -259,13 +259,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.33');
+      const { setRating } = await import('./db.js?v=2.0.38');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.33');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.38');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.33');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.38');
       confirmDeleteBottle(id);
     }
   });
