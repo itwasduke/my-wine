@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.39';
+import { SECTIONS, state } from './state.js?v=2.0.40';
 
 let lastRenderedHTML = '';
 
@@ -50,7 +50,8 @@ function cardHTML(w) {
   `;
 }
 
-function galleryCardHTML(w, index, totalCount) {
+// cloneType: null (real card) | 'start' (clone of last) | 'end' (clone of first)
+function galleryCardHTML(w, index, totalCount, cloneType = null) {
   if (!w) return '';
   const qty = parseInt(w.quantity) || 1;
   const qtyHtml  = qty > 1 ? `<span class="gc-qty">×${qty}</span>` : '';
@@ -77,9 +78,10 @@ function galleryCardHTML(w, index, totalCount) {
   }
 
   const abvHtml = w.abv ? `<span class="gc-abv-pill">${w.abv}</span>` : '';
+  const cloneAttr = cloneType ? `data-clone="${cloneType}"` : `data-index="${index}"`;
 
   return `
-    <div class="gallery-card ${w.status}" data-id="${w.id}" data-index="${index}">
+    <div class="gallery-card ${w.status}" data-id="${w.id}" ${cloneAttr}>
       <div class="gc-hero">
         <div class="gc-name">${w.name}</div>
         <div class="gc-year">${w.year || '—'}</div>
@@ -108,13 +110,20 @@ function renderGallery(items) {
   }
 
   const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
+  const N = items.length;
+
+  // Clone last card at start, first card at end — enables infinite wrap-around
+  const startClone = galleryCardHTML(items[N - 1], N - 1, N, 'start');
+  const endClone   = galleryCardHTML(items[0],     0,     N, 'end');
 
   main.innerHTML = `
     <div class="gallery-container" id="galleryContainer">
       <div class="gc-chevron gc-chevron-left" id="galChevronLeft">&#x2039;</div>
       <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
         <div class="gallery-spacer"></div>
-        ${items.map((item, idx) => galleryCardHTML(item, idx, items.length)).join('')}
+        ${startClone}
+        ${items.map((item, idx) => galleryCardHTML(item, idx, N)).join('')}
+        ${endClone}
         <div class="gallery-spacer"></div>
       </div>
       <div class="gc-chevron gc-chevron-right" id="galChevronRight">&#x203A;</div>
@@ -123,46 +132,61 @@ function renderGallery(items) {
     <div class="gallery-controls">
       <button class="gallery-nav-btn gallery-prev" id="galleryPrevBtn" aria-label="Previous bottle">←</button>
       <div class="gallery-pagination" id="galleryPagination">
-        ${state.galleryIndex + 1} of ${items.length}
+        ${state.galleryIndex + 1} of ${N}
       </div>
       <button class="gallery-nav-btn gallery-next" id="galleryNextBtn" aria-label="Next bottle">→</button>
     </div>
   `;
 
-  const container = document.getElementById('galleryContainer');
-  const cards = container.querySelectorAll('.gallery-card');
+  const container  = document.getElementById('galleryContainer');
+  const allCards   = container.querySelectorAll('.gallery-card');
+  // allCards layout: [startClone, real_0 … real_N-1, endClone]
+  const REAL_START = 1;           // node index of real card 0
+  const REAL_END   = N;           // node index of real card N-1
   const pagination = document.getElementById('galleryPagination');
-  const prevBtn = document.getElementById('galleryPrevBtn');
-  const nextBtn = document.getElementById('galleryNextBtn');
+  const prevBtn    = document.getElementById('galleryPrevBtn');
+  const nextBtn    = document.getElementById('galleryNextBtn');
 
-  // Scroll the container so card[idx] is centered
-  const scrollToIndex = (idx, smooth = true) => {
-    const card = cards[idx];
+  // Scroll container so allCards[nodeIdx] is centered
+  const scrollToNode = (nodeIdx, smooth = true) => {
+    const card = allCards[nodeIdx];
     if (!card) return;
     const targetLeft = card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
     container.scrollTo({ left: Math.max(0, targetLeft), behavior: smooth ? 'smooth' : 'instant' });
   };
 
-  // Mark a card active and update state + pagination
-  const setActive = (idx) => {
-    cards.forEach(c => c.classList.remove('active'));
-    if (cards[idx]) cards[idx].classList.add('active');
-    state.galleryIndex = idx;
-    pagination.textContent = `${idx + 1} of ${items.length}`;
+  // Mark a node active; map node index → logical index for state + pagination
+  const setActiveNode = (nodeIdx) => {
+    allCards.forEach(c => c.classList.remove('active'));
+    if (allCards[nodeIdx]) allCards[nodeIdx].classList.add('active');
+    const logicalIdx = Math.max(0, Math.min(N - 1, nodeIdx - REAL_START));
+    state.galleryIndex = logicalIdx;
+    pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
 
-  // After scroll settles, find the card closest to center and activate it
+  // After scroll settles: identify centered card, silently jump if it's a clone
   const detectActive = () => {
     const center = container.scrollLeft + container.clientWidth / 2;
-    let best = state.galleryIndex, bestDist = Infinity;
-    cards.forEach((card, i) => {
+    let bestNode = REAL_START, bestDist = Infinity;
+    allCards.forEach((card, i) => {
       const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - center);
-      if (dist < bestDist) { bestDist = dist; best = i; }
+      if (dist < bestDist) { bestDist = dist; bestNode = i; }
     });
-    if (best !== state.galleryIndex) setActive(best);
+
+    const landed = allCards[bestNode];
+    if (landed?.dataset.clone === 'start') {
+      // Swiped left past first → instant jump to real last
+      setActiveNode(REAL_END);
+      scrollToNode(REAL_END, false);
+    } else if (landed?.dataset.clone === 'end') {
+      // Swiped right past last → instant jump to real first
+      setActiveNode(REAL_START);
+      scrollToNode(REAL_START, false);
+    } else {
+      setActiveNode(bestNode);
+    }
   };
 
-  // Use scrollend if available; fallback to scroll + timeout
   let scrollTimer;
   if ('onscrollend' in window) {
     container.addEventListener('scrollend', detectActive, { passive: true });
@@ -173,35 +197,33 @@ function renderGallery(items) {
     }, { passive: true });
   }
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      const target = Math.max(0, state.galleryIndex - 1);
-      setActive(target);
-      scrollToIndex(target);
-    });
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      const target = Math.min(cards.length - 1, state.galleryIndex + 1);
-      setActive(target);
-      scrollToIndex(target);
-    });
-  }
+  // Shared navigate fn — used by buttons and exposed for keyboard handler
+  const navigate = (dir) => {
+    const curNode = state.galleryIndex + REAL_START;
+    const target  = dir < 0
+      ? (curNode <= REAL_START ? REAL_END   : curNode - 1)
+      : (curNode >= REAL_END   ? REAL_START : curNode + 1);
+    setActiveNode(target);
+    scrollToNode(target);
+  };
 
-  // Initial position — measure real DOM dimensions first so spacers are exact
+  state.galleryNavigate = navigate;
+  prevBtn?.addEventListener('click', () => navigate(-1));
+  nextBtn?.addEventListener('click', () => navigate(1));
+
+  // Initial render: measure real card width, set exact spacer sizes, then position
   setTimeout(() => {
-    // Set spacer widths from actual measured values so the last card can
-    // always scroll fully to center regardless of CSS percentage resolution
-    if (cards[0]) {
-      const spacerW = Math.max(0, (container.clientWidth - cards[0].offsetWidth) / 2);
+    const firstReal = allCards[REAL_START];
+    if (firstReal) {
+      const spacerW = Math.max(0, (container.clientWidth - firstReal.offsetWidth) / 2);
       container.querySelectorAll('.gallery-spacer').forEach(s => {
         s.style.flexBasis = spacerW + 'px';
         s.style.minWidth  = spacerW + 'px';
       });
     }
-    const startIdx = cards[state.galleryIndex] ? state.galleryIndex : 0;
-    scrollToIndex(startIdx, false);
-    setActive(startIdx);
+    const startNode = state.galleryIndex + REAL_START;
+    scrollToNode(startNode, false);
+    setActiveNode(startNode);
   }, 50);
 
   // Hide chevrons + hint on first scroll or after 3s
@@ -210,8 +232,7 @@ function renderGallery(items) {
     document.getElementById('galChevronRight')?.classList.add('hidden');
     if (showHint) {
       localStorage.setItem('cellar_gallery_hint_seen', 'true');
-      const hint = document.getElementById('galleryHint');
-      if (hint) hint.classList.add('faded');
+      document.getElementById('galleryHint')?.classList.add('faded');
     }
   };
   container.addEventListener('scroll', hideChevrons, { once: true, passive: true });
@@ -276,7 +297,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.39');
+      const { loadInventory } = await import('./db.js?v=2.0.40');
       await loadInventory();
     });
   }

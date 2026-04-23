@@ -1,4 +1,4 @@
-import { state } from './state.js?v=2.0.39';
+import { state } from './state.js?v=2.0.40';
 
 export function openModal(id) {
   const w = state.inventory[id];

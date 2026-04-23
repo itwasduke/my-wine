@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.39';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.39';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.39';
+import { state } from './state.js?v=2.0.40';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.40';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.40';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -115,23 +115,11 @@ export function initUIListeners() {
     });
   });
 
-  // Keyboard navigation
+  // Keyboard navigation — delegate to navigate fn wired up by renderGallery
   document.addEventListener('keydown', e => {
-    if (state.viewMode !== 'gallery') return;
-    const container = document.getElementById('galleryContainer');
-    if (!container) return;
-    const cards = container.querySelectorAll('.gallery-card');
-    let target = -1;
-    if (e.key === 'ArrowLeft' && state.galleryIndex > 0) target = state.galleryIndex - 1;
-    else if (e.key === 'ArrowRight' && state.galleryIndex < cards.length - 1) target = state.galleryIndex + 1;
-    if (target < 0) return;
-    e.preventDefault();
-    const card = cards[target];
-    state.galleryIndex = target;
-    container.querySelectorAll('.gallery-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-    const targetLeft = card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
-    container.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+    if (state.viewMode !== 'gallery' || !state.galleryNavigate) return;
+    if (e.key === 'ArrowLeft')       { e.preventDefault(); state.galleryNavigate(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); state.galleryNavigate(1);  }
   });
 
   // Main content clicks (Event Delegation for cards)
@@ -174,7 +162,7 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.39');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.40');
     renderAnalytics(state.inventory);
   });
 
@@ -201,7 +189,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.39');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.40');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -213,7 +201,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.39');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.40');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -226,7 +214,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.39');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.40');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -237,10 +225,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.39');
+      const { markConsumed } = await import('./db.js?v=2.0.40');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.39');
+      const { updateQuantity } = await import('./db.js?v=2.0.40');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -248,8 +236,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.39');
-      const { saveProScores }   = await import('./db.js?v=2.0.39');
+      const { lookupProScores } = await import('./ai.js?v=2.0.40');
+      const { saveProScores }   = await import('./db.js?v=2.0.40');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -259,13 +247,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.39');
+      const { setRating } = await import('./db.js?v=2.0.40');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.39');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.40');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.39');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.40');
       confirmDeleteBottle(id);
     }
   });

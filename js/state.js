@@ -6,7 +6,8 @@ export const state = {
   viewMode: localStorage.getItem('cellar_view_mode') || 'grid',
   galleryIndex: 0,
   showInventoryUnauth: false,
-  lastUpdated: null
+  lastUpdated: null,
+  galleryNavigate: null,  // set by renderGallery, used by keyboard handler
 };
 
 export const SECTIONS = [
