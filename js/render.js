@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.47';
+import { SECTIONS, state } from './state.js?v=2.0.48';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -174,7 +174,11 @@ function renderGallery(items) {
 
   const setActiveNode = (nodeIdx) => {
     allCards.forEach((c, i) => c.classList.toggle('active', i === nodeIdx));
-    const logicalIdx = Math.max(0, Math.min(N - 1, nodeIdx - REAL_START));
+    // Map clone indices back to logical items for pagination
+    let logicalIdx = nodeIdx - REAL_START;
+    if (logicalIdx < 0) logicalIdx = N - 1;
+    if (logicalIdx >= N) logicalIdx = 0;
+    
     state.galleryIndex = logicalIdx;
     pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
@@ -221,9 +225,7 @@ function renderGallery(items) {
 
   const navigate = (dir) => {
     const curNode = state.galleryIndex + REAL_START;
-    const target  = dir < 0
-      ? (curNode <= REAL_START ? REAL_END   : curNode - 1)
-      : (curNode >= REAL_END   ? REAL_START : curNode + 1);
+    const target = dir < 0 ? curNode - 1 : curNode + 1;
     setActiveNode(target);
     scrollToNode(target);
   };
@@ -412,7 +414,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.47');
+      const { loadInventory } = await import('./db.js?v=2.0.48');
       await loadInventory();
     });
   }

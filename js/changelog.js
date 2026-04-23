@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "2.0.48",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Fixed Gallery infinite scroll to smoothly transition onto the first/last card instead of jumping back across the entire list.",
+      "UI: Improved Gallery pagination accuracy during rapid scrolling."
+    ]
+  },
+  {
     version: "2.0.47",
     date: "April 23, 2026",
     changes: [

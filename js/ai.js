@@ -1,6 +1,6 @@
-import { app } from './firebase.js?v=2.0.47';
-import { state } from './state.js?v=2.0.47';
-import { saveNewBottle } from './db.js?v=2.0.47';
+import { app } from './firebase.js?v=2.0.48';
+import { state } from './state.js?v=2.0.48';
+import { saveNewBottle } from './db.js?v=2.0.48';
 
 let cachedGeminiModel = null;
 
