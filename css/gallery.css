@@ -50,8 +50,7 @@
   height: 100vh;
   overflow-x: auto;
   overflow-y: hidden;
-  display: flex;
-  align-items: center;
+  display: block;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -85,7 +84,7 @@
   align-items: center;
   gap: 20px;
   height: 100%;
-  width: 100%;
+  width: max-content;
   /* --card-w is overridden in media queries so spacer & card always match */
   --card-w: clamp(260px, 80vw, 320px);
 }

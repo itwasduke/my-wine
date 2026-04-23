@@ -1,5 +1,15 @@
 export const CHANGELOG = [
   {
+    version: "2.0.53",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Fixed horizontal gallery infinite scroll 'stop' issue by optimizing container layout width.",
+      "fix: Smoothed out the transition when looping between the end and start of the horizontal gallery.",
+      "perf: Improved active card detection responsiveness during scrolling.",
+      "UI: Adjusted gallery container to better handle content overflow and snapping."
+    ]
+  },
+  {
     version: "2.0.52",
     date: "April 23, 2026",
     changes: [
