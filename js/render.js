@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.38';
+import { SECTIONS, state } from './state.js?v=2.0.39';
 
 let lastRenderedHTML = '';
 
@@ -188,8 +188,17 @@ function renderGallery(items) {
     });
   }
 
-  // Initial position — instant, no animation
+  // Initial position — measure real DOM dimensions first so spacers are exact
   setTimeout(() => {
+    // Set spacer widths from actual measured values so the last card can
+    // always scroll fully to center regardless of CSS percentage resolution
+    if (cards[0]) {
+      const spacerW = Math.max(0, (container.clientWidth - cards[0].offsetWidth) / 2);
+      container.querySelectorAll('.gallery-spacer').forEach(s => {
+        s.style.flexBasis = spacerW + 'px';
+        s.style.minWidth  = spacerW + 'px';
+      });
+    }
     const startIdx = cards[state.galleryIndex] ? state.galleryIndex : 0;
     scrollToIndex(startIdx, false);
     setActive(startIdx);
@@ -267,7 +276,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.38');
+      const { loadInventory } = await import('./db.js?v=2.0.39');
       await loadInventory();
     });
   }
