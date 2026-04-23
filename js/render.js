@@ -1,11 +1,15 @@
-import { SECTIONS, state } from './state.js?v=2.0.40';
+import { SECTIONS, state } from './state.js?v=2.0.41';
 
 let lastRenderedHTML = '';
+let lastInventoryData = null;
+let lastFilterState = null;
+let lastGalleryItems = null;
 
 function formatRelativeTime(date) {
   if (!date) return 'Never';
   const now = new Date();
   const diff = Math.floor((now - date) / 1000);
+  if (diff < 0) return 'Just now'; // Handle future clocks
   if (diff < 5) return 'Just now';
   if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
@@ -102,8 +106,20 @@ function galleryCardHTML(w, index, totalCount, cloneType = null) {
   `;
 }
 
+let galleryScrollListener = null;
+let galleryResizeListener = null;
+let hintTimeout = null;
+
 function renderGallery(items) {
   const main = document.getElementById('main-content');
+  const itemsHash = items.map(i => i.id).join(',');
+  
+  // If the items are the same and we are already in gallery mode, just update active state
+  if (main.querySelector('.gallery-container') && main.dataset.galleryHash === itemsHash) {
+    return;
+  }
+  main.dataset.galleryHash = itemsHash;
+
   if (items.length === 0) {
     main.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">No bottles match your filters.</div>`;
     return;
@@ -112,7 +128,6 @@ function renderGallery(items) {
   const showHint = !localStorage.getItem('cellar_gallery_hint_seen');
   const N = items.length;
 
-  // Clone last card at start, first card at end — enables infinite wrap-around
   const startClone = galleryCardHTML(items[N - 1], N - 1, N, 'start');
   const endClone   = galleryCardHTML(items[0],     0,     N, 'end');
 
@@ -140,14 +155,12 @@ function renderGallery(items) {
 
   const container  = document.getElementById('galleryContainer');
   const allCards   = container.querySelectorAll('.gallery-card');
-  // allCards layout: [startClone, real_0 … real_N-1, endClone]
-  const REAL_START = 1;           // node index of real card 0
-  const REAL_END   = N;           // node index of real card N-1
+  const REAL_START = 1;
+  const REAL_END   = N;
   const pagination = document.getElementById('galleryPagination');
   const prevBtn    = document.getElementById('galleryPrevBtn');
   const nextBtn    = document.getElementById('galleryNextBtn');
 
-  // Scroll container so allCards[nodeIdx] is centered
   const scrollToNode = (nodeIdx, smooth = true) => {
     const card = allCards[nodeIdx];
     if (!card) return;
@@ -155,49 +168,53 @@ function renderGallery(items) {
     container.scrollTo({ left: Math.max(0, targetLeft), behavior: smooth ? 'smooth' : 'instant' });
   };
 
-  // Mark a node active; map node index → logical index for state + pagination
   const setActiveNode = (nodeIdx) => {
-    allCards.forEach(c => c.classList.remove('active'));
-    if (allCards[nodeIdx]) allCards[nodeIdx].classList.add('active');
+    allCards.forEach((c, i) => c.classList.toggle('active', i === nodeIdx));
     const logicalIdx = Math.max(0, Math.min(N - 1, nodeIdx - REAL_START));
     state.galleryIndex = logicalIdx;
     pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
 
-  // After scroll settles: identify centered card, silently jump if it's a clone
+  // O(1) active detection using card width + scroll offset
   const detectActive = () => {
-    const center = container.scrollLeft + container.clientWidth / 2;
-    let bestNode = REAL_START, bestDist = Infinity;
-    allCards.forEach((card, i) => {
-      const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - center);
-      if (dist < bestDist) { bestDist = dist; bestNode = i; }
-    });
+    if (!allCards[REAL_START]) return;
+    const cardWidth = allCards[REAL_START].offsetWidth;
+    const gap = 20; // from CSS gap
+    const containerMid = container.scrollLeft + container.clientWidth / 2;
+    const firstCardCenter = allCards[REAL_START].offsetLeft + cardWidth / 2;
+    
+    // Calculate node index from scroll position
+    const nodeIdx = Math.round((containerMid - firstCardCenter) / (cardWidth + gap)) + REAL_START;
+    const clampedNode = Math.max(0, Math.min(allCards.length - 1, nodeIdx));
 
-    const landed = allCards[bestNode];
+    const landed = allCards[clampedNode];
     if (landed?.dataset.clone === 'start') {
-      // Swiped left past first → instant jump to real last
       setActiveNode(REAL_END);
       scrollToNode(REAL_END, false);
     } else if (landed?.dataset.clone === 'end') {
-      // Swiped right past last → instant jump to real first
       setActiveNode(REAL_START);
       scrollToNode(REAL_START, false);
     } else {
-      setActiveNode(bestNode);
+      setActiveNode(clampedNode);
     }
   };
 
+  if (galleryScrollListener) container.removeEventListener('scrollend', galleryScrollListener);
+  
   let scrollTimer;
+  const onScroll = () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(detectActive, 50);
+  };
+
   if ('onscrollend' in window) {
-    container.addEventListener('scrollend', detectActive, { passive: true });
+    galleryScrollListener = detectActive;
+    container.addEventListener('scrollend', galleryScrollListener, { passive: true });
   } else {
-    container.addEventListener('scroll', () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(detectActive, 80);
-    }, { passive: true });
+    galleryScrollListener = onScroll;
+    container.addEventListener('scroll', galleryScrollListener, { passive: true });
   }
 
-  // Shared navigate fn — used by buttons and exposed for keyboard handler
   const navigate = (dir) => {
     const curNode = state.galleryIndex + REAL_START;
     const target  = dir < 0
@@ -211,7 +228,13 @@ function renderGallery(items) {
   prevBtn?.addEventListener('click', () => navigate(-1));
   nextBtn?.addEventListener('click', () => navigate(1));
 
-  // Initial render: measure real card width, set exact spacer sizes, then position
+  // Handle resize to fix centering
+  if (galleryResizeListener) window.removeEventListener('resize', galleryResizeListener);
+  galleryResizeListener = () => {
+    scrollToNode(state.galleryIndex + REAL_START, false);
+  };
+  window.addEventListener('resize', galleryResizeListener, { passive: true });
+
   setTimeout(() => {
     const firstReal = allCards[REAL_START];
     if (firstReal) {
@@ -221,12 +244,10 @@ function renderGallery(items) {
         s.style.minWidth  = spacerW + 'px';
       });
     }
-    const startNode = state.galleryIndex + REAL_START;
-    scrollToNode(startNode, false);
-    setActiveNode(startNode);
+    scrollToNode(state.galleryIndex + REAL_START, false);
+    setActiveNode(state.galleryIndex + REAL_START);
   }, 50);
 
-  // Hide chevrons + hint on first scroll or after 3s
   const hideChevrons = () => {
     document.getElementById('galChevronLeft')?.classList.add('hidden');
     document.getElementById('galChevronRight')?.classList.add('hidden');
@@ -236,7 +257,8 @@ function renderGallery(items) {
     }
   };
   container.addEventListener('scroll', hideChevrons, { once: true, passive: true });
-  if (showHint) setTimeout(hideChevrons, 3000);
+  clearTimeout(hintTimeout);
+  if (showHint) hintTimeout = setTimeout(hideChevrons, 3000);
 }
 
 function renderWelcome() {
@@ -297,7 +319,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.40');
+      const { loadInventory } = await import('./db.js?v=2.0.41');
       await loadInventory();
     });
   }
@@ -320,22 +342,21 @@ export function renderInventory() {
     btn.classList.toggle('active', btn.dataset.view === state.viewMode);
   });
 
-  let filter = document.getElementById('filterBar')?.dataset.filter || 'all';
-
-  // Enforce: unauthorized users cannot see "Consumed"
-  if (!state.currentUser && filter === 'consumed') {
-    filter = 'all';
-    const filterBar = document.getElementById('filterBar');
-    if (filterBar) {
-      filterBar.dataset.filter = 'all';
-      filterBar.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.filter === 'all');
-      });
-    }
-  }
-
+  const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
   const sortBy = document.getElementById('sortSelect')?.value || 'newest';
+
+  // 1. Caching check: skip re-filtering/sorting if nothing changed
+  const filterState = `${filter}|${searchQuery}|${sortBy}|${state.consumedLikedFilter}|${state.wineColorFilter}|${state.viewMode}`;
+  const inventoryData = JSON.stringify(Object.keys(state.inventory)); // simple check for structural changes
+
+  if (lastInventoryData === inventoryData && lastFilterState === filterState && state.viewMode !== 'gallery') {
+    // We only skip if NOT in gallery mode, as gallery mode handles its own internal re-renders
+    return;
+  }
+
+  lastInventoryData = inventoryData;
+  lastFilterState = filterState;
 
   // Toggle sub-filter visibility
   const subFilterBar = document.getElementById('subFilterBar');
@@ -350,70 +371,44 @@ export function renderInventory() {
   // Defensive: Clear any leftover stars from previous versions
   document.querySelectorAll('.tab-star').forEach(el => el.remove());
 
-  // 1. Convert to array and filter by Search + Type Filter + Color Filter
+  // Filtering
   let items = Object.values(state.inventory).filter(w => {
-    // Main Filter logic
     let matchesMain = false;
-    if (filter === 'all') {
-      matchesMain = (w.status !== 'consumed');
-    } else if (filter === 'wine') {
-      // Wine only, exclude spirits and consumed
-      matchesMain = (w.status !== 'spirits' && w.status !== 'consumed');
-    } else if (filter === 'spirits') {
-      // Spirits only, exclude consumed
-      matchesMain = (w.status === 'spirits' && w.status !== 'consumed');
-    } else if (filter === 'consumed') {
-      // Consumed only
-      matchesMain = (w.status === 'consumed');
-    }
+    if (filter === 'all') matchesMain = (w.status !== 'consumed');
+    else if (filter === 'wine') matchesMain = (w.status !== 'spirits' && w.status !== 'consumed');
+    else if (filter === 'spirits') matchesMain = (w.status === 'spirits' && w.status !== 'consumed');
+    else if (filter === 'consumed') matchesMain = (w.status === 'consumed');
 
     if (!matchesMain) return false;
-
-    // Consumed Sub-Filter (Liked vs All)
-    if (filter === 'consumed' && state.consumedLikedFilter === 'liked') {
-      if (w.liked !== true) return false;
-    }
-
-    // Wine Sub-Filter (Color)
-    if (filter === 'wine' && state.wineColorFilter !== 'all') {
-      if (w.colorStyle !== state.wineColorFilter) return false;
-    }
-
-    // Search Query
+    if (filter === 'consumed' && state.consumedLikedFilter === 'liked' && !w.liked) return false;
+    if (filter === 'wine' && state.wineColorFilter !== 'all' && w.colorStyle !== state.wineColorFilter) return false;
     if (searchQuery) {
       const searchStr = `${w.name} ${w.region} ${w.grape} ${w.year}`.toLowerCase();
       return searchStr.includes(searchQuery);
     }
-
     return true;
   });
 
-  // 2. Sort
+  // Sorting
   items.sort((a, b) => {
     switch (sortBy) {
-      case 'year-asc':
-        return (parseInt(a.year) || 0) - (parseInt(b.year) || 0);
-      case 'year-desc':
-        return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
-      case 'name-asc':
-        return a.name.localeCompare(b.name);
-      case 'name-desc':
-        return b.name.localeCompare(a.name);
-      case 'oldest':
-        return a.id.localeCompare(b.id);
+      case 'year-asc':  return (parseInt(a.year) || 0) - (parseInt(b.year) || 0);
+      case 'year-desc': return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+      case 'name-asc':  return a.name.localeCompare(b.name);
+      case 'name-desc': return b.name.localeCompare(a.name);
+      case 'oldest':    return a.id.localeCompare(b.id);
       case 'newest':
-      default:
-        return b.id.localeCompare(a.id);
+      default:          return b.id.localeCompare(a.id);
     }
   });
 
   if (state.viewMode === 'gallery') {
     renderGallery(items);
-    lastRenderedHTML = ''; // Reset cache for gallery mode
+    lastRenderedHTML = '';
     return;
   }
 
-  // 3. Group by Status
+  // Grouping
   const byStatus = {};
   items.forEach(w => {
     let key = w.status;
@@ -427,10 +422,7 @@ export function renderInventory() {
   });
 
   const visibleSections = (filter === 'consumed')
-    ? [
-        { status: 'consumed-wine',    label: 'Consumed Wine',    cls: 'consumed' },
-        { status: 'consumed-spirits', label: 'Consumed Spirits', cls: 'consumed' }
-      ]
+    ? [{ status: 'consumed-wine', label: 'Consumed Wine', cls: 'consumed' }, { status: 'consumed-spirits', label: 'Consumed Spirits', cls: 'consumed' }]
     : SECTIONS.filter(sec => {
         if (filter === 'wine')     return (sec.status !== 'spirits' && sec.status !== 'consumed');
         if (filter === 'spirits')  return (sec.status === 'spirits');
@@ -439,27 +431,19 @@ export function renderInventory() {
 
   const newHTML = visibleSections
     .filter(sec => byStatus[sec.status]?.length)
-    .map(sec => {
-      let sectionItems = byStatus[sec.status];
-      return `
-        <div class="section">
-          <div class="section-header">
-            <span class="section-title ${sec.cls}">${sec.label}</span>
-            <div class="section-line ${sec.cls}"></div>
-          </div>
-          <div class="grid">
-            ${sectionItems.map(cardHTML).join('')}
-          </div>
+    .map(sec => `
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title ${sec.cls}">${sec.label}</span>
+          <div class="section-line ${sec.cls}"></div>
         </div>
-      `;
-    }).join('');
+        <div class="grid">
+          ${byStatus[sec.status].map(cardHTML).join('')}
+        </div>
+      </div>
+    `).join('');
 
-  const finalHTML = newHTML || (() => {
-    const emptyMsg = searchQuery
-      ? `No bottles match "${searchQuery}"`
-      : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.");
-    return `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${emptyMsg}</div>`;
-  })();
+  const finalHTML = newHTML || `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${searchQuery ? `No bottles match "${searchQuery}"` : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.") }</div>`;
 
   if (finalHTML !== lastRenderedHTML) {
     main.innerHTML = finalHTML;
@@ -475,32 +459,16 @@ function createToastContainer() {
   if (!container) {
     container = document.createElement('div');
     container.id = 'toastContainer';
-    container.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      max-width: 400px;
-      z-index: 10000;
-    `;
+    container.style.cssText = `position: fixed; bottom: 20px; left: 20px; right: 20px; max-width: 400px; z-index: 10000;`;
     document.body.appendChild(container);
   }
   return container;
 }
 
-export function showErrorToast(message) {
+function showToast(message, color) {
   const container = createToastContainer();
   const toast = document.createElement('div');
-  toast.style.cssText = `
-    background: #c41e3a;
-    color: #ffffff;
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    animation: slideInUp 0.3s ease-out;
-  `;
+  toast.style.cssText = `background: ${color}; color: #ffffff; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); animation: slideInUp 0.3s ease-out;`;
   toast.textContent = message;
   container.appendChild(toast);
   setTimeout(() => {
@@ -509,40 +477,15 @@ export function showErrorToast(message) {
   }, 4000);
 }
 
-export function showSuccessToast(message) {
-  const container = createToastContainer();
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    background: #2ecc71;
-    color: #ffffff;
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    animation: slideInUp 0.3s ease-out;
-  `;
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = 'slideOutDown 0.3s ease-in forwards';
-    setTimeout(() => toast.remove(), 300);
-  }, 4000);
-}
+export const showErrorToast = (msg) => showToast(msg, '#c41e3a');
+export const showSuccessToast = (msg) => showToast(msg, '#2ecc71');
 
-// Inject toast animations if not already present
 if (!document.querySelector('style[data-toasts]')) {
   const style = document.createElement('style');
   style.setAttribute('data-toasts', 'true');
   style.textContent = `
-    @keyframes slideInUp {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes slideOutDown {
-      from { transform: translateY(0); opacity: 1; }
-      to { transform: translateY(100%); opacity: 0; }
-    }
+    @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes slideOutDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0; } }
   `;
   document.head.appendChild(style);
 }

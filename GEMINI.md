@@ -105,6 +105,13 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.41 (April 23, 2026)**:
+    - perf: Optimized Gallery Mode with O(1) active card detection using scroll position math.
+    - perf: Implemented DOM caching in `renderInventory` to skip redundant filtering, sorting, and rendering when data hasn't changed.
+    - perf: Added a `galleryHash` to prevent unnecessary reconstruction of the entire gallery container.
+    - perf: Cached the Gemini AI model instance in `ai.js` to reduce SDK overhead.
+    - fix: Added window resize listener to keep Gallery Mode centered.
+    - fix: Hardened `formatRelativeTime` for future-dated timestamps and edge cases.
 - **v2.0.33 (April 23, 2026)**:
     - (Add your changes here)
 - **v2.0.32 (April 23, 2026)**:

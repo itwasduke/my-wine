@@ -1,7 +1,7 @@
-import { auth } from './firebase.js?v=2.0.40';
+import { auth } from './firebase.js?v=2.0.41';
 import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { updateAuthUI } from './ui.js?v=2.0.40';
-import { startInventoryListener, stopInventoryListener } from './db.js?v=2.0.40';
+import { updateAuthUI } from './ui.js?v=2.0.41';
+import { startInventoryListener, stopInventoryListener } from './db.js?v=2.0.41';
 
 export async function signIn() {
   const provider = new GoogleAuthProvider();

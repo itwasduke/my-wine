@@ -1,6 +1,28 @@
-import { app } from './firebase.js?v=2.0.40';
-import { state } from './state.js?v=2.0.40';
-import { saveNewBottle } from './db.js?v=2.0.40';
+import { app } from './firebase.js?v=2.0.41';
+import { state } from './state.js?v=2.0.41';
+import { saveNewBottle } from './db.js?v=2.0.41';
+
+let cachedGeminiModel = null;
+
+async function getGeminiModel() {
+  if (cachedGeminiModel) return cachedGeminiModel;
+
+  try {
+    const { getVertexAI, getGenerativeModel } =
+      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
+    cachedGeminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
+  } catch (e1) {
+    try {
+      const { getAI, getGenerativeModel, GoogleAIBackend } =
+        await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
+      cachedGeminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
+    } catch (e2) {
+      console.error('Failed to load Gemini SDK:', e2);
+      throw e2;
+    }
+  }
+  return cachedGeminiModel;
+}
 
 export async function handleImageSelected(event) {
   const file = event.target.files[0];
@@ -29,24 +51,7 @@ export async function handleImageSelected(event) {
     
     statusText.textContent = 'Reading label with Gemini…';
     
-    let geminiModel;
-    let sdkLoadError;
-
-    try {
-      const { getVertexAI, getGenerativeModel } =
-        await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-      geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
-    } catch (e1) {
-      try {
-        const { getAI, getGenerativeModel, GoogleAIBackend } =
-          await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-        geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
-      } catch (e2) {
-        sdkLoadError = e2;
-      }
-    }
-
-    if (!geminiModel) throw sdkLoadError || new Error('Could not load Firebase AI SDK');
+    const geminiModel = await getGeminiModel();
 
     const data = await analyzeLabel(base64, mimeType, geminiModel);
     populateAddForm(data);
@@ -150,16 +155,7 @@ function populateAddForm(data) {
 }
 
 export async function guessWineColor(bottle) {
-  let geminiModel;
-  try {
-    const { getVertexAI, getGenerativeModel } =
-      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
-  } catch (e) {
-    const { getAI, getGenerativeModel, GoogleAIBackend } =
-      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
-  }
+  const geminiModel = await getGeminiModel();
 
   const prompt = `Identify the color/style of this wine based on its name and grape:
   Name: ${bottle.name}
@@ -214,16 +210,7 @@ export async function confirmAddBottle() {
 }
 
 export async function lookupProScores(bottle) {
-  let geminiModel;
-  try {
-    const { getVertexAI, getGenerativeModel } =
-      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-vertexai.js');
-    geminiModel = getGenerativeModel(getVertexAI(app), { model: 'gemini-2.5-flash' });
-  } catch (e) {
-    const { getAI, getGenerativeModel, GoogleAIBackend } =
-      await import('https://www.gstatic.com/firebasejs/12.11.0/firebase-ai.js');
-    geminiModel = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), { model: 'gemini-2.5-flash' });
-  }
+  const geminiModel = await getGeminiModel();
 
   const prompt = `You are an expert wine critic. Find professional scores and ratings for this bottle:
   Name: ${bottle.name}
