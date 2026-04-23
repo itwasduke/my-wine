@@ -1,5 +1,15 @@
 export const CHANGELOG = [
   {
+    version: "2.0.49",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Consolidated Horizontal and Vertical views into a unified 'Gallery' category.",
+      "feat: Added a sub-mode toggle within the Gallery to easily switch between Horizontal and Vertical layouts.",
+      "UI: Simplified main navigation with a cleaner 2-way Grid/Gallery toggle.",
+      "UX: Persists your preferred Gallery sub-mode across sessions."
+    ]
+  },
+  {
     version: "2.0.48",
     date: "April 23, 2026",
     changes: [

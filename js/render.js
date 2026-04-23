@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.48';
+import { SECTIONS, state } from './state.js?v=2.0.49';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -106,6 +106,21 @@ function galleryCardHTML(w, index, totalCount, cloneType = null) {
   `;
 }
 
+function immersiveHeaderHTML(currentMode) {
+  return `
+    <div class="immersive-header">
+      <button class="vertical-close" id="immersiveBackBtn" aria-label="Back to inventory">
+        <span>←</span>
+        <span>Back</span>
+      </button>
+      <div class="mode-sub-toggle">
+        <button class="sub-mode-btn ${currentMode === 'gallery' ? 'active' : ''}" data-mode="gallery">Horizontal</button>
+        <button class="sub-mode-btn ${currentMode === 'vertical' ? 'active' : ''}" data-mode="vertical">Vertical</button>
+      </div>
+    </div>
+  `;
+}
+
 let galleryScrollListener = null;
 let galleryResizeListener = null;
 let hintTimeout = null;
@@ -133,10 +148,7 @@ function renderGallery(items) {
 
   main.innerHTML = `
     <div class="gallery-container" id="galleryContainer">
-      <button class="vertical-close" id="galleryBackBtn" aria-label="Back to inventory">
-        <span>←</span>
-        <span>Back</span>
-      </button>
+      ${immersiveHeaderHTML('gallery')}
       <div class="gc-chevron gc-chevron-left" id="galChevronLeft">&#x2039;</div>
       <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
         <div class="gallery-spacer"></div>
@@ -288,10 +300,7 @@ function renderVertical(items) {
 
   main.innerHTML = `
     <div class="vertical-container" id="verticalContainer">
-      <button class="vertical-close" id="verticalBackBtn" aria-label="Back to inventory">
-        <span>←</span>
-        <span>Back</span>
-      </button>
+      ${immersiveHeaderHTML('vertical')}
       <div class="vertical-wrapper" id="verticalWrapper">
         ${items.map((item, idx) => `
           <div class="vertical-card-wrapper" data-index="${idx}">
@@ -414,7 +423,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.48');
+      const { loadInventory } = await import('./db.js?v=2.0.49');
       await loadInventory();
     });
   }
@@ -434,7 +443,12 @@ export function renderInventory() {
 
   // Update View Toggle UI
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === state.viewMode);
+    const isImmersive = (state.viewMode === 'gallery' || state.viewMode === 'vertical');
+    if (btn.dataset.view === 'grid') {
+      btn.classList.toggle('active', state.viewMode === 'grid');
+    } else if (btn.dataset.view === 'gallery') {
+      btn.classList.toggle('active', isImmersive);
+    }
   });
 
   const filter = document.getElementById('filterBar')?.dataset.filter || 'all';

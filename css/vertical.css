@@ -100,12 +100,22 @@
   background: var(--accent);
 }
 
-/* Back button for Vertical mode */
-.vertical-close {
+/* ── Immersive Header & Toggle ─────────────────────────────────────────── */
+.immersive-header {
   position: fixed;
   top: 24px;
   left: 20px;
+  right: 20px;
   z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.immersive-header > * { pointer-events: auto; }
+
+.vertical-close {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -126,6 +136,34 @@
 .vertical-close:hover {
   background: rgba(78, 205, 196, 0.15);
   border-color: var(--accent);
+}
+
+.mode-sub-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.sub-mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sub-mode-btn.active {
+  background: var(--accent);
+  color: #111;
 }
 
 /* Animations */

@@ -4,6 +4,7 @@ export const state = {
   consumedLikedFilter: 'all',
   wineColorFilter: 'all',
   viewMode: localStorage.getItem('cellar_view_mode') || 'grid',
+  immersiveMode: localStorage.getItem('cellar_immersive_mode') || 'gallery',
   galleryIndex: 0,
   showInventoryUnauth: false,
   lastUpdated: null,

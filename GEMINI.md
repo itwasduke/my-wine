@@ -105,6 +105,9 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.49 (April 23, 2026)**:
+    - feat: Unified Horizontal and Vertical modes into a single 'Gallery' category with an in-view toggle.
+    - UI: Simplified top-level navigation to a 2-way Grid/Gallery toggle.
 - **v2.0.48 (April 23, 2026)**:
     - fix: Improved Gallery infinite scroll by allowing smooth transitions into clones before silent swapping.
     - UI: Fixed pagination mapping for clone elements in Gallery mode.
