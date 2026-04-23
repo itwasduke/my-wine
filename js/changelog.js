@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.56",
+    date: "April 23, 2026",
+    changes: [
+      "UI: Centered the search bar and filter controls on the main dashboard for improved visual balance.",
+      "UI: Optimized search input width for better desktop layout.",
+      "UI: Unified alignment across filter and sub-filter button bars."
+    ]
+  },
+  {
     version: "2.0.55",
     date: "April 23, 2026",
     changes: [
