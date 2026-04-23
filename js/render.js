@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.31';
+import { SECTIONS, state } from './state.js?v=2.0.32';
 
 let lastRenderedHTML = '';
 
@@ -104,7 +104,8 @@ function renderGallery(items) {
 
   const observerOptions = {
     root: container,
-    threshold: 0.6
+    threshold: 0.5,
+    rootMargin: '0px -40% 0px -40%' // Focus only on the center 20% of the viewport
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -206,7 +207,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.31');
+      const { loadInventory } = await import('./db.js?v=2.0.32');
       await loadInventory();
     });
   }

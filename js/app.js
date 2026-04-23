@@ -1,6 +1,6 @@
-import { initAuth } from './auth.js?v=2.0.31';
-import { initUIListeners, closeModalDirect, renderInventory } from './ui.js?v=2.0.31';
-import { initAIListeners, closeScanModal } from './ai.js?v=2.0.31';
+import { initAuth } from './auth.js?v=2.0.32';
+import { initUIListeners, closeModalDirect, renderInventory } from './ui.js?v=2.0.32';
+import { initAIListeners, closeScanModal } from './ai.js?v=2.0.32';
 
 // Initialize
 initAuth();

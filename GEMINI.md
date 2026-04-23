@@ -105,6 +105,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.32 (April 23, 2026)**:
+    - (Add your changes here)
 - **v2.0.31 (April 23, 2026)**:
     - (Add your changes here)
 - **v2.0.30 (April 23, 2026)**:

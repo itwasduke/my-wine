@@ -52,10 +52,11 @@
   display: flex;
   align-items: center;
   scroll-snap-type: x mandatory;
+  scroll-padding: 0 20px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Hide scrollbar Firefox */
   perspective: 1200px;
-  padding: 0 15%; /* Allow first and last cards to center */
+  padding: 0 10vw; /* Base padding to help centering */
 }
 
 .gallery-container::-webkit-scrollbar {
@@ -67,7 +68,7 @@
   align-items: center;
   gap: 20px;
   height: 100%;
-  padding: 0 20px;
+  padding: 0 40vw; /* Large padding so first/last cards can center perfectly */
   transform-style: preserve-3d;
 }
 
@@ -76,8 +77,8 @@
   flex: 0 0 75vw;
   width: 75vw;
   height: 80%;
-  max-width: 320px;
-  max-height: 500px;
+  max-width: 300px;
+  max-height: 480px;
   background: #242424;
   border-radius: 20px;
   padding: 24px;
@@ -92,6 +93,7 @@
   overflow: hidden;
   backface-visibility: hidden;
   scroll-snap-align: center;
+  scroll-snap-stop: always;
   transform-style: preserve-3d;
   
   /* Initial state for cards not in focus */
