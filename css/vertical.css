@@ -10,8 +10,8 @@
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  z-index: 10;
-  background: var(--bg);
+  z-index: 5; /* Lower to ensure it stays behind header/controls */
+  background: transparent; /* Fix black background, allow wine image to show */
 }
 
 .vertical-container::-webkit-scrollbar {

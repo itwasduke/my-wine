@@ -105,6 +105,9 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.45 (April 23, 2026)**:
+    - fix: Restored background image in Vertical mode by removing solid background color.
+    - UI: Improved View Toggle visibility with increased contrast and backdrop blur.
 - **v2.0.44 (April 23, 2026)**:
     - fix: Restored navigation visibility in Vertical mode by adjusting z-indices.
     - UI: Enhanced sticky header/controls contrast and card centering.

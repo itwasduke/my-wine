@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.45",
+    date: "April 23, 2026",
+    changes: [
+      "fix: Restored app background image in Vertical mode by making container transparent.",
+      "fix: Hardened navigation toggle accessibility with high-contrast background and stronger backdrop blur.",
+      "UI: Finalized immersive vertical centering to ensure cards don't collide with controls."
+    ]
+  },
+  {
     version: "2.0.44",
     date: "April 23, 2026",
     changes: [

@@ -9,8 +9,8 @@ main {
   max-width: 1400px;
   margin: 0 auto;
   padding: 24px 40px;
-  background: rgba(0,0,0,0.6); /* Slightly darker for legibility on cards */
-  backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.85); /* Much darker for reliable contrast */
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
