@@ -44,23 +44,26 @@
 /* Gallery Mode Container */
 .gallery-container {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   height: 70vh;
-  margin: 20px 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;
   align-items: center;
   scroll-snap-type: x mandatory;
-  scroll-padding: 0 20px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Hide scrollbar Firefox */
+  scrollbar-width: none;
   perspective: 1200px;
-  padding: 0 10vw; /* Base padding to help centering */
 }
 
 .gallery-container::-webkit-scrollbar {
-  display: none; /* Hide scrollbar Chrome/Safari */
+  display: none;
 }
 
 .gallery-scroll-wrapper {
@@ -68,17 +71,21 @@
   align-items: center;
   gap: 20px;
   height: 100%;
-  padding: 0 40vw; /* Large padding so first/last cards can center perfectly */
+  padding: 0;
   transform-style: preserve-3d;
+}
+
+.gallery-spacer {
+  flex: 0 0 calc(50vw - 160px); /* 160px is half of max-width 320px */
 }
 
 .gallery-card {
   position: relative;
-  flex: 0 0 75vw;
-  width: 75vw;
-  height: 80%;
-  max-width: 300px;
-  max-height: 480px;
+  flex: 0 0 80vw;
+  width: 80vw;
+  height: 85%;
+  max-width: 320px;
+  max-height: 500px;
   background: #242424;
   border-radius: 20px;
   padding: 24px;

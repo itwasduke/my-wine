@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.32';
+import { SECTIONS, state } from './state.js?v=2.0.33';
 
 let lastRenderedHTML = '';
 
@@ -90,7 +90,9 @@ function renderGallery(items) {
     <div class="gallery-container" id="galleryContainer">
       ${hintHtml}
       <div class="gallery-scroll-wrapper" id="galleryScrollWrapper">
+        <div class="gallery-spacer"></div>
         ${items.map((item, idx) => galleryCardHTML(item, idx)).join('')}
+        <div class="gallery-spacer"></div>
       </div>
     </div>
     <div class="gallery-pagination" id="galleryPagination">
@@ -104,8 +106,7 @@ function renderGallery(items) {
 
   const observerOptions = {
     root: container,
-    threshold: 0.5,
-    rootMargin: '0px -40% 0px -40%' // Focus only on the center 20% of the viewport
+    threshold: 0.8
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -207,7 +208,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.32');
+      const { loadInventory } = await import('./db.js?v=2.0.33');
       await loadInventory();
     });
   }

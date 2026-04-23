@@ -30,6 +30,11 @@
 }
 
 /* ── Typography & Body ──────────────────────────────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text-primary);
