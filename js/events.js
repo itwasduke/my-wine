@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.53';
-import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.53';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.53';
+import { state } from './state.js?v=2.0.55';
+import { renderInventory, updateLastUpdatedUI } from './render.js?v=2.0.55';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.55';
 
 export function initUIListeners() {
   // Restore preferences from localStorage
@@ -193,14 +193,14 @@ export function initUIListeners() {
   navAnalytics.addEventListener('click', async () => {
     toggleDrawer(false);
     analyticsOverlay.classList.add('active');
-    const { renderAnalytics } = await import('./analytics.js?v=2.0.53');
+    const { renderAnalytics } = await import('./analytics.js?v=2.0.55');
     renderAnalytics(state.inventory);
   });
 
   navChangelog.addEventListener('click', async () => {
     toggleDrawer(false);
     changelogOverlay.classList.add('active');
-    const { renderChangelog } = await import('./renderChangelog.js?v=2.0.53');
+    const { renderChangelog } = await import('./renderChangelog.js?v=2.0.55');
     renderChangelog('changelog-content');
   });
 
@@ -232,7 +232,7 @@ export function initUIListeners() {
     bulkUpdateBtn.addEventListener('click', async () => {
       bulkUpdateBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkUpdateScores } = await import('./db.js?v=2.0.53');
+      const { bulkUpdateScores } = await import('./db.js?v=2.0.55');
       await bulkUpdateScores((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -244,7 +244,7 @@ export function initUIListeners() {
     bulkColorBtn.addEventListener('click', async () => {
       bulkColorBtn.disabled = true;
       if (bulkUpdateStatus) bulkUpdateStatus.style.display = 'block';
-      const { bulkTagWineColor } = await import('./db.js?v=2.0.53');
+      const { bulkTagWineColor } = await import('./db.js?v=2.0.55');
       await bulkTagWineColor((msg) => {
         if (bulkUpdateStatus) bulkUpdateStatus.textContent = msg;
       });
@@ -257,7 +257,7 @@ export function initUIListeners() {
     if (e.target.id === 'edit-consumed-count') {
       const { id, value } = e.target;
       const bottleId = e.target.dataset.id;
-      const { updateConsumedCount } = await import('./db.js?v=2.0.53');
+      const { updateConsumedCount } = await import('./db.js?v=2.0.55');
       await updateConsumedCount(bottleId, value);
     }
   });
@@ -268,10 +268,10 @@ export function initUIListeners() {
     const { action, id, value } = btn.dataset;
 
     if (action === 'consume') {
-      const { markConsumed } = await import('./db.js?v=2.0.53');
+      const { markConsumed } = await import('./db.js?v=2.0.55');
       markConsumed(id);
     } else if (action === 'qty-dec' || action === 'qty-inc') {
-      const { updateQuantity } = await import('./db.js?v=2.0.53');
+      const { updateQuantity } = await import('./db.js?v=2.0.55');
       const w = state.inventory[id];
       const current = parseInt(w.quantity) || 1;
       const change = action === 'qty-inc' ? 1 : -1;
@@ -279,8 +279,8 @@ export function initUIListeners() {
     } else if (action === 'lookup-scores') {
       btn.disabled = true;
       btn.textContent = 'Searching critics & vintage...';
-      const { lookupProScores } = await import('./ai.js?v=2.0.53');
-      const { saveProScores }   = await import('./db.js?v=2.0.53');
+      const { lookupProScores } = await import('./ai.js?v=2.0.55');
+      const { saveProScores }   = await import('./db.js?v=2.0.55');
       try {
         const scores = await lookupProScores(state.inventory[id]);
         await saveProScores(id, scores);
@@ -290,13 +290,13 @@ export function initUIListeners() {
         btn.textContent = 'Lookup Failed - Try Again';
       }
     } else if (action === 'rate') {
-      const { setRating } = await import('./db.js?v=2.0.53');
+      const { setRating } = await import('./db.js?v=2.0.55');
       setRating(id, value === 'true');
     } else if (action === 'buy-again') {
-      const { toggleBuyAgain } = await import('./db.js?v=2.0.53');
+      const { toggleBuyAgain } = await import('./db.js?v=2.0.55');
       toggleBuyAgain(id);
     } else if (action === 'delete') {
-      const { confirmDeleteBottle } = await import('./db.js?v=2.0.53');
+      const { confirmDeleteBottle } = await import('./db.js?v=2.0.55');
       confirmDeleteBottle(id);
     }
   });

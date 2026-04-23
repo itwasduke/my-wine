@@ -1,10 +1,9 @@
-import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.53';
-import { initUIListeners } from './events.js?v=2.0.53';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.53';
-import { state } from './state.js?v=2.0.53';
+import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.55';
+import { initUIListeners } from './events.js?v=2.0.55';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.55';
+import { state } from './state.js?v=2.0.55';
 
-// Coordinator module: re-exports all public functions from sub-modules
-// for backward compatibility with existing import contracts.
+const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 
 export {
   renderInventory,
@@ -16,9 +15,10 @@ export {
   closeModalDirect
 };
 
-// updateAuthUI manages auth state changes and triggers renders
 export function updateAuthUI(user) {
   state.currentUser = user;
+  const isOwner = user && user.uid === OWNER_UID;
+
   const signInBtn = document.getElementById('signInBtn');
   const userInfo  = document.getElementById('userInfo');
   const fab       = document.getElementById('fab');
@@ -34,9 +34,11 @@ export function updateAuthUI(user) {
     } else {
       initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
     }
-    fab.style.display = '';
+    
+    // Only show "Add" and "Consumed" if they are the owner
+    fab.style.display = isOwner ? '' : 'none';
     if (menuBtn) menuBtn.style.display = 'flex';
-    if (consumedBtn) consumedBtn.style.display = '';
+    if (consumedBtn) consumedBtn.style.display = isOwner ? '' : 'none';
   } else {
     signInBtn.style.display = '';
     userInfo.style.display  = 'none';
@@ -44,7 +46,7 @@ export function updateAuthUI(user) {
     if (menuBtn) menuBtn.style.display = 'none';
     if (consumedBtn) consumedBtn.style.display = 'none';
   }
-  // Re-render open modal if any
+
   const activeModal = document.getElementById('modalContent');
   if (activeModal && document.getElementById('modalOverlay').classList.contains('active')) {
     const openId = activeModal.dataset.openId;

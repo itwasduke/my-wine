@@ -1,3 +1,5 @@
+export const VERSION = '2.0.55';
+
 export const state = {
   inventory: {},
   currentUser: null,

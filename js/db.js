@@ -1,22 +1,23 @@
-import { db } from './firebase.js?v=2.0.53';
+import { db } from './firebase.js?v=2.0.55';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp, onSnapshot }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { state } from './state.js?v=2.0.53';
-import { closeScanModal } from './ai.js?v=2.0.53';
+import { state } from './state.js?v=2.0.55';
+import { closeScanModal } from './ai.js?v=2.0.55';
+
+const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
+const isOwner = () => state.currentUser && state.currentUser.uid === OWNER_UID;
 
 let unsubscribeInventory = null;
 let renderTimeout = null;
 
-// Applies legacy data fixes to a raw Firestore doc
+// Clean processDoc — removed legacy 'cook' and specific Japan logic
 function processDoc(d) {
   const data = d.data();
   const item = { id: d.id, ...data };
-  const name = (item.name || '').toLowerCase();
-  if (!item.type && (name.includes('piggyback') || name.includes('powers'))) {
-    item.type = 'spirit';
-  }
-  if (!item.status || item.status === 'cook') {
-    item.status = (item.type === 'spirit' || item.region === 'Japan') ? 'spirits' : 'ready';
+  if (!item.status) {
+    const name = (item.name || '').toLowerCase();
+    const isSpirit = (item.type === 'spirit' || name.includes('piggyback') || name.includes('powers'));
+    item.status = isSpirit ? 'spirits' : 'ready';
   }
   return item;
 }
@@ -45,20 +46,17 @@ export function startInventoryListener() {
   unsubscribeInventory = onSnapshot(
     collection(db, 'cellar'),
     async (snapshot) => {
-      if (snapshot.metadata.fromCache) {
-        console.log('[Cellar] Serving inventory from local cache');
-      }
       buildInventoryFromSnapshot(snapshot);
       
       clearTimeout(renderTimeout);
       renderTimeout = setTimeout(async () => {
-        const { renderInventory } = await import('./ui.js?v=2.0.53');
+        const { renderInventory } = await import('./render.js?v=2.0.55');
         renderInventory();
       }, 50);
     },
     async (e) => {
       console.error('[Cellar] onSnapshot error:', e);
-      const { showErrorToast, renderInventory } = await import('./ui.js?v=2.0.53');
+      const { showErrorToast, renderInventory } = await import('./render.js?v=2.0.55');
       showErrorToast('Real-time sync unavailable — loading snapshot');
       try {
         const snapshot = await getDocs(collection(db, 'cellar'));
@@ -78,14 +76,9 @@ export function stopInventoryListener() {
   }
 }
 
-// Kept as alias for the welcome-screen "View Collection" path in ui.js
-export function loadInventory() {
-  startInventoryListener();
-}
-
 export async function deleteBottle(id) {
-  if (!state.currentUser) return;
-  const { closeModalDirect, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { closeModalDirect, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.55');
   try {
     await deleteDoc(doc(db, 'cellar', id));
     state.lastUpdated = new Date();
@@ -93,13 +86,13 @@ export async function deleteBottle(id) {
     showSuccessToast('Bottle removed from cellar');
   } catch (e) {
     console.error('Failed to delete from Firestore:', e);
-    showErrorToast('Could not remove bottle — check your connection');
+    showErrorToast('Could not remove bottle');
   }
 }
 
 export async function markConsumed(id) {
-  if (!state.currentUser) return;
-  const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { renderInventory, closeModalDirect, openModal, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.55');
 
   const previous = { ...state.inventory[id] };
   const currentQty = parseInt(previous.quantity) || 1;
@@ -108,13 +101,11 @@ export async function markConsumed(id) {
   let firestoreUpdate = { updatedAt: serverTimestamp(), consumedCount: currentConsumed + 1 };
 
   if (currentQty > 1) {
-    // Optimistic: decrement quantity
     state.inventory[id] = { ...previous, quantity: currentQty - 1, consumedCount: currentConsumed + 1 };
     firestoreUpdate.quantity = currentQty - 1;
     renderInventory();
     openModal(id);
   } else {
-    // Optimistic: move to consumed
     const consumedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     state.inventory[id] = {
       ...previous,
@@ -137,18 +128,17 @@ export async function markConsumed(id) {
     console.error('Failed to update Firestore:', e);
     state.inventory[id] = previous;
     renderInventory();
-    showErrorToast('Could not mark bottle as consumed — changes reverted');
+    showErrorToast('Could not mark as consumed — changes reverted');
   }
 }
 
 export async function setRating(id, liked) {
-  if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { renderInventory, openModal, showErrorToast } = await import('./render.js?v=2.0.55');
 
   const previous = { ...state.inventory[id] };
   const newValue = (previous.liked === liked) ? null : liked;
 
-  // Optimistic update
   if (newValue === null) {
     const optimistic = { ...previous };
     delete optimistic.liked;
@@ -171,13 +161,13 @@ export async function setRating(id, liked) {
     state.inventory[id] = previous;
     openModal(id);
     renderInventory();
-    showErrorToast('Could not save rating — changes reverted');
+    showErrorToast('Could not save rating');
   }
 }
 
 export async function toggleBuyAgain(id) {
-  if (!state.currentUser) return;
-  const { openModal, showErrorToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { openModal, showErrorToast } = await import('./render.js?v=2.0.55');
   try {
     const current = state.inventory[id].buyAgain || false;
     const newValue = !current;
@@ -197,10 +187,9 @@ export async function toggleBuyAgain(id) {
 }
 
 export async function saveNewBottle(data) {
-  if (!state.currentUser) return;
-  const { openModal, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { openModal, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.55');
   try {
-    // Check for existing bottle (Duplicate / Restock)
     const existingId = Object.keys(state.inventory).find(id => {
       const w = state.inventory[id];
       return w.name.toLowerCase() === data.name.toLowerCase() &&
@@ -240,18 +229,13 @@ export async function saveNewBottle(data) {
     showSuccessToast('Bottle added to cellar');
   } catch (e) {
     console.error('Failed to save to Firestore:', e);
-    document.getElementById('scanOverlay').classList.add('active');
-    const status = document.getElementById('scanStatus');
-    status.className = 'scan-status error';
-    document.getElementById('scanStatusText').textContent = 'Save failed — check Firestore rules';
-    document.getElementById('scanSpinner').style.display = 'none';
     showErrorToast('Could not save bottle');
   }
 }
 
 export async function updateQuantity(id, newQty) {
-  if (!state.currentUser) return;
-  const { renderInventory, openModal, showErrorToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { renderInventory, openModal, showErrorToast } = await import('./render.js?v=2.0.55');
 
   const previous = { ...state.inventory[id] };
   const qty = Math.max(0, newQty);
@@ -268,7 +252,6 @@ export async function updateQuantity(id, newQty) {
     firestoreUpdate = { ...firestoreUpdate, status: 'ready', statusLabel: 'Ready to Drink', consumedDate: deleteField() };
   }
 
-  // Optimistic update
   state.inventory[id] = optimistic;
   openModal(id);
   renderInventory();
@@ -281,13 +264,13 @@ export async function updateQuantity(id, newQty) {
     state.inventory[id] = previous;
     openModal(id);
     renderInventory();
-    showErrorToast('Could not update quantity — changes reverted');
+    showErrorToast('Could not update quantity');
   }
 }
 
 export async function updateConsumedCount(id, newCount) {
-  if (!state.currentUser) return;
-  const { updateLastUpdatedUI, showErrorToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { updateLastUpdatedUI, showErrorToast } = await import('./render.js?v=2.0.55');
   try {
     const count = Math.max(0, parseInt(newCount) || 0);
     await updateDoc(doc(db, 'cellar', id), { consumedCount: count, updatedAt: serverTimestamp() });
@@ -301,16 +284,17 @@ export async function updateConsumedCount(id, newCount) {
 }
 
 export async function saveProScores(id, scoreData) {
-  const { openModal, updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./ui.js?v=2.0.53');
+  if (!isOwner()) return;
+  const { openModal, updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.55');
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;
     state.lastUpdated = new Date();
     const activeModal = document.getElementById('modalContent');
     if (activeModal && activeModal.dataset.openId === id) {
-      openModal(id); // Refresh modal if it's currently open
+      openModal(id);
     }
-    updateLastUpdatedUI(); // Immediate UI update
+    updateLastUpdatedUI();
     showSuccessToast('Professional scores saved');
   } catch (e) {
     console.error('Failed to update scores in Firestore:', e);
@@ -319,11 +303,9 @@ export async function saveProScores(id, scoreData) {
 }
 
 export async function bulkUpdateScores(onProgress) {
+  if (!isOwner()) return;
   const winesToUpdate = Object.values(state.inventory).filter(w => {
-    // Only wines, skip spirits
-    if (w.status === 'spirits') return false;
-    // Missing scores OR missing the new vintage field
-    return !w.proScores || !w.proScores.vintage;
+    return w.status !== 'spirits' && (!w.proScores || !w.proScores.vintage);
   });
 
   const total = winesToUpdate.length;
@@ -332,47 +314,36 @@ export async function bulkUpdateScores(onProgress) {
     return;
   }
 
-  const { lookupProScores } = await import('./ai.js?v=2.0.53');
+  const { lookupProScores } = await import('./ai.js?v=2.0.55');
 
   for (let i = 0; i < total; i++) {
     const w = winesToUpdate[i];
     onProgress(`Updating ${i + 1} of ${total}: ${w.name}…`);
-    
     try {
       const scores = await lookupProScores(w);
       await saveProScores(w.id, scores);
     } catch (e) {
       console.error(`Failed to update ${w.name}:`, e);
-      // Continue to next bottle even if one fails
     }
-    
-    // Small delay to be kind to the API rate limits
     await new Promise(r => setTimeout(r, 800));
   }
-
-  state.lastUpdated = new Date();
   onProgress(`Successfully updated ${total} wines.`);
-  const { renderInventory: renderInv1 } = await import('./ui.js?v=2.0.53');
-  renderInv1();
 }
 
 export async function bulkTagWineColor(onProgress) {
-  const winesToTag = Object.values(state.inventory).filter(w => {
-    return w.status !== 'spirits' && !w.colorStyle;
-  });
-
+  if (!isOwner()) return;
+  const winesToTag = Object.values(state.inventory).filter(w => w.status !== 'spirits' && !w.colorStyle);
   const total = winesToTag.length;
   if (total === 0) {
     onProgress('All wines already have color tags.');
     return;
   }
 
-  const { guessWineColor } = await import('./ai.js?v=2.0.53');
+  const { guessWineColor } = await import('./ai.js?v=2.0.55');
 
   for (let i = 0; i < total; i++) {
     const w = winesToTag[i];
     onProgress(`Tagging ${i + 1} of ${total}: ${w.name}…`);
-    
     try {
       const color = await guessWineColor(w);
       await updateDoc(doc(db, 'cellar', w.id), { colorStyle: color, updatedAt: serverTimestamp() });
@@ -380,20 +351,16 @@ export async function bulkTagWineColor(onProgress) {
     } catch (e) {
       console.error(`Failed to tag ${w.name}:`, e);
     }
-    
     await new Promise(r => setTimeout(r, 600));
   }
-
-  state.lastUpdated = new Date();
   onProgress(`Successfully tagged ${total} wines.`);
-  const { renderInventory: renderInv2 } = await import('./ui.js?v=2.0.53');
-  renderInv2();
 }
 
 export function confirmDeleteBottle(id) {
-  if (!state.currentUser) return;
+  if (!isOwner()) return;
   const name = state.inventory[id]?.name || 'this bottle';
   if (confirm(`Remove "${name}" from your cellar?\n\nThis cannot be undone.`)) {
     deleteBottle(id);
   }
 }
+

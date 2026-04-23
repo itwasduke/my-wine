@@ -1,9 +1,19 @@
-import { SECTIONS, state } from './state.js?v=2.0.53';
+import { SECTIONS, state } from './state.js?v=2.0.55';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
 let lastFilterState = null;
-let lastGalleryItems = null;
+
+// Simple HTML escaping to mitigate XSS from AI-generated or user-provided content
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 function formatRelativeTime(date) {
   if (!date) return 'Never';
@@ -32,19 +42,22 @@ function cardHTML(w) {
     ? `<span class="card-qty">×${w.quantity}</span>`
     : '';
   const starBadge = (w.buyAgain) ? '<span class="card-star">⭐</span>' : '';
-  const badge = w.status === 'consumed'
-    ? `<span class="card-badge badge-consumed">Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}</span>`
-    : (w.badge ? `<span class="card-badge ${w.badgeClass || ''}">${w.badge}</span>` : '');
+  const badgeText = w.status === 'consumed'
+    ? `Consumed${w.consumedDate ? ` · ${w.consumedDate}` : ''}`
+    : (w.badge || '');
+  
+  const badge = badgeText ? `<span class="card-badge ${w.status === 'consumed' ? 'badge-consumed' : (w.badgeClass || '')}">${esc(badgeText)}</span>` : '';
+  
   const likedIcon = (w.status === 'consumed' && w.liked === true)
     ? `<span class="card-liked-icon" title="Liked" style="color:var(--accent)">👍</span>`
     : '';
-  const addedDateHtml = w.addedDate ? `<div class="card-added-date">Added ${w.addedDate}</div>` : '';
+  const addedDateHtml = w.addedDate ? `<div class="card-added-date">Added ${esc(w.addedDate)}</div>` : '';
   return `
-    <div class="card ${w.status}" data-id="${w.id}">
+    <div class="card ${esc(w.status)}" data-id="${esc(w.id)}">
       ${likedIcon}
-      <div class="card-year">${w.year}</div>
-      <div class="card-name">${w.name}</div>
-      <div class="card-region">${w.region}</div>
+      <div class="card-year">${esc(w.year)}</div>
+      <div class="card-name">${esc(w.name)}</div>
+      <div class="card-region">${esc(w.region)}</div>
       ${addedDateHtml}
       <div class="card-footer">
         <div class="card-badges-left">${badge}</div>
@@ -81,24 +94,24 @@ function galleryCardHTML(w, index, totalCount, cloneType = null) {
     dotsHtml = `<div class="gc-progress"><div class="gc-progress-fill" style="width:${pct}%"></div></div>`;
   }
 
-  const abvHtml = w.abv ? `<span class="gc-abv-pill">${w.abv}</span>` : '';
-  const cloneAttr = cloneType ? `data-clone="${cloneType}"` : `data-index="${index}"`;
+  const abvHtml = w.abv ? `<span class="gc-abv-pill">${esc(w.abv)}</span>` : '';
+  const cloneAttr = cloneType ? `data-clone="${esc(cloneType)}"` : `data-index="${index}"`;
 
   return `
-    <div class="gallery-card ${w.status}" data-id="${w.id}" ${cloneAttr}>
+    <div class="gallery-card ${esc(w.status)}" data-id="${esc(w.id)}" ${cloneAttr}>
       <div class="gc-hero">
-        <div class="gc-name">${w.name}</div>
-        <div class="gc-year">${w.year || '—'}</div>
-        <div class="gc-region">${w.region || ''}</div>
-        ${w.grape ? `<div class="gc-grape">${w.grape}</div>` : ''}
+        <div class="gc-name">${esc(w.name)}</div>
+        <div class="gc-year">${esc(w.year) || '—'}</div>
+        <div class="gc-region">${esc(w.region) || ''}</div>
+        ${w.grape ? `<div class="gc-grape">${esc(w.grape)}</div>` : ''}
       </div>
       <div class="gc-divider"></div>
       <div class="gc-bottom">
         <div class="gc-badges-row">
-          <span class="gc-status-badge">${badgeLabel}</span>
+          <span class="gc-status-badge">${esc(badgeLabel)}</span>
           ${abvHtml}
         </div>
-        ${notesPreview ? `<p class="gc-notes">${notesPreview}</p>` : ''}
+        ${notesPreview ? `<p class="gc-notes">${esc(notesPreview)}</p>` : ''}
         ${(starHtml || qtyHtml) ? `<div class="gc-bottom-meta">${starHtml}${qtyHtml}</div>` : ''}
         <div class="gc-dots">${dotsHtml}</div>
       </div>
@@ -122,14 +135,15 @@ function immersiveHeaderHTML(currentMode) {
 }
 
 let galleryScrollListener = null;
+let galleryScrollEndListener = null;
 let galleryResizeListener = null;
 let hintTimeout = null;
 
 function renderGallery(items) {
+  const containerId = 'galleryContainer';
   const main = document.getElementById('main-content');
   const itemsHash = items.map(i => i.id).join(',');
   
-  // If the items are the same and we are already in gallery mode, just update active state
   if (main.querySelector('.gallery-container') && main.dataset.galleryHash === itemsHash) {
     return;
   }
@@ -186,7 +200,6 @@ function renderGallery(items) {
 
   const setActiveNode = (nodeIdx) => {
     allCards.forEach((c, i) => c.classList.toggle('active', i === nodeIdx));
-    // Map clone indices back to logical items for pagination
     let logicalIdx = nodeIdx - REAL_START;
     if (logicalIdx < 0) logicalIdx = N - 1;
     if (logicalIdx >= N) logicalIdx = 0;
@@ -195,18 +208,26 @@ function renderGallery(items) {
     pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
 
-  // O(1) active detection using card width + scroll offset
-  const detectActive = () => {
+  const getCenteredNode = () => {
     const center = container.scrollLeft + container.clientWidth / 2;
-    if (!allCards[REAL_START]) return;
+    if (!allCards[REAL_START]) return REAL_START;
     const cardWidth = allCards[REAL_START].offsetWidth;
     const gap = 20;
     const firstCardCenter = allCards[REAL_START].offsetLeft + cardWidth / 2;
-    
     const nodeIdx = Math.round((center - firstCardCenter) / (cardWidth + gap)) + REAL_START;
-    const clampedNode = Math.max(0, Math.min(allCards.length - 1, nodeIdx));
+    return Math.max(0, Math.min(allCards.length - 1, nodeIdx));
+  };
 
-    const landed = allCards[clampedNode];
+  const updateActiveVisuals = () => {
+    const nodeIdx = getCenteredNode();
+    allCards.forEach((c, i) => c.classList.toggle('active', i === nodeIdx));
+  };
+
+  const handleScrollEnd = () => {
+    const nodeIdx = getCenteredNode();
+    const landed = allCards[nodeIdx];
+    const cardWidth = allCards[REAL_START]?.offsetWidth || 300;
+
     if (landed?.dataset.clone === 'start') {
       setActiveNode(REAL_END);
       container.scrollTo({ left: allCards[REAL_END].offsetLeft - (container.clientWidth - cardWidth) / 2, behavior: 'instant' });
@@ -214,22 +235,26 @@ function renderGallery(items) {
       setActiveNode(REAL_START);
       container.scrollTo({ left: allCards[REAL_START].offsetLeft - (container.clientWidth - cardWidth) / 2, behavior: 'instant' });
     } else {
-      setActiveNode(clampedNode);
+      setActiveNode(nodeIdx);
     }
   };
 
   if (galleryScrollListener) container.removeEventListener('scroll', galleryScrollListener);
+  if (galleryScrollEndListener) container.removeEventListener('scrollend', galleryScrollEndListener);
+
+  galleryScrollListener = () => requestAnimationFrame(updateActiveVisuals);
+  container.addEventListener('scroll', galleryScrollListener, { passive: true });
 
   if ('onscrollend' in window) {
-    galleryScrollListener = detectActive;
-    container.addEventListener('scrollend', galleryScrollListener, { passive: true });
+    galleryScrollEndListener = handleScrollEnd;
+    container.addEventListener('scrollend', galleryScrollEndListener, { passive: true });
   } else {
     let scrollTimer;
-    galleryScrollListener = () => {
+    galleryScrollEndListener = () => {
       clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(detectActive, 50);
+      scrollTimer = setTimeout(handleScrollEnd, 100);
     };
-    container.addEventListener('scroll', galleryScrollListener, { passive: true });
+    container.addEventListener('scroll', galleryScrollEndListener, { passive: true });
   }
 
   const navigate = (dir) => {
@@ -244,11 +269,8 @@ function renderGallery(items) {
   prevBtn?.addEventListener('click', () => navigate(-1));
   nextBtn?.addEventListener('click', () => navigate(1));
 
-  // Handle resize to fix centering
   if (galleryResizeListener) window.removeEventListener('resize', galleryResizeListener);
-  galleryResizeListener = () => {
-    scrollToNode(state.galleryIndex + REAL_START, false);
-  };
+  galleryResizeListener = () => scrollToNode(state.galleryIndex + REAL_START, false);
   window.addEventListener('resize', galleryResizeListener, { passive: true });
 
   setTimeout(() => {
@@ -265,11 +287,14 @@ function renderGallery(items) {
   }, 50);
 
   const hideChevrons = () => {
-    document.getElementById('galChevronLeft')?.classList.add('hidden');
-    document.getElementById('galChevronRight')?.classList.add('hidden');
+    const l = document.getElementById('galChevronLeft');
+    const r = document.getElementById('galChevronRight');
+    if (l) l.classList.add('hidden');
+    if (r) r.classList.add('hidden');
     if (showHint) {
       localStorage.setItem('cellar_gallery_hint_seen', 'true');
-      document.getElementById('galleryHint')?.classList.add('faded');
+      const hint = document.getElementById('galleryHint');
+      if (hint) hint.classList.add('faded');
     }
   };
   container.addEventListener('scroll', hideChevrons, { once: true, passive: true });
@@ -294,7 +319,6 @@ function renderVertical(items) {
   }
 
   const N = items.length;
-  // Clones for infinite scroll
   const startClone = galleryCardHTML(items[N - 1], N - 1, N, 'start');
   const endClone   = galleryCardHTML(items[0],     0,     N, 'end');
 
@@ -330,18 +354,16 @@ function renderVertical(items) {
 
   const setActive = (nodeIdx) => {
     wrappers.forEach((w, i) => w.classList.toggle('active', i === nodeIdx));
-    
     let logicalIdx = nodeIdx - REAL_START;
     if (logicalIdx < 0) logicalIdx = N - 1;
     if (logicalIdx >= N) logicalIdx = 0;
     
     state.galleryIndex = logicalIdx;
     dots.forEach((d, i) => d.classList.toggle('active', i === logicalIdx));
-    pagination.textContent = `${logicalIdx + 1} of ${N}`;
+    if (pagination) pagination.textContent = `${logicalIdx + 1} of ${N}`;
   };
 
   const detectActive = () => {
-    // O(1): each wrapper is exactly 100vh = container.clientHeight
     const nodeIdx = Math.round(container.scrollTop / container.clientHeight);
     const clampedNode = Math.max(0, Math.min(wrappers.length - 1, nodeIdx));
 
@@ -377,12 +399,13 @@ function renderVertical(items) {
   };
 
   setTimeout(() => {
-  const startNodeIdx = state.galleryIndex + REAL_START;
-  const startNode = wrappers[startNodeIdx];
-  if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
-  setActive(startNodeIdx);
-}, 50);
+    const startNodeIdx = state.galleryIndex + REAL_START;
+    const startNode = wrappers[startNodeIdx];
+    if (startNode) container.scrollTo({ top: startNode.offsetTop, behavior: 'instant' });
+    setActive(startNodeIdx);
+  }, 50);
 }
+
 function renderWelcome() {
   const main = document.getElementById('main-content');
   main.innerHTML = `
@@ -428,21 +451,17 @@ function renderWelcome() {
       </div>
     </div>
   `;
-  // Attach event listener to the welcome sign in button
   const welcomeSignInBtn = document.getElementById('welcomeSignInBtn');
   if (welcomeSignInBtn) {
-    welcomeSignInBtn.addEventListener('click', () => {
-      document.getElementById('signInBtn').click();
-    });
+    welcomeSignInBtn.addEventListener('click', () => document.getElementById('signInBtn').click());
   }
 
-  // Attach event listener to the welcome view button
   const welcomeViewBtn = document.getElementById('welcomeViewBtn');
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.53');
-      await loadInventory();
+      const { startInventoryListener } = await import('./db.js?v=2.0.55');
+      startInventoryListener();
     });
   }
 }
@@ -459,48 +478,32 @@ export function renderInventory() {
 
   if (controls) controls.style.display = 'block';
 
-  // Update View Toggle UI
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
     const isImmersive = (state.viewMode === 'gallery' || state.viewMode === 'vertical');
-    if (btn.dataset.view === 'grid') {
-      btn.classList.toggle('active', state.viewMode === 'grid');
-    } else if (btn.dataset.view === 'gallery') {
-      btn.classList.toggle('active', isImmersive);
-    }
+    if (btn.dataset.view === 'grid') btn.classList.toggle('active', state.viewMode === 'grid');
+    else if (btn.dataset.view === 'gallery') btn.classList.toggle('active', isImmersive);
   });
 
   const filter = document.getElementById('filterBar')?.dataset.filter || 'all';
   const searchQuery = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
   const sortBy = document.getElementById('sortSelect')?.value || 'newest';
 
-  // 1. Caching check: skip re-filtering/sorting if nothing changed
   const filterState = `${filter}|${searchQuery}|${sortBy}|${state.consumedLikedFilter}|${state.wineColorFilter}|${state.viewMode}`;
-  const inventoryData = JSON.stringify(Object.keys(state.inventory)); // simple check for structural changes
+  const inventoryData = JSON.stringify(Object.keys(state.inventory));
 
   const isImmersive = (state.viewMode === 'gallery' || state.viewMode === 'vertical');
-  
-  if (lastInventoryData === inventoryData && lastFilterState === filterState && !isImmersive) {
-    // We only skip if NOT in an immersive mode
-    return;
-  }
+  if (lastInventoryData === inventoryData && lastFilterState === filterState && !isImmersive) return;
 
   lastInventoryData = inventoryData;
   lastFilterState = filterState;
 
-  // Toggle sub-filter visibility
   const subFilterBar = document.getElementById('subFilterBar');
-  if (subFilterBar) {
-    subFilterBar.style.display = (filter === 'wine') ? 'flex' : 'none';
-  }
+  if (subFilterBar) subFilterBar.style.display = (filter === 'wine') ? 'flex' : 'none';
   const consumedFilterBar = document.getElementById('consumedFilterBar');
-  if (consumedFilterBar) {
-    consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
-  }
+  if (consumedFilterBar) consumedFilterBar.style.display = (filter === 'consumed') ? 'flex' : 'none';
 
-  // Defensive: Clear any leftover stars from previous versions
   document.querySelectorAll('.tab-star').forEach(el => el.remove());
 
-  // Filtering
   let items = Object.values(state.inventory).filter(w => {
     let matchesMain = false;
     if (filter === 'all') matchesMain = (w.status !== 'consumed');
@@ -518,7 +521,6 @@ export function renderInventory() {
     return true;
   });
 
-  // Sorting
   items.sort((a, b) => {
     switch (sortBy) {
       case 'year-asc':  return (parseInt(a.year) || 0) - (parseInt(b.year) || 0);
@@ -533,17 +535,13 @@ export function renderInventory() {
 
   if (state.viewMode === 'gallery') {
     renderGallery(items);
-    lastRenderedHTML = '';
     return;
   }
-
   if (state.viewMode === 'vertical') {
     renderVertical(items);
-    lastRenderedHTML = '';
     return;
   }
 
-  // Grouping
   const byStatus = {};
   items.forEach(w => {
     let key = w.status;
@@ -569,8 +567,8 @@ export function renderInventory() {
     .map(sec => `
       <div class="section">
         <div class="section-header">
-          <span class="section-title ${sec.cls}">${sec.label}</span>
-          <div class="section-line ${sec.cls}"></div>
+          <span class="section-title ${esc(sec.cls)}">${esc(sec.label)}</span>
+          <div class="section-line ${esc(sec.cls)}"></div>
         </div>
         <div class="grid">
           ${byStatus[sec.status].map(cardHTML).join('')}
@@ -578,23 +576,16 @@ export function renderInventory() {
       </div>
     `).join('');
 
-  const finalHTML = newHTML || `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${searchQuery ? `No bottles match "${searchQuery}"` : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.") }</div>`;
-
-  if (finalHTML !== lastRenderedHTML) {
-    main.innerHTML = finalHTML;
-    lastRenderedHTML = finalHTML;
-  }
-
+  main.innerHTML = newHTML || `<div style="text-align:center;padding:80px 20px;color:var(--text-muted);">${searchQuery ? `No bottles match "${esc(searchQuery)}"` : (filter === 'consumed' ? "You haven't finished any bottles yet." : "Your cellar is currently empty.") }</div>`;
   updateLastUpdatedUI();
 }
 
-// ── Toast Notifications ────────────────────────────────────────────────────
 function createToastContainer() {
   let container = document.getElementById('toastContainer');
   if (!container) {
     container = document.createElement('div');
     container.id = 'toastContainer';
-    container.style.cssText = `position: fixed; bottom: 20px; left: 20px; right: 20px; max-width: 400px; z-index: 10000;`;
+    container.style.cssText = 'position: fixed; bottom: 20px; left: 20px; right: 20px; max-width: 400px; z-index: 10000;';
     document.body.appendChild(container);
   }
   return container;

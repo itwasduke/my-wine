@@ -1,5 +1,16 @@
 export const CHANGELOG = [
   {
+    version: "2.0.55",
+    date: "April 23, 2026",
+    changes: [
+      "security: Implemented HTML sanitization for all rendered wine data to mitigate XSS risks.",
+      "security: Hardened client-side owner UID checks for all write and restricted UI operations.",
+      "cleanup: Removed legacy 'cook' status and outdated Japan-specific spirit logic.",
+      "refactor: Consolidated and optimized module graph with centralized version constants.",
+      "perf: Reduced redundant UI updates during authentication state changes."
+    ]
+  },
+  {
     version: "2.0.54",
     date: "April 23, 2026",
     changes: [
