@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "2.0.57",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Added immersive filter buttons to Gallery and Vertical modes for quick switching between Wine and Spirits.",
+      "UI: Redesigned immersive header with a two-row layout for better control accessibility.",
+      "UX: Synchronized immersive filters with the main dashboard state."
+    ]
+  },
+  {
     version: "2.0.56",
     date: "April 23, 2026",
     changes: [

@@ -109,12 +109,24 @@
   right: 20px;
   z-index: 3000;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
   pointer-events: none;
 }
 
+.immersive-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.immersive-type-row {
+  justify-content: center;
+}
+
 .immersive-header > * { pointer-events: auto; }
+.immersive-header-row > * { pointer-events: auto; }
 
 .vertical-close {
   background: rgba(0, 0, 0, 0.6);

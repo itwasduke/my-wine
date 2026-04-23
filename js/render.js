@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.56';
+import { SECTIONS, state } from './state.js?v=2.0.57';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -120,15 +120,25 @@ function galleryCardHTML(w, index, totalCount, cloneType = null) {
 }
 
 function immersiveHeaderHTML(currentMode) {
+  const currentFilter = document.getElementById('filterBar')?.dataset.filter || 'all';
   return `
     <div class="immersive-header">
-      <button class="vertical-close" id="immersiveBackBtn" aria-label="Back to inventory">
-        <span>←</span>
-        <span>Back</span>
-      </button>
-      <div class="mode-sub-toggle">
-        <button class="sub-mode-btn ${currentMode === 'gallery' ? 'active' : ''}" data-mode="gallery">Horizontal</button>
-        <button class="sub-mode-btn ${currentMode === 'vertical' ? 'active' : ''}" data-mode="vertical">Vertical</button>
+      <div class="immersive-header-row">
+        <button class="vertical-close" id="immersiveBackBtn" aria-label="Back to inventory">
+          <span>←</span>
+          <span>Back</span>
+        </button>
+        <div class="mode-sub-toggle">
+          <button class="sub-mode-btn ${currentMode === 'gallery' ? 'active' : ''}" data-mode="gallery">Horizontal</button>
+          <button class="sub-mode-btn ${currentMode === 'vertical' ? 'active' : ''}" data-mode="vertical">Vertical</button>
+        </div>
+      </div>
+      <div class="immersive-header-row immersive-type-row">
+        <div class="mode-sub-toggle">
+          <button class="sub-mode-btn immersive-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
+          <button class="sub-mode-btn immersive-filter-btn ${currentFilter === 'wine' ? 'active' : ''}" data-filter="wine">Wine</button>
+          <button class="sub-mode-btn immersive-filter-btn ${currentFilter === 'spirits' ? 'active' : ''}" data-filter="spirits">Spirits</button>
+        </div>
       </div>
     </div>
   `;
@@ -460,7 +470,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { startInventoryListener } = await import('./db.js?v=2.0.56');
+      const { startInventoryListener } = await import('./db.js?v=2.0.57');
       startInventoryListener();
     });
   }
