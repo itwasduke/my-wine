@@ -10,8 +10,25 @@
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  z-index: 5; /* Lower to ensure it stays behind header/controls */
-  background: transparent; /* Fix black background, allow wine image to show */
+  z-index: 2500; /* Over everything */
+  background: var(--bg); /* Use solid bg to hide main content, but body::before still shows if we want */
+}
+
+/* Ensure the wine background is still visible behind the vertical container */
+.vertical-container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../wine.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .vertical-container::-webkit-scrollbar {
@@ -33,19 +50,19 @@
   justify-content: center;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  padding: 180px 20px 40px; /* Leave space for sticky header/controls */
+  padding: 40px 20px;
 }
 
 /* Reuse Gallery Card styles but override scale/opacity for vertical context */
 .vertical-card-wrapper .gallery-card {
   transform: scale(0.9);
-  opacity: 0.5;
-  filter: blur(2px);
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              opacity 0.4s ease, 
-              filter 0.4s ease;
+  opacity: 0.4;
+  filter: blur(4px);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              opacity 0.5s ease, 
+              filter 0.5s ease;
   width: clamp(280px, 85vw, 420px);
-  height: 80vh;
+  height: 75vh;
   max-height: 650px;
   margin: 0 auto;
 }
@@ -59,48 +76,56 @@
 /* Vertical Side Dots */
 .vertical-indicators {
   position: fixed;
-  right: 15px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 100;
+  gap: 12px;
+  z-index: 3000;
   pointer-events: none;
 }
 
 .vi-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   transition: all 0.3s ease;
 }
 
 .vi-dot.active {
-  height: 20px;
+  height: 24px;
   border-radius: 4px;
   background: var(--accent);
 }
 
-/* Close/Back button for full-screen modes */
+/* Back button for Vertical mode */
 .vertical-close {
   position: fixed;
-  top: 20px;
+  top: 24px;
   left: 20px;
-  z-index: 110;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--accent);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  cursor: pointer;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.vertical-close:hover {
+  background: rgba(78, 205, 196, 0.15);
+  border-color: var(--accent);
 }
 
 /* Animations */

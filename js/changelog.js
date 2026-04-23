@@ -1,5 +1,15 @@
 export const CHANGELOG = [
   {
+    version: "2.0.46",
+    date: "April 23, 2026",
+    changes: [
+      "feat: Redesigned Vertical mode as a full-screen immersive overlay.",
+      "feat: Added a 'Back' button to Vertical mode for seamless return to Grid view.",
+      "UI: Enhanced vertical card animations and blur effects for a more premium feel.",
+      "UI: Increased Vertical mode z-index to ensure it properly covers navigation when active."
+    ]
+  },
+  {
     version: "2.0.45",
     date: "April 23, 2026",
     changes: [

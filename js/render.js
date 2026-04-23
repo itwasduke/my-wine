@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js?v=2.0.45';
+import { SECTIONS, state } from './state.js?v=2.0.46';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -282,6 +282,10 @@ function renderVertical(items) {
 
   main.innerHTML = `
     <div class="vertical-container" id="verticalContainer">
+      <button class="vertical-close" id="verticalBackBtn" aria-label="Back to inventory">
+        <span>←</span>
+        <span>Back</span>
+      </button>
       <div class="vertical-wrapper" id="verticalWrapper">
         ${items.map((item, idx) => `
           <div class="vertical-card-wrapper" data-index="${idx}">
@@ -404,7 +408,7 @@ function renderWelcome() {
   if (welcomeViewBtn) {
     welcomeViewBtn.addEventListener('click', async () => {
       state.showInventoryUnauth = true;
-      const { loadInventory } = await import('./db.js?v=2.0.45');
+      const { loadInventory } = await import('./db.js?v=2.0.46');
       await loadInventory();
     });
   }
