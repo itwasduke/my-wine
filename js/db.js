@@ -1,10 +1,9 @@
-import { db } from './firebase.js?v=2.0.64';
+import { db } from './firebase.js';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp, onSnapshot }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { state } from './state.js?v=2.0.64';
-import { closeScanModal } from './ai.js?v=2.0.64';
+import { state, OWNER_UID } from './state.js';
+import { closeScanModal } from './ai.js';
 
-const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 const isOwner = () => state.currentUser && state.currentUser.uid === OWNER_UID;
 
 let unsubscribeInventory = null;
@@ -50,13 +49,13 @@ export function startInventoryListener() {
       
       clearTimeout(renderTimeout);
       renderTimeout = setTimeout(async () => {
-        const { renderInventory } = await import('./render.js?v=2.0.64');
+        const { renderInventory } = await import('./render.js');
         renderInventory();
       }, 50);
     },
     async (e) => {
       console.error('[Cellar] onSnapshot error:', e);
-      const { showErrorToast, renderInventory } = await import('./render.js?v=2.0.64');
+      const { showErrorToast, renderInventory } = await import('./render.js');
       showErrorToast('Real-time sync unavailable — loading snapshot');
       try {
         const snapshot = await getDocs(collection(db, 'cellar'));
@@ -78,8 +77,8 @@ export function stopInventoryListener() {
 
 export async function deleteBottle(id) {
   if (!isOwner()) return;
-  const { showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.64');
-  const { closeModalDirect } = await import('./modal.js?v=2.0.64');
+  const { showErrorToast, showSuccessToast } = await import('./render.js');
+  const { closeModalDirect } = await import('./modal.js');
   try {
     await deleteDoc(doc(db, 'cellar', id));
     state.lastUpdated = new Date();
@@ -96,15 +95,15 @@ export async function markConsumed(id) {
   console.log('[Cellar] currentUser:', state.currentUser);
   if (!isOwner()) {
     console.warn('[Cellar] isOwner check failed. Expected:', OWNER_UID, 'Got:', state.currentUser?.uid);
-    const { showErrorToast } = await import('./render.js?v=2.0.64');
+    const { showErrorToast } = await import('./render.js');
     showErrorToast('Permission denied: Only the cellar owner can mark bottles as consumed.');
     return;
   }
   const btn = document.querySelector(`button[data-action="consume"][data-id="${id}"]`);
   if (btn) btn.disabled = true;
 
-  const { renderInventory, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.64');
-  const { closeModalDirect, openModal } = await import('./modal.js?v=2.0.64');
+  const { renderInventory, showErrorToast, showSuccessToast } = await import('./render.js');
+  const { closeModalDirect, openModal } = await import('./modal.js');
 
   const previous = { ...state.inventory[id] };
   console.log('[Cellar] Previous state:', previous);
@@ -152,8 +151,8 @@ export async function markConsumed(id) {
 
 export async function setRating(id, liked) {
   if (!isOwner()) return;
-  const { renderInventory, showErrorToast } = await import('./render.js?v=2.0.64');
-  const { openModal } = await import('./modal.js?v=2.0.64');
+  const { renderInventory, showErrorToast } = await import('./render.js');
+  const { openModal } = await import('./modal.js');
 
   const previous = { ...state.inventory[id] };
   const newValue = (previous.liked === liked) ? null : liked;
@@ -186,8 +185,8 @@ export async function setRating(id, liked) {
 
 export async function toggleBuyAgain(id) {
   if (!isOwner()) return;
-  const { showErrorToast } = await import('./render.js?v=2.0.64');
-  const { openModal } = await import('./modal.js?v=2.0.64');
+  const { showErrorToast } = await import('./render.js');
+  const { openModal } = await import('./modal.js');
   try {
     const current = state.inventory[id].buyAgain || false;
     const newValue = !current;
@@ -208,8 +207,8 @@ export async function toggleBuyAgain(id) {
 
 export async function saveNewBottle(data) {
   if (!isOwner()) return;
-  const { showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.64');
-  const { openModal } = await import('./modal.js?v=2.0.64');
+  const { showErrorToast, showSuccessToast } = await import('./render.js');
+  const { openModal } = await import('./modal.js');
   try {
     const existingId = Object.keys(state.inventory).find(id => {
       const w = state.inventory[id];
@@ -256,8 +255,8 @@ export async function saveNewBottle(data) {
 
 export async function updateQuantity(id, newQty) {
   if (!isOwner()) return;
-  const { renderInventory, showErrorToast } = await import('./render.js?v=2.0.64');
-  const { openModal } = await import('./modal.js?v=2.0.64');
+  const { renderInventory, showErrorToast } = await import('./render.js');
+  const { openModal } = await import('./modal.js');
 
   const previous = { ...state.inventory[id] };
   const qty = Math.max(0, newQty);
@@ -297,7 +296,7 @@ export async function updateQuantity(id, newQty) {
 
 export async function updateConsumedCount(id, newCount) {
   if (!isOwner()) return;
-  const { updateLastUpdatedUI, showErrorToast } = await import('./render.js?v=2.0.64');
+  const { updateLastUpdatedUI, showErrorToast } = await import('./render.js');
   try {
     const count = Math.max(0, parseInt(newCount) || 0);
     await updateDoc(doc(db, 'cellar', id), { consumedCount: count, updatedAt: serverTimestamp() });
@@ -312,8 +311,8 @@ export async function updateConsumedCount(id, newCount) {
 
 export async function saveProScores(id, scoreData) {
   if (!isOwner()) return;
-  const { updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./render.js?v=2.0.64');
-  const { openModal } = await import('./modal.js?v=2.0.64');
+  const { updateLastUpdatedUI, showErrorToast, showSuccessToast } = await import('./render.js');
+  const { openModal } = await import('./modal.js');
   try {
     await updateDoc(doc(db, 'cellar', id), { proScores: scoreData, updatedAt: serverTimestamp() });
     state.inventory[id].proScores = scoreData;
@@ -342,7 +341,7 @@ export async function bulkUpdateScores(onProgress) {
     return;
   }
 
-  const { lookupProScores } = await import('./ai.js?v=2.0.64');
+  const { lookupProScores } = await import('./ai.js');
 
   for (let i = 0; i < total; i++) {
     const w = winesToUpdate[i];
@@ -367,7 +366,7 @@ export async function bulkTagWineColor(onProgress) {
     return;
   }
 
-  const { guessWineColor } = await import('./ai.js?v=2.0.64');
+  const { guessWineColor } = await import('./ai.js');
 
   for (let i = 0; i < total; i++) {
     const w = winesToTag[i];

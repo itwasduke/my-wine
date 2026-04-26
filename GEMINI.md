@@ -105,6 +105,11 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.65 (April 26, 2026)**:
+    - refactor: Removed `?v=X.X.XX` cache-busting params from all JS imports and CSS link tags — `SHELL_CACHE` bump in `sw.js` is now the single source of truth for cache invalidation, eliminating version-drift bugs.
+    - refactor: Consolidated `OWNER_UID` into `state.js` as a single exported constant; removed hardcoded copies from `db.js`, `modal.js`, and `ui.js`.
+- **v2.0.64 (April 26, 2026)**:
+    - fix: `markConsumed`, `deleteBottle`, `saveNewBottle`, `setRating`, `toggleBuyAgain`, `updateQuantity`, and `saveProScores` in `db.js` were importing `openModal`/`closeModalDirect` from `render.js` (where they don't exist) instead of `modal.js`, causing silent failures.
 - **v2.0.63 (April 26, 2026)**:
     - debug: Enhanced logging to help user verify their exact UID against the hardcoded `OWNER_UID`.
 - **v2.0.62 (April 26, 2026)**:

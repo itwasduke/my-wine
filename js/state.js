@@ -1,4 +1,5 @@
-export const VERSION = '2.0.63';
+export const VERSION = '2.0.65';
+export const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 
 export const state = {
   inventory: {},
