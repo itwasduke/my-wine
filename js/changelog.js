@@ -1,5 +1,12 @@
 export const CHANGELOG = [
   {
+    version: "2.0.63",
+    date: "April 26, 2026",
+    changes: [
+      "debug: Enhanced logging to help verify user UID against owner permissions."
+    ]
+  },
+  {
     version: "2.0.62",
     date: "April 26, 2026",
     changes: [
