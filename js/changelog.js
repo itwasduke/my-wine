@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "2.0.61",
+    date: "April 26, 2026",
+    changes: [
+      "fix: Updated OWNER_UID across the codebase and Firestore rules to resolve permission issues.",
+      "feat: Added 'Copy My User UID' button in Settings to assist with debugging identity mismatches."
+    ]
+  },
+  {
     version: "2.0.60",
     date: "April 26, 2026",
     changes: [
