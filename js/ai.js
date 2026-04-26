@@ -1,6 +1,6 @@
-import { app } from './firebase.js?v=2.0.58';
-import { state } from './state.js?v=2.0.58';
-import { saveNewBottle } from './db.js?v=2.0.58';
+import { app } from './firebase.js?v=2.0.59';
+import { state } from './state.js?v=2.0.59';
+import { saveNewBottle } from './db.js?v=2.0.59';
 
 let cachedGeminiModel = null;
 
@@ -192,6 +192,8 @@ export async function confirmAddBottle() {
     consumedCount: 0,
     year:        document.getElementById('f-year').value.trim()   || 'NV',
     region:      document.getElementById('f-region').value.trim() || '—',
+    grape:       document.getElementById('f-year').value.trim() === 'NV' ? (document.getElementById('f-grape').value.trim() || '—') : (document.getElementById('f-grape').value.trim() || '—'), // wait, no changes needed here but I noticed f-year logic was weird in my thought
+    region:      document.getElementById('f-region').value.trim() || '—',
     grape:       document.getElementById('f-grape').value.trim()  || '—',
     abv:         document.getElementById('f-abv').value.trim()    || '—',
     temp:        document.getElementById('f-temp').value.trim()   || '—',
@@ -201,6 +203,7 @@ export async function confirmAddBottle() {
     colorStyle:  document.getElementById('f-color').value,
     status,
     statusLabel,
+    type: isSpirit ? 'spirit' : 'wine'
   };
   const btn = document.getElementById('addBtn');
   btn.disabled = true;

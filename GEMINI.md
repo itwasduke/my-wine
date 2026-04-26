@@ -105,12 +105,28 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.59 (April 26, 2026)**:
+    - fix: Fixed critical codebase corruption (removed literal "..." placeholders from index.html and sw.js).
+    - fix: Improved `markConsumed` and `updateQuantity` logic to handle spirits correctly.
+    - fix: Added button disabling to `markConsumed` to prevent double-clicks.
+    - fix: Ensured `type` field is saved during new bottle entry for better categorization.
+    - fix: Restored missing `controls-container` in index.html.
+- **v2.0.58 (April 23, 2026)**:
+    - UI: Centered mode toggle in immersive header.
+- **v2.0.57 (April 23, 2026)**:
+    - feat: Added immersive filter buttons to gallery header.
+- **v2.0.56 (April 23, 2026)**:
+    - UI: Centered search and filter controls on main dashboard.
+- **v2.0.55 (April 23, 2026)**:
+    - refactor: Security audit cleanup, XSS sanitization, and owner check hardening.
+- **v2.0.54 (April 23, 2026)**:
+    - fix: Ensured modal appears above gallery with z-index 5000.
+- **v2.0.53 (April 23, 2026)**:
+    - fix: Resolved horizontal scroll stop and smoothed infinite transitions.
 - **v2.0.52 (April 23, 2026)**:
-    - perf: Optimized immersive views with GPU acceleration and O(1) detection math.
-    - fix: Smoothed out horizontal infinite scroll jank.
+    - perf: Optimized scroll smoothness and accuracy.
 - **v2.0.51 (April 23, 2026)**:
-    - fix: Fixed critical caching bug that broke Gallery mode initialization.
-    - fix: Corrected Vertical mode scroll-to-start logic.
+    - fix: Fixed Gallery mode initialization and Vertical scroll logic.
 - **v2.0.50 (April 23, 2026)**:
     - feat: Implemented infinite scrolling for Vertical mode with smooth looping and silent jumps.
     - UI: Unified infinite scroll behavior across Horizontal and Vertical gallery views.
@@ -304,7 +320,7 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
     - Redesigned navigation with a slide-out Hamburger Menu (Drawer).
     - Moved Analytics Dashboard into a dedicated Modal overlay.
     - Integrated Inventory Settings into the navigation drawer.
-    - Improved UI layout by removing inline dashboard and gear icon.
+    - Improved UI layout by removing solo dashboard and gear icon.
 - **v1.5.0 (April 13, 2026)**:
     - Added Settings Gear to controls bar (only visible when signed in).
     - Implemented "Bulk Update" feature to find and update wines missing scores/vintages.

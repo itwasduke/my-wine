@@ -1,5 +1,16 @@
 export const CHANGELOG = [
   {
+    version: "2.0.59",
+    date: "April 26, 2026",
+    changes: [
+      "fix: Fixed critical codebase corruption in index.html and sw.js.",
+      "fix: Improved markConsumed and updateQuantity logic for better spirit handling.",
+      "fix: Added button disabling to markConsumed to prevent duplicate writes.",
+      "fix: Ensured 'type' field is persisted for all new bottles.",
+      "fix: Restored missing UI controls container in index.html."
+    ]
+  },
+  {
     version: "2.0.58",
     date: "April 23, 2026",
     changes: [

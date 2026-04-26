@@ -1,4 +1,4 @@
-import { CHANGELOG } from './changelog.js?v=2.0.58';
+import { CHANGELOG } from './changelog.js?v=2.0.59';
 
 export function renderChangelog(containerId) {
   const container = document.getElementById(containerId);
