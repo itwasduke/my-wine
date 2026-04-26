@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "2.0.62",
+    date: "April 26, 2026",
+    changes: [
+      "fix: Reverted OWNER_UID to ZJgo9XDaDyT4Xwrvpsrlp1M7rk33 after user confirmation.",
+      "fix: Added firebase.json to the repository to support Firestore rule deployments."
+    ]
+  },
+  {
     version: "2.0.61",
     date: "April 26, 2026",
     changes: [

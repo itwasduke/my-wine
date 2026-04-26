@@ -8,7 +8,7 @@ service cloud.firestore {
 
       // All writes require the signed-in owner UID.
       allow create, update, delete: if request.auth != null
-                                    && request.auth.uid == "yV9R26u5U6YFqZ6p0uX0pY9R26u5";
+                                    && request.auth.uid == "ZJgo9XDaDyT4Xwrvpsrlp1M7rk33";
     }
   }
 }

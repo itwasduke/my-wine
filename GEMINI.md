@@ -105,6 +105,9 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.62 (April 26, 2026)**:
+    - fix: Reverted `OWNER_UID` to `ZJgo9XDaDyT4Xwrvpsrlp1M7rk33` after user confirmation.
+    - fix: Added `firebase.json` to the repository to support Firestore rule deployments.
 - **v2.0.61 (April 26, 2026)**:
     - fix: Updated `OWNER_UID` across the codebase and Firestore rules to resolve permission issues.
     - feat: Added 'Copy My User UID' button in Settings to assist with debugging identity mismatches.

@@ -1,4 +1,4 @@
-export const VERSION = '2.0.61';
+export const VERSION = '2.0.62';
 
 export const state = {
   inventory: {},

@@ -1,6 +1,6 @@
-import { state } from './state.js?v=2.0.61';
+import { state } from './state.js?v=2.0.62';
 
-const OWNER_UID = 'yV9R26u5U6YFqZ6p0uX0pY9R26u5';
+const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 const isOwner = () => state.currentUser && state.currentUser.uid === OWNER_UID;
 
 function esc(str) {
