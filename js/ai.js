@@ -178,28 +178,33 @@ export function closeScanModal() {
   preview.style.display = 'none';
 }
 
+const FIELD_MAX = { name: 200, year: 20, region: 100, grape: 100, abv: 20, temp: 50, notes: 2000, decant: 200, window: 100 };
+
+function truncate(value, field) {
+  const max = FIELD_MAX[field];
+  return max && value.length > max ? value.slice(0, max) : value;
+}
+
 export async function confirmAddBottle() {
   if (!state.currentUser) return;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
-  const qty  = parseInt(document.getElementById('f-qty').value) || 1;
+  const qty  = Math.min(Math.max(parseInt(document.getElementById('f-qty').value) || 1, 1), 999);
   const isSpirit   = document.getElementById('f-type').value === 'spirit';
   const status      = isSpirit ? 'spirits' : 'ready';
   const statusLabel = isSpirit ? 'Spirits'  : 'Ready to Drink';
   const data = {
-    name,
+    name:        truncate(name, 'name'),
     quantity:    qty,
     consumedCount: 0,
-    year:        document.getElementById('f-year').value.trim()   || 'NV',
-    region:      document.getElementById('f-region').value.trim() || '—',
-    grape:       document.getElementById('f-year').value.trim() === 'NV' ? (document.getElementById('f-grape').value.trim() || '—') : (document.getElementById('f-grape').value.trim() || '—'), // wait, no changes needed here but I noticed f-year logic was weird in my thought
-    region:      document.getElementById('f-region').value.trim() || '—',
-    grape:       document.getElementById('f-grape').value.trim()  || '—',
-    abv:         document.getElementById('f-abv').value.trim()    || '—',
-    temp:        document.getElementById('f-temp').value.trim()   || '—',
-    notes:       document.getElementById('f-notes').value.trim()  || '—',
-    decant:      document.getElementById('f-decant').value.trim() || '—',
-    window:      document.getElementById('f-window').value.trim() || '—',
+    year:        truncate(document.getElementById('f-year').value.trim()   || 'NV',  'year'),
+    region:      truncate(document.getElementById('f-region').value.trim() || '—',   'region'),
+    grape:       truncate(document.getElementById('f-grape').value.trim()  || '—',   'grape'),
+    abv:         truncate(document.getElementById('f-abv').value.trim()    || '—',   'abv'),
+    temp:        truncate(document.getElementById('f-temp').value.trim()   || '—',   'temp'),
+    notes:       truncate(document.getElementById('f-notes').value.trim()  || '—',   'notes'),
+    decant:      truncate(document.getElementById('f-decant').value.trim() || '—',   'decant'),
+    window:      truncate(document.getElementById('f-window').value.trim() || '—',   'window'),
     colorStyle:  document.getElementById('f-color').value,
     status,
     statusLabel,
@@ -237,7 +242,12 @@ export async function lookupProScores(bottle) {
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/```\s*$/, '')
     .trim();
-  return JSON.parse(text);
+  const parsed = JSON.parse(text);
+  return {
+    summary: typeof parsed.summary === 'string' ? parsed.summary.slice(0, 500) : '',
+    scores:  typeof parsed.scores  === 'string' ? parsed.scores.slice(0, 300)  : '',
+    vintage: typeof parsed.vintage === 'string' ? parsed.vintage.slice(0, 200) : '',
+  };
 }
 
 export function initAIListeners() {

@@ -28,7 +28,12 @@ export function updateAuthUI(user) {
     userInfo.style.display  = 'flex';
     const initial = document.getElementById('userInitial');
     if (user.photoURL) {
-      initial.outerHTML = `<img class="auth-avatar" id="userInitial" src="${user.photoURL}" alt="${user.displayName || ''}">`;
+      const img = document.createElement('img');
+      img.className = 'auth-avatar';
+      img.id = 'userInitial';
+      img.src = user.photoURL;
+      img.alt = user.displayName || '';
+      initial.replaceWith(img);
     } else {
       initial.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
     }

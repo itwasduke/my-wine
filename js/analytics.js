@@ -1,3 +1,5 @@
+import { isSpirit } from './state.js';
+
 export function renderAnalytics(inventory) {
   const container = document.getElementById('analytics-dashboard');
   if (!container) return;
@@ -25,10 +27,7 @@ export function renderAnalytics(inventory) {
   const regionCounts = {};
 
   activeBottles.forEach(w => {
-    const name = (w.name || '').toLowerCase();
-    const isSpirit = (w.status === 'spirits' || w.type === 'spirit' || name.includes('piggyback') || name.includes('powers'));
-    
-    if (isSpirit) {
+    if (isSpirit(w)) {
       spiritsCount++;
     } else {
       wineCount++;

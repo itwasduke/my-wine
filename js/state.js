@@ -1,4 +1,4 @@
-export const VERSION = '2.0.65';
+export const VERSION = '2.0.66';
 export const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 
 export const state = {
@@ -13,6 +13,12 @@ export const state = {
   lastUpdated: null,
   galleryNavigate: null,  // set by renderGallery, used by keyboard handler
 };
+
+export function isSpirit(item) {
+  const name = (item.name || '').toLowerCase();
+  return item.type === 'spirit' || item.status === 'spirits' || item.statusLabel === 'Spirits'
+    || name.includes('piggyback') || name.includes('powers');
+}
 
 export const SECTIONS = [
   { status: 'ready',    label: 'Ready to Drink',          cls: 'ready' },

@@ -1,4 +1,4 @@
-import { SECTIONS, state } from './state.js';
+import { SECTIONS, state, isSpirit } from './state.js';
 
 let lastRenderedHTML = '';
 let lastInventoryData = null;
@@ -556,9 +556,7 @@ export function renderInventory() {
   items.forEach(w => {
     let key = w.status;
     if (filter === 'consumed') {
-      const name = (w.name || '').toLowerCase();
-      const isSpirit = (w.type === 'spirit' || w.statusLabel === 'Spirits' || name.includes('piggyback') || name.includes('powers'));
-      key = isSpirit ? 'consumed-spirits' : 'consumed-wine';
+      key = isSpirit(w) ? 'consumed-spirits' : 'consumed-wine';
     }
     if (!byStatus[key]) byStatus[key] = [];
     byStatus[key].push(w);

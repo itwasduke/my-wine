@@ -1,7 +1,7 @@
 import { db } from './firebase.js';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, deleteField, serverTimestamp, onSnapshot }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { state, OWNER_UID } from './state.js';
+import { state, OWNER_UID, isSpirit } from './state.js';
 import { closeScanModal } from './ai.js';
 
 const isOwner = () => state.currentUser && state.currentUser.uid === OWNER_UID;
@@ -14,9 +14,7 @@ function processDoc(d) {
   const data = d.data();
   const item = { id: d.id, ...data };
   if (!item.status) {
-    const name = (item.name || '').toLowerCase();
-    const isSpirit = (item.type === 'spirit' || name.includes('piggyback') || name.includes('powers'));
-    item.status = isSpirit ? 'spirits' : 'ready';
+    item.status = isSpirit(item) ? 'spirits' : 'ready';
   }
   return item;
 }
@@ -49,8 +47,12 @@ export function startInventoryListener() {
       
       clearTimeout(renderTimeout);
       renderTimeout = setTimeout(async () => {
-        const { renderInventory } = await import('./render.js');
-        renderInventory();
+        try {
+          const { renderInventory } = await import('./render.js');
+          renderInventory();
+        } catch (e) {
+          console.error('[Cellar] Render failed after snapshot:', e);
+        }
       }, 50);
     },
     async (e) => {
@@ -91,10 +93,7 @@ export async function deleteBottle(id) {
 }
 
 export async function markConsumed(id) {
-  console.log('[Cellar] markConsumed called for ID:', id);
-  console.log('[Cellar] currentUser:', state.currentUser);
   if (!isOwner()) {
-    console.warn('[Cellar] isOwner check failed. Expected:', OWNER_UID, 'Got:', state.currentUser?.uid);
     const { showErrorToast } = await import('./render.js');
     showErrorToast('Permission denied: Only the cellar owner can mark bottles as consumed.');
     return;
@@ -106,13 +105,10 @@ export async function markConsumed(id) {
   const { closeModalDirect, openModal } = await import('./modal.js');
 
   const previous = { ...state.inventory[id] };
-  console.log('[Cellar] Previous state:', previous);
   const currentQty = parseInt(previous.quantity) || 0;
-  // If it was missing quantity entirely, treat as 1 so we can consume it
   const effectiveQty = (previous.quantity === undefined || previous.quantity === null) ? 1 : currentQty;
   const currentConsumed = parseInt(previous.consumedCount) || 0;
 
-  console.log('[Cellar] effectiveQty:', effectiveQty, 'currentConsumed:', currentConsumed);
   let firestoreUpdate = { updatedAt: serverTimestamp(), consumedCount: currentConsumed + 1 };
 
 

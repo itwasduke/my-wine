@@ -12,8 +12,6 @@ const firebaseConfig = {
   appId: "1:393703017848:web:eefd98ed3e0c49f811cc8d"
 };
 
-console.log('[Cellar] Initializing Firebase…');
 export const app  = initializeApp(firebaseConfig);
 export const db   = initializeFirestore(app, { localCache: persistentLocalCache() });
 export const auth = getAuth(app);
-console.log('[Cellar] Firebase ready');

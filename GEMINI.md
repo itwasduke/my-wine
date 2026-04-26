@@ -105,6 +105,15 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.66 (April 26, 2026)**:
+    - security: Added Content Security Policy meta tag restricting scripts/styles/connections to known origins.
+    - security: Replaced `outerHTML` string interpolation for user avatar with `createElement` + `setAttribute` to eliminate injection vector.
+    - security: Validated and capped Gemini AI response fields (`summary`, `scores`, `vintage`) before storing to Firestore.
+    - security: Added input max-length enforcement and quantity bounds in `confirmAddBottle`.
+    - refactor: Centralised `isSpirit()` helper in `state.js`; removed three diverging inline copies from `db.js`, `render.js`, and `analytics.js`.
+    - fix: Removed duplicate dead `region`/`grape` property assignments in `confirmAddBottle` (ai.js).
+    - fix: Wrapped `setTimeout` render callback in `startInventoryListener` in try/catch to prevent silent failures.
+    - fix: Removed leftover debug `console.log` statements from `markConsumed` and `firebase.js`.
 - **v2.0.65 (April 26, 2026)**:
     - refactor: Removed `?v=X.X.XX` cache-busting params from all JS imports and CSS link tags — `SHELL_CACHE` bump in `sw.js` is now the single source of truth for cache invalidation, eliminating version-drift bugs.
     - refactor: Consolidated `OWNER_UID` into `state.js` as a single exported constant; removed hardcoded copies from `db.js`, `modal.js`, and `ui.js`.
