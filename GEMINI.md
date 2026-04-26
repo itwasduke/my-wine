@@ -105,6 +105,8 @@ All runtime state lives in `js/state.js` — a single exported `state` object. M
 - `buyAgain`: (Optional) Boolean to track bottles to be restocked.
 
 ## Version History
+- **v2.0.60 (April 26, 2026)**:
+    - debug: Added detailed logging to `markConsumed` to diagnose owner permissions and state issues.
 - **v2.0.59 (April 26, 2026)**:
     - fix: Fixed critical codebase corruption (removed literal "..." placeholders from index.html and sw.js).
     - fix: Improved `markConsumed` and `updateQuantity` logic to handle spirits correctly.

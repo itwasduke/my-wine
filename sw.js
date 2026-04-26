@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'cellar-shell-v87';
+const SHELL_CACHE = 'cellar-shell-v88';
 const FONT_CACHE  = 'cellar-fonts-v1';
 
 // App shell — everything needed to render the page offline
@@ -8,25 +8,25 @@ const APP_SHELL = [
   './manifest.json',
   './icon.svg',
   './wine.jpg',
-  './css/base.css?v=2.0.59',
-  './css/cards.css?v=2.0.59',
-  './css/modal.css?v=2.0.59',
-  './css/gallery.css?v=2.0.59',
-  './css/vertical.css?v=2.0.59',
-  './css/style.css?v=2.0.59',
-  './js/app.js?v=2.0.59',
-  './js/state.js?v=2.0.59',
-  './js/ui.js?v=2.0.59',
-  './js/render.js?v=2.0.59',
-  './js/events.js?v=2.0.59',
-  './js/modal.js?v=2.0.59',
-  './js/db.js?v=2.0.59',
-  './js/auth.js?v=2.0.59',
-  './js/ai.js?v=2.0.59',
-  './js/firebase.js?v=2.0.59',
-  './js/analytics.js?v=2.0.59',
-  './js/changelog.js?v=2.0.59',
-  './js/renderChangelog.js?v=2.0.59',
+  './css/base.css?v=2.0.60',
+  './css/cards.css?v=2.0.60',
+  './css/modal.css?v=2.0.60',
+  './css/gallery.css?v=2.0.60',
+  './css/vertical.css?v=2.0.60',
+  './css/style.css?v=2.0.60',
+  './js/app.js?v=2.0.60',
+  './js/state.js?v=2.0.60',
+  './js/ui.js?v=2.0.60',
+  './js/render.js?v=2.0.60',
+  './js/events.js?v=2.0.60',
+  './js/modal.js?v=2.0.60',
+  './js/db.js?v=2.0.60',
+  './js/auth.js?v=2.0.60',
+  './js/ai.js?v=2.0.60',
+  './js/firebase.js?v=2.0.60',
+  './js/analytics.js?v=2.0.60',
+  './js/changelog.js?v=2.0.60',
+  './js/renderChangelog.js?v=2.0.60',
 ];
 
 // ── Install: pre-cache app shell ──────────────────────────────────────────────
