@@ -1,7 +1,7 @@
-import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.63';
-import { initUIListeners } from './events.js?v=2.0.63';
-import { openModal, closeModalDirect } from './modal.js?v=2.0.63';
-import { state } from './state.js?v=2.0.63';
+import { renderInventory, updateLastUpdatedUI, showErrorToast, showSuccessToast } from './render.js?v=2.0.64';
+import { initUIListeners } from './events.js?v=2.0.64';
+import { openModal, closeModalDirect } from './modal.js?v=2.0.64';
+import { state } from './state.js?v=2.0.64';
 
 const OWNER_UID = 'ZJgo9XDaDyT4Xwrvpsrlp1M7rk33';
 
